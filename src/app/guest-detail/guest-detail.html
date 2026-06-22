@@ -1,0 +1,73 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+
+<aside class="drawer" role="dialog" aria-label="VM detail">
+  <header>
+    <div class="title">
+      <span class="name">{{ guest().ref?.name }}</span>
+      <span class="sub">{{ guest().ref?.cluster }} / {{ guest().ref?.namespace }}</span>
+    </div>
+    <button mat-icon-button (click)="closed.emit()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <section>
+    <h4>Status</h4>
+    <dl>
+      <dt>Phase</dt>
+      <dd><span class="phase" [attr.data-phase]="guest().phase">{{ guest().phase || '—' }}</span></dd>
+      <dt>Guest running</dt>
+      <dd>{{ guest().guestRunning ? 'yes' : 'no' }}</dd>
+      <dt>Node</dt>
+      <dd>{{ guest().nodeName || '—' }}</dd>
+      <dt>Hypervisor</dt>
+      <dd>{{ guest().hypervisor || '—' }}</dd>
+      <dt>Primary IP</dt>
+      <dd>{{ guest().primaryIp || '—' }}</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h4>Spec</h4>
+    <dl>
+      <dt>Boot source</dt>
+      <dd>{{ guest().bootSource || '—' }}</dd>
+      <dt>Guest class</dt>
+      <dd>{{ guest().guestClass || '—' }}</dd>
+      <dt>Created</dt>
+      <dd>{{ created() }}</dd>
+    </dl>
+  </section>
+
+  @if (guest().conditions.length) {
+    <section>
+      <h4>Conditions</h4>
+      <table class="conds">
+        <thead><tr><th>Type</th><th>Status</th><th>Reason</th></tr></thead>
+        <tbody>
+          @for (c of guest().conditions; track c.type) {
+            <tr>
+              <td>{{ c.type }}</td>
+              <td class="st" [class.t]="c.status === 'True'" [class.f]="c.status === 'False'">{{ c.status }}</td>
+              <td>{{ c.reason || '—' }}</td>
+            </tr>
+            @if (c.message) {
+              <tr class="msg"><td colspan="3">{{ c.message }}</td></tr>
+            }
+          }
+        </tbody>
+      </table>
+    </section>
+  }
+
+  @if (labelEntries().length) {
+    <section>
+      <h4>Labels</h4>
+      <div class="labels">
+        @for (e of labelEntries(); track e.k) {
+          <span class="lbl">{{ e.k }}={{ e.v }}</span>
+        }
+      </div>
+    </section>
+  }
+</aside>

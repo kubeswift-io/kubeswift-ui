@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { GatewayService } from '../gateway.service';
+import { GuestDetail } from '../guest-detail/guest-detail';
 import type { Cluster } from '../gen/kubeswift/v1/cluster_pb';
 import type { Guest, GuestEvent } from '../gen/kubeswift/v1/guest_pb';
 import type { ClusterError } from '../gen/kubeswift/v1/common_pb';
@@ -18,7 +19,7 @@ import { EventType } from '../gen/kubeswift/v1/common_pb';
  */
 @Component({
   selector: 'app-fleet',
-  imports: [MatTableModule, MatIconModule, MatProgressBarModule, MatButtonModule],
+  imports: [MatTableModule, MatIconModule, MatProgressBarModule, MatButtonModule, GuestDetail],
   templateUrl: './fleet.html',
   styleUrl: './fleet.scss',
 })
@@ -30,6 +31,7 @@ export class Fleet implements OnInit, OnDestroy {
   readonly guests = signal<Guest[]>([]);
   readonly errors = signal<ClusterError[]>([]);
   readonly selectedCluster = signal<string | null>(null);
+  readonly selected = signal<Guest | null>(null);
   readonly loadError = signal<string | null>(null);
   readonly live = signal(false);
 
@@ -62,6 +64,27 @@ export class Fleet implements OnInit, OnDestroy {
 
   selectCluster(name: string): void {
     this.selectedCluster.update((c) => (c === name ? null : name));
+  }
+
+  // Open the detail drawer instantly from the row, then refresh via
+  // GetGuestDetail (so it auto-enriches when the backend aggregates).
+  select(g: Guest): void {
+    this.selected.set(g);
+    const ref = g.ref;
+    if (!ref) return;
+    void this.gw.guests
+      .getGuestDetail({ ref: { cluster: ref.cluster, namespace: ref.namespace, name: ref.name } })
+      .then((res) => {
+        const cur = this.selected();
+        if (res.guest && cur && this.key(cur) === this.key(g)) this.selected.set(res.guest);
+      })
+      .catch(() => {
+        // keep the row data already shown
+      });
+  }
+
+  closeDetail(): void {
+    this.selected.set(null);
   }
 
   private async refreshClusters(): Promise<void> {

@@ -113,6 +113,8 @@
   border-radius: 12px;
   overflow: hidden;
 
+  .clickable { cursor: pointer; }
+  .clickable:hover { background: var(--mat-sys-surface-container-low); }
   .strong { font-weight: 500; }
 
   .phase {
