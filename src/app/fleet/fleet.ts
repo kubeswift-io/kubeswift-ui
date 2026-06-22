@@ -132,9 +132,19 @@ export class Fleet implements OnInit, OnDestroy {
     const g = ev.guest;
     if (!g) return;
     const k = this.key(g);
-    if (ev.type === EventType.DELETED) this.guestMap.delete(k);
-    else this.guestMap.set(k, g);
+    if (ev.type === EventType.DELETED) {
+      this.guestMap.delete(k);
+      if (this.isSelected(k)) this.selected.set(null); // the drawer's guest is gone
+    } else {
+      this.guestMap.set(k, g);
+      if (this.isSelected(k)) this.selected.set(g); // keep the open drawer live (phase flips after Start/Stop)
+    }
     this.flush();
+  }
+
+  private isSelected(k: string): boolean {
+    const sel = this.selected();
+    return !!sel && this.key(sel) === k;
   }
 
   private key(g: Guest): string {

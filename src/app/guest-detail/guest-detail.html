@@ -11,6 +11,22 @@
     </button>
   </header>
 
+  <div class="actions">
+    <button mat-stroked-button (click)="start()" [disabled]="acting() || !canStart()">
+      <mat-icon>play_arrow</mat-icon> Start
+    </button>
+    <button mat-stroked-button (click)="stop()" [disabled]="acting() || !canStop()">
+      <mat-icon>stop</mat-icon> Stop
+    </button>
+    @if (acting()) { <span class="working">working…</span> }
+  </div>
+  @if (acting()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+  @if (actionError(); as err) {
+    <div class="action-error"><mat-icon>error</mat-icon> <span>{{ err }}</span></div>
+  }
+
   <section>
     <h4>Status</h4>
     <dl>
