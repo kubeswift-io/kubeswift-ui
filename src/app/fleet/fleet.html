@@ -1,0 +1,84 @@
+<div class="fleet">
+  <div class="head">
+    <h2>Fleet inventory</h2>
+    <span class="spacer"></span>
+    <code class="endpoint">{{ baseUrl }}</code>
+    <button mat-icon-button (click)="refresh()" [disabled]="loading()" aria-label="Refresh">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (loadError(); as err) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon>
+      <span>Gateway unreachable — {{ err }}</span>
+    </div>
+  }
+
+  <!-- Cluster selector summary (ClusterService.ListClusters) -->
+  @if (clusters().length) {
+    <div class="clusters">
+      @for (c of clusters(); track c.name) {
+        <div class="cluster" [class.down]="!c.ready">
+          <span class="dot" [class.ok]="c.ready"></span>
+          <div class="meta">
+            <span class="name">{{ c.displayName || c.name }}</span>
+            <span class="ver">{{ c.kubernetesVersion || 'unknown' }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Partial-fleet errors (GuestService.ListGuests errors[]) — no silent failures -->
+  @for (e of errors(); track e.cluster) {
+    <div class="banner warn">
+      <mat-icon>cloud_off</mat-icon>
+      <span><strong>{{ e.cluster }}</strong> — {{ e.message }}</span>
+    </div>
+  }
+
+  <!-- Fleet-merged VM inventory (GuestService.ListGuests guests[]) -->
+  <table mat-table [dataSource]="guests()" class="inventory">
+    <ng-container matColumnDef="cluster">
+      <th mat-header-cell *matHeaderCellDef>Cluster</th>
+      <td mat-cell *matCellDef="let g">{{ g.ref?.cluster }}</td>
+    </ng-container>
+    <ng-container matColumnDef="namespace">
+      <th mat-header-cell *matHeaderCellDef>Namespace</th>
+      <td mat-cell *matCellDef="let g">{{ g.ref?.namespace }}</td>
+    </ng-container>
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let g" class="strong">{{ g.ref?.name }}</td>
+    </ng-container>
+    <ng-container matColumnDef="phase">
+      <th mat-header-cell *matHeaderCellDef>Phase</th>
+      <td mat-cell *matCellDef="let g">
+        <span class="phase" [attr.data-phase]="g.phase">{{ g.phase || '—' }}</span>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="node">
+      <th mat-header-cell *matHeaderCellDef>Node</th>
+      <td mat-cell *matCellDef="let g">{{ g.nodeName || '—' }}</td>
+    </ng-container>
+    <ng-container matColumnDef="ip">
+      <th mat-header-cell *matHeaderCellDef>IP</th>
+      <td mat-cell *matCellDef="let g">{{ g.primaryIp || '—' }}</td>
+    </ng-container>
+    <ng-container matColumnDef="bootSource">
+      <th mat-header-cell *matHeaderCellDef>Boot source</th>
+      <td mat-cell *matCellDef="let g">{{ g.bootSource || '—' }}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+  </table>
+
+  @if (!loading() && !loadError() && guests().length === 0) {
+    <div class="empty">No VMs across the fleet.</div>
+  }
+</div>

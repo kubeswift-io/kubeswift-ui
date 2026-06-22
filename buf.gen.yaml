@@ -1,0 +1,10 @@
+version: v2
+clean: true
+plugins:
+  # @bufbuild/protoc-gen-es v2 generates messages AND service descriptors, so
+  # @connectrpc/connect's createClient(Service, transport) works directly — no
+  # separate connect plugin needed.
+  - local: protoc-gen-es
+    out: src/app/gen
+    opt:
+      - target=ts
