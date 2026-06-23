@@ -8,6 +8,7 @@ import type { MetricSeries } from '../gen/kubeswift/v1/telemetry_pb';
 import { GatewayService } from '../gateway.service';
 import { Sparkline } from '../sparkline/sparkline';
 import { Console } from '../console/console';
+import { MigrateDialog } from '../migrate-dialog/migrate-dialog';
 
 /**
  * GuestDetail is the right slide-in drawer for one VM. It opens instantly from
@@ -21,7 +22,7 @@ import { Console } from '../console/console';
  */
 @Component({
   selector: 'app-guest-detail',
-  imports: [MatIconModule, MatButtonModule, MatProgressBarModule, Sparkline, Console],
+  imports: [MatIconModule, MatButtonModule, MatProgressBarModule, Sparkline, Console, MigrateDialog],
   templateUrl: './guest-detail.html',
   styleUrl: './guest-detail.scss',
 })
@@ -33,6 +34,7 @@ export class GuestDetail {
   readonly acting = signal(false);
   readonly actionError = signal<string | null>(null);
   readonly showConsole = signal(false);
+  readonly showMigrate = signal(false);
 
   // Telemetry: range series polled from the gateway while the drawer is open.
   readonly metrics = signal<MetricSeries[]>([]);
@@ -112,6 +114,17 @@ export class GuestDetail {
   }
   closeConsole(): void {
     this.showConsole.set(false);
+  }
+
+  // Migrate needs a running guest to move.
+  canMigrate(): boolean {
+    return this.guest().phase === 'Running';
+  }
+  openMigrate(): void {
+    this.showMigrate.set(true);
+  }
+  closeMigrate(): void {
+    this.showMigrate.set(false);
   }
 
   start(): void {

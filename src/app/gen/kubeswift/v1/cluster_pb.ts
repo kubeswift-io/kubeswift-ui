@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file kubeswift/v1/cluster.proto.
  */
 export const file_kubeswift_v1_cluster: GenFile = /*@__PURE__*/
-  fileDesc("ChprdWJlc3dpZnQvdjEvY2x1c3Rlci5wcm90bxIMa3ViZXN3aWZ0LnYxIoQCCgdDbHVzdGVyEgwKBG5hbWUYASABKAkSEQoJbmFtZXNwYWNlGAIgASgJEhQKDGRpc3BsYXlfbmFtZRgDIAEoCRIOCgZzZXJ2ZXIYBCABKAkSGgoSa3ViZXJuZXRlc192ZXJzaW9uGAUgASgJEg0KBXJlYWR5GAYgASgIEhEKCXJlYWNoYWJsZRgHIAEoCBITCgtndWVzdF9jb3VudBgIIAEoBRIyCg5sYXN0X2Nvbm5lY3RlZBgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKwoKY29uZGl0aW9ucxgKIAMoCzIXLmt1YmVzd2lmdC52MS5Db25kaXRpb24iPgoTTGlzdENsdXN0ZXJzUmVxdWVzdBInCgRwYWdlGAEgASgLMhkua3ViZXN3aWZ0LnYxLlBhZ2VSZXF1ZXN0IpUBChRMaXN0Q2x1c3RlcnNSZXNwb25zZRInCghjbHVzdGVycxgBIAMoCzIVLmt1YmVzd2lmdC52MS5DbHVzdGVyEigKBHBhZ2UYAiABKAsyGi5rdWJlc3dpZnQudjEuUGFnZVJlc3BvbnNlEioKBmVycm9ycxgDIAMoCzIaLmt1YmVzd2lmdC52MS5DbHVzdGVyRXJyb3IiFgoUV2F0Y2hDbHVzdGVyc1JlcXVlc3QiiAEKDENsdXN0ZXJFdmVudBIlCgR0eXBlGAEgASgOMhcua3ViZXN3aWZ0LnYxLkV2ZW50VHlwZRImCgdjbHVzdGVyGAIgASgLMhUua3ViZXN3aWZ0LnYxLkNsdXN0ZXISKQoFZXJyb3IYAyABKAsyGi5rdWJlc3dpZnQudjEuQ2x1c3RlckVycm9yMroBCg5DbHVzdGVyU2VydmljZRJVCgxMaXN0Q2x1c3RlcnMSIS5rdWJlc3dpZnQudjEuTGlzdENsdXN0ZXJzUmVxdWVzdBoiLmt1YmVzd2lmdC52MS5MaXN0Q2x1c3RlcnNSZXNwb25zZRJRCg1XYXRjaENsdXN0ZXJzEiIua3ViZXN3aWZ0LnYxLldhdGNoQ2x1c3RlcnNSZXF1ZXN0Ghoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFdmVudDABQkFaP2dpdGh1Yi5jb20vcHJvamVjdGJlc2thci9rdWJlc3dpZnQvZ2VuL2t1YmVzd2lmdC92MTtrdWJlc3dpZnR2MWIGcHJvdG8z", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
+  fileDesc("ChprdWJlc3dpZnQvdjEvY2x1c3Rlci5wcm90bxIMa3ViZXN3aWZ0LnYxIoQCCgdDbHVzdGVyEgwKBG5hbWUYASABKAkSEQoJbmFtZXNwYWNlGAIgASgJEhQKDGRpc3BsYXlfbmFtZRgDIAEoCRIOCgZzZXJ2ZXIYBCABKAkSGgoSa3ViZXJuZXRlc192ZXJzaW9uGAUgASgJEg0KBXJlYWR5GAYgASgIEhEKCXJlYWNoYWJsZRgHIAEoCBITCgtndWVzdF9jb3VudBgIIAEoBRIyCg5sYXN0X2Nvbm5lY3RlZBgJIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKwoKY29uZGl0aW9ucxgKIAMoCzIXLmt1YmVzd2lmdC52MS5Db25kaXRpb24iPgoTTGlzdENsdXN0ZXJzUmVxdWVzdBInCgRwYWdlGAEgASgLMhkua3ViZXN3aWZ0LnYxLlBhZ2VSZXF1ZXN0IpUBChRMaXN0Q2x1c3RlcnNSZXNwb25zZRInCghjbHVzdGVycxgBIAMoCzIVLmt1YmVzd2lmdC52MS5DbHVzdGVyEigKBHBhZ2UYAiABKAsyGi5rdWJlc3dpZnQudjEuUGFnZVJlc3BvbnNlEioKBmVycm9ycxgDIAMoCzIaLmt1YmVzd2lmdC52MS5DbHVzdGVyRXJyb3IiFgoUV2F0Y2hDbHVzdGVyc1JlcXVlc3QiiAEKDENsdXN0ZXJFdmVudBIlCgR0eXBlGAEgASgOMhcua3ViZXN3aWZ0LnYxLkV2ZW50VHlwZRImCgdjbHVzdGVyGAIgASgLMhUua3ViZXN3aWZ0LnYxLkNsdXN0ZXISKQoFZXJyb3IYAyABKAsyGi5rdWJlc3dpZnQudjEuQ2x1c3RlckVycm9yIkkKBE5vZGUSDwoHY2x1c3RlchgBIAEoCRIMCgRuYW1lGAIgASgJEg0KBXJlYWR5GAMgASgIEhMKC3NjaGVkdWxhYmxlGAQgASgIIiMKEExpc3ROb2Rlc1JlcXVlc3QSDwoHY2x1c3RlchgBIAEoCSJhChFMaXN0Tm9kZXNSZXNwb25zZRIhCgVub2RlcxgBIAMoCzISLmt1YmVzd2lmdC52MS5Ob2RlEikKBWVycm9yGAIgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvcjKIAgoOQ2x1c3RlclNlcnZpY2USVQoMTGlzdENsdXN0ZXJzEiEua3ViZXN3aWZ0LnYxLkxpc3RDbHVzdGVyc1JlcXVlc3QaIi5rdWJlc3dpZnQudjEuTGlzdENsdXN0ZXJzUmVzcG9uc2USUQoNV2F0Y2hDbHVzdGVycxIiLmt1YmVzd2lmdC52MS5XYXRjaENsdXN0ZXJzUmVxdWVzdBoaLmt1YmVzd2lmdC52MS5DbHVzdGVyRXZlbnQwARJMCglMaXN0Tm9kZXMSHi5rdWJlc3dpZnQudjEuTGlzdE5vZGVzUmVxdWVzdBofLmt1YmVzd2lmdC52MS5MaXN0Tm9kZXNSZXNwb25zZUJBWj9naXRodWIuY29tL3Byb2plY3RiZXNrYXIva3ViZXN3aWZ0L2dlbi9rdWJlc3dpZnQvdjE7a3ViZXN3aWZ0djFiBnByb3RvMw", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
 
 /**
  * Cluster is a UI-shaped view of a federated member cluster (a
@@ -175,8 +175,87 @@ export const ClusterEventSchema: GenMessage<ClusterEvent> = /*@__PURE__*/
   messageDesc(file_kubeswift_v1_cluster, 4);
 
 /**
+ * Node is a member cluster's node, for the migrate target picker.
+ *
+ * @generated from message kubeswift.v1.Node
+ */
+export type Node = Message<"kubeswift.v1.Node"> & {
+  /**
+   * @generated from field: string cluster = 1;
+   */
+  cluster: string;
+
+  /**
+   * @generated from field: string name = 2;
+   */
+  name: string;
+
+  /**
+   * @generated from field: bool ready = 3;
+   */
+  ready: boolean;
+
+  /**
+   * @generated from field: bool schedulable = 4;
+   */
+  schedulable: boolean;
+};
+
+/**
+ * Describes the message kubeswift.v1.Node.
+ * Use `create(NodeSchema)` to create a new message.
+ */
+export const NodeSchema: GenMessage<Node> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_cluster, 5);
+
+/**
+ * @generated from message kubeswift.v1.ListNodesRequest
+ */
+export type ListNodesRequest = Message<"kubeswift.v1.ListNodesRequest"> & {
+  /**
+   * cluster is required — nodes are per-member (the migrate dialog asks for one
+   * cluster's nodes).
+   *
+   * @generated from field: string cluster = 1;
+   */
+  cluster: string;
+};
+
+/**
+ * Describes the message kubeswift.v1.ListNodesRequest.
+ * Use `create(ListNodesRequestSchema)` to create a new message.
+ */
+export const ListNodesRequestSchema: GenMessage<ListNodesRequest> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_cluster, 6);
+
+/**
+ * @generated from message kubeswift.v1.ListNodesResponse
+ */
+export type ListNodesResponse = Message<"kubeswift.v1.ListNodesResponse"> & {
+  /**
+   * @generated from field: repeated kubeswift.v1.Node nodes = 1;
+   */
+  nodes: Node[];
+
+  /**
+   * error is set (nodes empty) when the cluster is unknown or unreachable.
+   *
+   * @generated from field: kubeswift.v1.ClusterError error = 2;
+   */
+  error?: ClusterError | undefined;
+};
+
+/**
+ * Describes the message kubeswift.v1.ListNodesResponse.
+ * Use `create(ListNodesResponseSchema)` to create a new message.
+ */
+export const ListNodesResponseSchema: GenMessage<ListNodesResponse> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_cluster, 7);
+
+/**
  * ClusterService exposes the hub's fleet registry to the UI: the cluster
- * selector lists members, and a watch keeps per-cluster health live.
+ * selector lists members, a watch keeps per-cluster health live, and ListNodes
+ * feeds the migrate target picker.
  *
  * @generated from service kubeswift.v1.ClusterService
  */
@@ -196,6 +275,14 @@ export const ClusterService: GenService<{
     methodKind: "server_streaming";
     input: typeof WatchClustersRequestSchema;
     output: typeof ClusterEventSchema;
+  },
+  /**
+   * @generated from rpc kubeswift.v1.ClusterService.ListNodes
+   */
+  listNodes: {
+    methodKind: "unary";
+    input: typeof ListNodesRequestSchema;
+    output: typeof ListNodesResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_kubeswift_v1_cluster, 0);

@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file kubeswift/v1/guest.proto.
  */
 export const file_kubeswift_v1_guest: GenFile = /*@__PURE__*/
-  fileDesc("ChhrdWJlc3dpZnQvdjEvZ3Vlc3QucHJvdG8SDGt1YmVzd2lmdC52MSKWAwoFR3Vlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZhINCgVwaGFzZRgCIAEoCRIRCglub2RlX25hbWUYAyABKAkSEgoKaHlwZXJ2aXNvchgEIAEoCRISCgpwcmltYXJ5X2lwGAUgASgJEhMKC2Jvb3Rfc291cmNlGAYgASgJEhMKC2d1ZXN0X2NsYXNzGAcgASgJEhUKDWd1ZXN0X3J1bm5pbmcYCCABKAgSCwoDY3B1GAkgASgFEhIKCm1lbW9yeV9taWIYCiABKAMSLgoKY3JlYXRlZF9hdBgLIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKwoKY29uZGl0aW9ucxgMIAMoCzIXLmt1YmVzd2lmdC52MS5Db25kaXRpb24SLwoGbGFiZWxzGA0gAygLMh8ua3ViZXN3aWZ0LnYxLkd1ZXN0LkxhYmVsc0VudHJ5Gi0KC0xhYmVsc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEijwEKEUxpc3RHdWVzdHNSZXF1ZXN0Ei8KCGNsdXN0ZXJzGAEgASgLMh0ua3ViZXN3aWZ0LnYxLkNsdXN0ZXJTZWxlY3RvchIRCgluYW1lc3BhY2UYAiABKAkSDQoFcGhhc2UYAyABKAkSJwoEcGFnZRgEIAEoCzIZLmt1YmVzd2lmdC52MS5QYWdlUmVxdWVzdCKPAQoSTGlzdEd1ZXN0c1Jlc3BvbnNlEiMKBmd1ZXN0cxgBIAMoCzITLmt1YmVzd2lmdC52MS5HdWVzdBIoCgRwYWdlGAIgASgLMhoua3ViZXN3aWZ0LnYxLlBhZ2VSZXNwb25zZRIqCgZlcnJvcnMYAyADKAsyGi5rdWJlc3dpZnQudjEuQ2x1c3RlckVycm9yIlgKEldhdGNoR3Vlc3RzUmVxdWVzdBIvCghjbHVzdGVycxgBIAEoCzIdLmt1YmVzd2lmdC52MS5DbHVzdGVyU2VsZWN0b3ISEQoJbmFtZXNwYWNlGAIgASgJIoIBCgpHdWVzdEV2ZW50EiUKBHR5cGUYASABKA4yFy5rdWJlc3dpZnQudjEuRXZlbnRUeXBlEiIKBWd1ZXN0GAIgASgLMhMua3ViZXN3aWZ0LnYxLkd1ZXN0EikKBWVycm9yGAMgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvciI9ChVHZXRHdWVzdERldGFpbFJlcXVlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZiI8ChZHZXRHdWVzdERldGFpbFJlc3BvbnNlEiIKBWd1ZXN0GAEgASgLMhMua3ViZXN3aWZ0LnYxLkd1ZXN0IjoKEkd1ZXN0QWN0aW9uUmVxdWVzdBIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmIjkKE0d1ZXN0QWN0aW9uUmVzcG9uc2USIgoFZ3Vlc3QYASABKAsyEy5rdWJlc3dpZnQudjEuR3Vlc3QyrgMKDEd1ZXN0U2VydmljZRJPCgpMaXN0R3Vlc3RzEh8ua3ViZXN3aWZ0LnYxLkxpc3RHdWVzdHNSZXF1ZXN0GiAua3ViZXN3aWZ0LnYxLkxpc3RHdWVzdHNSZXNwb25zZRJLCgtXYXRjaEd1ZXN0cxIgLmt1YmVzd2lmdC52MS5XYXRjaEd1ZXN0c1JlcXVlc3QaGC5rdWJlc3dpZnQudjEuR3Vlc3RFdmVudDABElsKDkdldEd1ZXN0RGV0YWlsEiMua3ViZXN3aWZ0LnYxLkdldEd1ZXN0RGV0YWlsUmVxdWVzdBokLmt1YmVzd2lmdC52MS5HZXRHdWVzdERldGFpbFJlc3BvbnNlElEKClN0YXJ0R3Vlc3QSIC5rdWJlc3dpZnQudjEuR3Vlc3RBY3Rpb25SZXF1ZXN0GiEua3ViZXN3aWZ0LnYxLkd1ZXN0QWN0aW9uUmVzcG9uc2USUAoJU3RvcEd1ZXN0EiAua3ViZXN3aWZ0LnYxLkd1ZXN0QWN0aW9uUmVxdWVzdBohLmt1YmVzd2lmdC52MS5HdWVzdEFjdGlvblJlc3BvbnNlQkFaP2dpdGh1Yi5jb20vcHJvamVjdGJlc2thci9rdWJlc3dpZnQvZ2VuL2t1YmVzd2lmdC92MTtrdWJlc3dpZnR2MWIGcHJvdG8z", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
+  fileDesc("ChhrdWJlc3dpZnQvdjEvZ3Vlc3QucHJvdG8SDGt1YmVzd2lmdC52MSKWAwoFR3Vlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZhINCgVwaGFzZRgCIAEoCRIRCglub2RlX25hbWUYAyABKAkSEgoKaHlwZXJ2aXNvchgEIAEoCRISCgpwcmltYXJ5X2lwGAUgASgJEhMKC2Jvb3Rfc291cmNlGAYgASgJEhMKC2d1ZXN0X2NsYXNzGAcgASgJEhUKDWd1ZXN0X3J1bm5pbmcYCCABKAgSCwoDY3B1GAkgASgFEhIKCm1lbW9yeV9taWIYCiABKAMSLgoKY3JlYXRlZF9hdBgLIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKwoKY29uZGl0aW9ucxgMIAMoCzIXLmt1YmVzd2lmdC52MS5Db25kaXRpb24SLwoGbGFiZWxzGA0gAygLMh8ua3ViZXN3aWZ0LnYxLkd1ZXN0LkxhYmVsc0VudHJ5Gi0KC0xhYmVsc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEijwEKEUxpc3RHdWVzdHNSZXF1ZXN0Ei8KCGNsdXN0ZXJzGAEgASgLMh0ua3ViZXN3aWZ0LnYxLkNsdXN0ZXJTZWxlY3RvchIRCgluYW1lc3BhY2UYAiABKAkSDQoFcGhhc2UYAyABKAkSJwoEcGFnZRgEIAEoCzIZLmt1YmVzd2lmdC52MS5QYWdlUmVxdWVzdCKPAQoSTGlzdEd1ZXN0c1Jlc3BvbnNlEiMKBmd1ZXN0cxgBIAMoCzITLmt1YmVzd2lmdC52MS5HdWVzdBIoCgRwYWdlGAIgASgLMhoua3ViZXN3aWZ0LnYxLlBhZ2VSZXNwb25zZRIqCgZlcnJvcnMYAyADKAsyGi5rdWJlc3dpZnQudjEuQ2x1c3RlckVycm9yIlgKEldhdGNoR3Vlc3RzUmVxdWVzdBIvCghjbHVzdGVycxgBIAEoCzIdLmt1YmVzd2lmdC52MS5DbHVzdGVyU2VsZWN0b3ISEQoJbmFtZXNwYWNlGAIgASgJIoIBCgpHdWVzdEV2ZW50EiUKBHR5cGUYASABKA4yFy5rdWJlc3dpZnQudjEuRXZlbnRUeXBlEiIKBWd1ZXN0GAIgASgLMhMua3ViZXN3aWZ0LnYxLkd1ZXN0EikKBWVycm9yGAMgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvciI9ChVHZXRHdWVzdERldGFpbFJlcXVlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZiI8ChZHZXRHdWVzdERldGFpbFJlc3BvbnNlEiIKBWd1ZXN0GAEgASgLMhMua3ViZXN3aWZ0LnYxLkd1ZXN0IjoKEkd1ZXN0QWN0aW9uUmVxdWVzdBIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmIjkKE0d1ZXN0QWN0aW9uUmVzcG9uc2USIgoFZ3Vlc3QYASABKAsyEy5rdWJlc3dpZnQudjEuR3Vlc3QidwoTTWlncmF0ZUd1ZXN0UmVxdWVzdBIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEhMKC3RhcmdldF9ub2RlGAIgASgJEgwKBG1vZGUYAyABKAkSFwoPYWxsb3dfaXBfY2hhbmdlGAQgASgIIkIKFE1pZ3JhdGVHdWVzdFJlc3BvbnNlEioKCW1pZ3JhdGlvbhgBIAEoCzIXLmt1YmVzd2lmdC52MS5PYmplY3RSZWYyhQQKDEd1ZXN0U2VydmljZRJPCgpMaXN0R3Vlc3RzEh8ua3ViZXN3aWZ0LnYxLkxpc3RHdWVzdHNSZXF1ZXN0GiAua3ViZXN3aWZ0LnYxLkxpc3RHdWVzdHNSZXNwb25zZRJLCgtXYXRjaEd1ZXN0cxIgLmt1YmVzd2lmdC52MS5XYXRjaEd1ZXN0c1JlcXVlc3QaGC5rdWJlc3dpZnQudjEuR3Vlc3RFdmVudDABElsKDkdldEd1ZXN0RGV0YWlsEiMua3ViZXN3aWZ0LnYxLkdldEd1ZXN0RGV0YWlsUmVxdWVzdBokLmt1YmVzd2lmdC52MS5HZXRHdWVzdERldGFpbFJlc3BvbnNlElEKClN0YXJ0R3Vlc3QSIC5rdWJlc3dpZnQudjEuR3Vlc3RBY3Rpb25SZXF1ZXN0GiEua3ViZXN3aWZ0LnYxLkd1ZXN0QWN0aW9uUmVzcG9uc2USUAoJU3RvcEd1ZXN0EiAua3ViZXN3aWZ0LnYxLkd1ZXN0QWN0aW9uUmVxdWVzdBohLmt1YmVzd2lmdC52MS5HdWVzdEFjdGlvblJlc3BvbnNlElUKDE1pZ3JhdGVHdWVzdBIhLmt1YmVzd2lmdC52MS5NaWdyYXRlR3Vlc3RSZXF1ZXN0GiIua3ViZXN3aWZ0LnYxLk1pZ3JhdGVHdWVzdFJlc3BvbnNlQkFaP2dpdGh1Yi5jb20vcHJvamVjdGJlc2thci9rdWJlc3dpZnQvZ2VuL2t1YmVzd2lmdC92MTtrdWJlc3dpZnR2MWIGcHJvdG8z", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
 
 /**
  * Guest is a UI-shaped, denormalized view of a SwiftGuest across the fleet.
@@ -308,10 +308,71 @@ export const GuestActionResponseSchema: GenMessage<GuestActionResponse> = /*@__P
   messageDesc(file_kubeswift_v1_guest, 8);
 
 /**
- * GuestService is the read plane for VM inventory plus the P1 lifecycle write
- * actions. List/Watch fan out across the selected member clusters and merge,
- * stamping the cluster dimension on every row; a per-cluster error surface
- * preserves partial-fleet results.
+ * MigrateGuestRequest moves a guest to another node by creating a
+ * SwiftMigration on its member cluster. targetNode is required; mode defaults
+ * to auto. A cross-node move on default node-local networking changes the
+ * guest IP, so allowIpChange is required there (the webhook rejects it
+ * otherwise).
+ *
+ * @generated from message kubeswift.v1.MigrateGuestRequest
+ */
+export type MigrateGuestRequest = Message<"kubeswift.v1.MigrateGuestRequest"> & {
+  /**
+   * @generated from field: kubeswift.v1.ObjectRef ref = 1;
+   */
+  ref?: ObjectRef | undefined;
+
+  /**
+   * @generated from field: string target_node = 2;
+   */
+  targetNode: string;
+
+  /**
+   * auto | live | offline
+   *
+   * @generated from field: string mode = 3;
+   */
+  mode: string;
+
+  /**
+   * @generated from field: bool allow_ip_change = 4;
+   */
+  allowIpChange: boolean;
+};
+
+/**
+ * Describes the message kubeswift.v1.MigrateGuestRequest.
+ * Use `create(MigrateGuestRequestSchema)` to create a new message.
+ */
+export const MigrateGuestRequestSchema: GenMessage<MigrateGuestRequest> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_guest, 9);
+
+/**
+ * MigrateGuestResponse returns the created SwiftMigration's ref; the migration
+ * then progresses on the member (watch the guest's phase, or a future
+ * migrations view).
+ *
+ * @generated from message kubeswift.v1.MigrateGuestResponse
+ */
+export type MigrateGuestResponse = Message<"kubeswift.v1.MigrateGuestResponse"> & {
+  /**
+   * @generated from field: kubeswift.v1.ObjectRef migration = 1;
+   */
+  migration?: ObjectRef | undefined;
+};
+
+/**
+ * Describes the message kubeswift.v1.MigrateGuestResponse.
+ * Use `create(MigrateGuestResponseSchema)` to create a new message.
+ */
+export const MigrateGuestResponseSchema: GenMessage<MigrateGuestResponse> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_guest, 10);
+
+/**
+ * GuestService is the read plane for VM inventory plus the P1/P2 write actions.
+ * List/Watch fan out across the selected member clusters and merge, stamping
+ * the cluster dimension on every row; a per-cluster error surface preserves
+ * partial-fleet results.
  *
  * @generated from service kubeswift.v1.GuestService
  */
@@ -359,6 +420,17 @@ export const GuestService: GenService<{
     methodKind: "unary";
     input: typeof GuestActionRequestSchema;
     output: typeof GuestActionResponseSchema;
+  },
+  /**
+   * Migrate (write plane, P2): create a SwiftMigration to move the guest. The
+   * impersonated user must be allowed to create swiftmigrations on the member.
+   *
+   * @generated from rpc kubeswift.v1.GuestService.MigrateGuest
+   */
+  migrateGuest: {
+    methodKind: "unary";
+    input: typeof MigrateGuestRequestSchema;
+    output: typeof MigrateGuestResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_kubeswift_v1_guest, 0);

@@ -1,0 +1,64 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+
+<div class="dialog" role="dialog" aria-label="Migrate VM">
+  <header>
+    <span class="title">Migrate {{ guest().ref?.name }}</span>
+    <span class="spacer"></span>
+    <button mat-icon-button (click)="closed.emit()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  @if (loadError(); as e) {
+    <div class="err"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
+  } @else {
+    <p class="from">From node <strong>{{ guest().nodeName || '—' }}</strong></p>
+
+    <label class="field">
+      <span>Target node</span>
+      @if (nodes().length) {
+        <select (change)="pick($any($event.target).value)">
+          @for (n of nodes(); track n.name) {
+            <option [value]="n.name">{{ n.name }}</option>
+          }
+        </select>
+      } @else {
+        <span class="muted">No other schedulable node available.</span>
+      }
+    </label>
+
+    <label class="field">
+      <span>Mode</span>
+      <select (change)="setMode($any($event.target).value)">
+        <option value="auto">auto</option>
+        <option value="live">live</option>
+        <option value="offline">offline</option>
+      </select>
+    </label>
+
+    <label class="check">
+      <input
+        type="checkbox"
+        [checked]="allowIp()"
+        (change)="allowIp.set($any($event.target).checked)"
+      />
+      <span>Allow IP change — required for a cross-node move on default networking</span>
+    </label>
+
+    @if (error(); as e) {
+      <div class="err"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
+    }
+
+    <footer>
+      <button mat-button (click)="closed.emit()">Cancel</button>
+      <button
+        mat-flat-button
+        color="primary"
+        [disabled]="!target() || migrating()"
+        (click)="migrate()"
+      >
+        {{ migrating() ? 'Migrating…' : 'Migrate' }}
+      </button>
+    </footer>
+  }
+</div>

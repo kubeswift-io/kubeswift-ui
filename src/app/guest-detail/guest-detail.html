@@ -21,6 +21,9 @@
     <button mat-stroked-button (click)="openConsole()" [disabled]="!canConsole()">
       <mat-icon>terminal</mat-icon> Console
     </button>
+    <button mat-stroked-button (click)="openMigrate()" [disabled]="!canMigrate()">
+      <mat-icon>swap_horiz</mat-icon> Migrate
+    </button>
     @if (acting()) { <span class="working">working…</span> }
   </div>
   @if (acting()) {
@@ -107,4 +110,8 @@
 
 @if (showConsole()) {
   <app-console [ref]="guest().ref!" (closed)="closeConsole()" />
+}
+
+@if (showMigrate()) {
+  <app-migrate-dialog [guest]="guest()" (closed)="closeMigrate()" />
 }

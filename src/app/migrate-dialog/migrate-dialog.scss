@@ -1,0 +1,97 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 30;
+}
+
+.dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 440px;
+  max-width: 92vw;
+  z-index: 31;
+  background: var(--mat-sys-surface);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  padding: 8px 20px 16px;
+
+  header {
+    display: flex;
+    align-items: center;
+    padding: 4px 0 8px;
+    .title {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .spacer {
+      flex: 1;
+    }
+  }
+
+  .from {
+    margin: 4px 0 12px;
+    font-size: 13px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 14px;
+    font-size: 13px;
+
+    > span {
+      color: var(--mat-sys-on-surface-variant);
+    }
+    select {
+      padding: 8px 10px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--mat-sys-outline);
+      background: var(--mat-sys-surface);
+      color: var(--mat-sys-on-surface);
+    }
+    .muted {
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+
+  .check {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    margin-bottom: 14px;
+    input {
+      margin-top: 2px;
+    }
+  }
+
+  .err {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 12px;
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+    mat-icon {
+      font-size: 18px;
+      height: 18px;
+      width: 18px;
+      flex: none;
+    }
+  }
+
+  footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}
