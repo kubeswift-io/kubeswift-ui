@@ -18,6 +18,9 @@
     <button mat-stroked-button (click)="stop()" [disabled]="acting() || !canStop()">
       <mat-icon>stop</mat-icon> Stop
     </button>
+    <button mat-stroked-button (click)="openConsole()" [disabled]="!canConsole()">
+      <mat-icon>terminal</mat-icon> Console
+    </button>
     @if (acting()) { <span class="working">working…</span> }
   </div>
   @if (acting()) {
@@ -101,3 +104,7 @@
     </section>
   }
 </aside>
+
+@if (showConsole()) {
+  <app-console [ref]="guest().ref!" (closed)="closeConsole()" />
+}

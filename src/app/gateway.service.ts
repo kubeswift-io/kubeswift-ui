@@ -26,4 +26,13 @@ export class GatewayService {
   readonly clusters = createClient(ClusterService, this.transport);
   readonly guests = createClient(GuestService, this.transport);
   readonly telemetry = createClient(TelemetryService, this.transport);
+
+  // The console plane is a raw WebSocket (not Connect), so build its URL by hand
+  // off the gateway base (http→ws, https→wss). A token-auth deployment would
+  // append &token=<jwt>; insecure mode (the dev default) needs none.
+  consoleWsUrl(cluster: string, namespace: string, name: string): string {
+    const base = GATEWAY_URL.replace(/^http/, 'ws');
+    const q = new URLSearchParams({ cluster, namespace, name });
+    return `${base}/console?${q.toString()}`;
+  }
 }

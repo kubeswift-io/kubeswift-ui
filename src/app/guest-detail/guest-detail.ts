@@ -7,6 +7,7 @@ import type { Guest } from '../gen/kubeswift/v1/guest_pb';
 import type { MetricSeries } from '../gen/kubeswift/v1/telemetry_pb';
 import { GatewayService } from '../gateway.service';
 import { Sparkline } from '../sparkline/sparkline';
+import { Console } from '../console/console';
 
 /**
  * GuestDetail is the right slide-in drawer for one VM. It opens instantly from
@@ -20,7 +21,7 @@ import { Sparkline } from '../sparkline/sparkline';
  */
 @Component({
   selector: 'app-guest-detail',
-  imports: [MatIconModule, MatButtonModule, MatProgressBarModule, Sparkline],
+  imports: [MatIconModule, MatButtonModule, MatProgressBarModule, Sparkline, Console],
   templateUrl: './guest-detail.html',
   styleUrl: './guest-detail.scss',
 })
@@ -31,6 +32,7 @@ export class GuestDetail {
 
   readonly acting = signal(false);
   readonly actionError = signal<string | null>(null);
+  readonly showConsole = signal(false);
 
   // Telemetry: range series polled from the gateway while the drawer is open.
   readonly metrics = signal<MetricSeries[]>([]);
@@ -99,6 +101,17 @@ export class GuestDetail {
   }
   canStop(): boolean {
     return this.guest().phase !== 'Stopped';
+  }
+  // The serial socket exists only while the VM is running.
+  canConsole(): boolean {
+    return this.guest().phase === 'Running';
+  }
+
+  openConsole(): void {
+    this.showConsole.set(true);
+  }
+  closeConsole(): void {
+    this.showConsole.set(false);
   }
 
   start(): void {
