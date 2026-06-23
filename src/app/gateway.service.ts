@@ -3,6 +3,7 @@ import { createClient } from '@connectrpc/connect';
 import { createConnectTransport } from '@connectrpc/connect-web';
 import { ClusterService } from './gen/kubeswift/v1/cluster_pb';
 import { GuestService } from './gen/kubeswift/v1/guest_pb';
+import { MigrationService } from './gen/kubeswift/v1/migration_pb';
 import { TelemetryService } from './gen/kubeswift/v1/telemetry_pb';
 
 // The kubeswift-gateway endpoint. By default it targets the gateway on the
@@ -25,6 +26,7 @@ export class GatewayService {
 
   readonly clusters = createClient(ClusterService, this.transport);
   readonly guests = createClient(GuestService, this.transport);
+  readonly migrations = createClient(MigrationService, this.transport);
   readonly telemetry = createClient(TelemetryService, this.transport);
 
   // The console plane is a raw WebSocket (not Connect), so build its URL by hand

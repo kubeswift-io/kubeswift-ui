@@ -16,7 +16,23 @@
 
   .logo { color: var(--mat-sys-primary); }
   .brand { font-weight: 600; font-size: 18px; }
-  .sub { color: var(--mat-sys-on-surface-variant); font-size: 13px; }
+  .nav {
+    display: flex;
+    gap: 4px;
+    margin-left: 16px;
+    a {
+      text-decoration: none;
+      color: var(--mat-sys-on-surface-variant);
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      &:hover { background: var(--mat-sys-surface-container-high); }
+      &.active {
+        color: var(--mat-sys-primary);
+        background: var(--mat-sys-primary-container);
+      }
+    }
+  }
   .spacer { flex: 1; }
   .tag {
     font-size: 12px;

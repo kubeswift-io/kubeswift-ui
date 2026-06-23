@@ -1,7 +1,10 @@
 <mat-toolbar class="topbar">
   <mat-icon class="logo">dns</mat-icon>
   <span class="brand">KubeSwift</span>
-  <span class="sub">fleet console</span>
+  <nav class="nav">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Fleet</a>
+    <a routerLink="/migrations" routerLinkActive="active">Migrations</a>
+  </nav>
   <span class="spacer"></span>
   <span class="tag">v1alpha1</span>
 </mat-toolbar>
