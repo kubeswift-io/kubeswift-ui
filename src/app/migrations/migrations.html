@@ -1,5 +1,11 @@
 <div class="page">
-  <h2>Migrations</h2>
+  <div class="head">
+    <h2>Migrations</h2>
+    <span class="live" [class.on]="live()">
+      <span class="dot"></span>{{ live() ? 'live' : 'reconnecting…' }}
+    </span>
+    <span class="count">{{ migrations().length }} total</span>
+  </div>
 
   @if (loadError(); as e) {
     <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>

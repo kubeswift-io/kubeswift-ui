@@ -6,7 +6,7 @@ import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegen
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { ClusterError, ClusterSelector, ObjectRef } from "./common_pb";
+import type { ClusterError, ClusterSelector, EventType, ObjectRef } from "./common_pb";
 import { file_kubeswift_v1_common } from "./common_pb";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file kubeswift/v1/migration.proto.
  */
 export const file_kubeswift_v1_migration: GenFile = /*@__PURE__*/
-  fileDesc("ChxrdWJlc3dpZnQvdjEvbWlncmF0aW9uLnByb3RvEgxrdWJlc3dpZnQudjEikAMKCU1pZ3JhdGlvbhIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEg0KBWd1ZXN0GAIgASgJEhMKC3NvdXJjZV9ub2RlGAMgASgJEhMKC3RhcmdldF9ub2RlGAQgASgJEgwKBG1vZGUYBSABKAkSDQoFcGhhc2UYBiABKAkSFAoMcGhhc2VfZGV0YWlsGAcgASgJEhYKDmZhaWx1cmVfcmVhc29uGAggASgJEhcKD2ZhaWx1cmVfbWVzc2FnZRgJIAEoCRIZChF0cmFuc2Zlcl9wcm9ncmVzcxgKIAEoBRIhChlvYnNlcnZlZF9kb3dudGltZV9zZWNvbmRzGAsgASgBEiEKGW9ic2VydmVkX3RyYW5zZmVyX3NlY29uZHMYDCABKAESLgoKY3JlYXRlZF9hdBgNIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLwoLdGVybWluYWxfYXQYDiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIlsKFUxpc3RNaWdyYXRpb25zUmVxdWVzdBIvCghjbHVzdGVycxgBIAEoCzIdLmt1YmVzd2lmdC52MS5DbHVzdGVyU2VsZWN0b3ISEQoJbmFtZXNwYWNlGAIgASgJInEKFkxpc3RNaWdyYXRpb25zUmVzcG9uc2USKwoKbWlncmF0aW9ucxgBIAMoCzIXLmt1YmVzd2lmdC52MS5NaWdyYXRpb24SKgoGZXJyb3JzGAIgAygLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvcjJvChBNaWdyYXRpb25TZXJ2aWNlElsKDkxpc3RNaWdyYXRpb25zEiMua3ViZXN3aWZ0LnYxLkxpc3RNaWdyYXRpb25zUmVxdWVzdBokLmt1YmVzd2lmdC52MS5MaXN0TWlncmF0aW9uc1Jlc3BvbnNlQkFaP2dpdGh1Yi5jb20vcHJvamVjdGJlc2thci9rdWJlc3dpZnQvZ2VuL2t1YmVzd2lmdC92MTtrdWJlc3dpZnR2MWIGcHJvdG8z", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
+  fileDesc("ChxrdWJlc3dpZnQvdjEvbWlncmF0aW9uLnByb3RvEgxrdWJlc3dpZnQudjEikAMKCU1pZ3JhdGlvbhIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEg0KBWd1ZXN0GAIgASgJEhMKC3NvdXJjZV9ub2RlGAMgASgJEhMKC3RhcmdldF9ub2RlGAQgASgJEgwKBG1vZGUYBSABKAkSDQoFcGhhc2UYBiABKAkSFAoMcGhhc2VfZGV0YWlsGAcgASgJEhYKDmZhaWx1cmVfcmVhc29uGAggASgJEhcKD2ZhaWx1cmVfbWVzc2FnZRgJIAEoCRIZChF0cmFuc2Zlcl9wcm9ncmVzcxgKIAEoBRIhChlvYnNlcnZlZF9kb3dudGltZV9zZWNvbmRzGAsgASgBEiEKGW9ic2VydmVkX3RyYW5zZmVyX3NlY29uZHMYDCABKAESLgoKY3JlYXRlZF9hdBgNIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLwoLdGVybWluYWxfYXQYDiABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIlsKFUxpc3RNaWdyYXRpb25zUmVxdWVzdBIvCghjbHVzdGVycxgBIAEoCzIdLmt1YmVzd2lmdC52MS5DbHVzdGVyU2VsZWN0b3ISEQoJbmFtZXNwYWNlGAIgASgJInEKFkxpc3RNaWdyYXRpb25zUmVzcG9uc2USKwoKbWlncmF0aW9ucxgBIAMoCzIXLmt1YmVzd2lmdC52MS5NaWdyYXRpb24SKgoGZXJyb3JzGAIgAygLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvciJcChZXYXRjaE1pZ3JhdGlvbnNSZXF1ZXN0Ei8KCGNsdXN0ZXJzGAEgASgLMh0ua3ViZXN3aWZ0LnYxLkNsdXN0ZXJTZWxlY3RvchIRCgluYW1lc3BhY2UYAiABKAkijgEKDk1pZ3JhdGlvbkV2ZW50EiUKBHR5cGUYASABKA4yFy5rdWJlc3dpZnQudjEuRXZlbnRUeXBlEioKCW1pZ3JhdGlvbhgCIAEoCzIXLmt1YmVzd2lmdC52MS5NaWdyYXRpb24SKQoFZXJyb3IYAyABKAsyGi5rdWJlc3dpZnQudjEuQ2x1c3RlckVycm9yMsgBChBNaWdyYXRpb25TZXJ2aWNlElsKDkxpc3RNaWdyYXRpb25zEiMua3ViZXN3aWZ0LnYxLkxpc3RNaWdyYXRpb25zUmVxdWVzdBokLmt1YmVzd2lmdC52MS5MaXN0TWlncmF0aW9uc1Jlc3BvbnNlElcKD1dhdGNoTWlncmF0aW9ucxIkLmt1YmVzd2lmdC52MS5XYXRjaE1pZ3JhdGlvbnNSZXF1ZXN0Ghwua3ViZXN3aWZ0LnYxLk1pZ3JhdGlvbkV2ZW50MAFCQVo/Z2l0aHViLmNvbS9wcm9qZWN0YmVza2FyL2t1YmVzd2lmdC9nZW4va3ViZXN3aWZ0L3YxO2t1YmVzd2lmdHYxYgZwcm90bzM", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
 
 /**
  * Migration is a UI-shaped view of a SwiftMigration (decision D8), denormalized
@@ -151,10 +151,61 @@ export const ListMigrationsResponseSchema: GenMessage<ListMigrationsResponse> = 
   messageDesc(file_kubeswift_v1_migration, 2);
 
 /**
- * MigrationService is the read plane for migrations. ListMigrations fans out
- * across the selected members and merges, stamping the cluster dimension; the
- * UI polls it while a migration is in flight (a server-stream Watch is a later
- * add, mirroring GuestService).
+ * @generated from message kubeswift.v1.WatchMigrationsRequest
+ */
+export type WatchMigrationsRequest = Message<"kubeswift.v1.WatchMigrationsRequest"> & {
+  /**
+   * @generated from field: kubeswift.v1.ClusterSelector clusters = 1;
+   */
+  clusters?: ClusterSelector | undefined;
+
+  /**
+   * @generated from field: string namespace = 2;
+   */
+  namespace: string;
+};
+
+/**
+ * Describes the message kubeswift.v1.WatchMigrationsRequest.
+ * Use `create(WatchMigrationsRequestSchema)` to create a new message.
+ */
+export const WatchMigrationsRequestSchema: GenMessage<WatchMigrationsRequest> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_migration, 3);
+
+/**
+ * @generated from message kubeswift.v1.MigrationEvent
+ */
+export type MigrationEvent = Message<"kubeswift.v1.MigrationEvent"> & {
+  /**
+   * @generated from field: kubeswift.v1.EventType type = 1;
+   */
+  type: EventType;
+
+  /**
+   * @generated from field: kubeswift.v1.Migration migration = 2;
+   */
+  migration?: Migration | undefined;
+
+  /**
+   * error is set on a BOOKMARK event when a member's watch failed, so a failing
+   * member surfaces as a per-cluster problem rather than a dead stream.
+   *
+   * @generated from field: kubeswift.v1.ClusterError error = 3;
+   */
+  error?: ClusterError | undefined;
+};
+
+/**
+ * Describes the message kubeswift.v1.MigrationEvent.
+ * Use `create(MigrationEventSchema)` to create a new message.
+ */
+export const MigrationEventSchema: GenMessage<MigrationEvent> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_migration, 4);
+
+/**
+ * MigrationService is the read plane for migrations. List/Watch fan out across
+ * the selected members and merge, stamping the cluster dimension; the UI
+ * snapshots with List then follows Watch (mirrors GuestService).
  *
  * @generated from service kubeswift.v1.MigrationService
  */
@@ -166,6 +217,14 @@ export const MigrationService: GenService<{
     methodKind: "unary";
     input: typeof ListMigrationsRequestSchema;
     output: typeof ListMigrationsResponseSchema;
+  },
+  /**
+   * @generated from rpc kubeswift.v1.MigrationService.WatchMigrations
+   */
+  watchMigrations: {
+    methodKind: "server_streaming";
+    input: typeof WatchMigrationsRequestSchema;
+    output: typeof MigrationEventSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_kubeswift_v1_migration, 0);
