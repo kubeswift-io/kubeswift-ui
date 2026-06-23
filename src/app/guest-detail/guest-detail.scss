@@ -75,6 +75,16 @@
     dd { margin: 0; word-break: break-word; }
   }
 
+  .charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .muted {
+    font-size: 13px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
   .phase {
     display: inline-block;
     padding: 2px 10px;

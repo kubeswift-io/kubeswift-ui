@@ -44,6 +44,20 @@
   </section>
 
   <section>
+    <h4>Telemetry</h4>
+    @if (metricsError(); as err) {
+      <div class="muted">{{ err }}</div>
+    } @else {
+      <div class="charts">
+        <app-sparkline label="CPU" [values]="seriesValues('cpu_cores')" unit="cores" color="#1a73e8" />
+        <app-sparkline label="Memory" [values]="seriesValues('memory_bytes')" unit="bytes" color="#1e8e3e" />
+        <app-sparkline label="Net RX" [values]="seriesValues('net_rx_bps')" unit="bytes/sec" color="#9334e6" />
+        <app-sparkline label="Net TX" [values]="seriesValues('net_tx_bps')" unit="bytes/sec" color="#e8710a" />
+      </div>
+    }
+  </section>
+
+  <section>
     <h4>Spec</h4>
     <dl>
       <dt>Boot source</dt>

@@ -6,7 +6,7 @@ import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegen
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import type { Timestamp } from "@bufbuild/protobuf/wkt";
 import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { ObjectRef } from "./common_pb";
+import type { ClusterError, ObjectRef } from "./common_pb";
 import { file_kubeswift_v1_common } from "./common_pb";
 import type { Message } from "@bufbuild/protobuf";
 
@@ -14,86 +14,145 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file kubeswift/v1/telemetry.proto.
  */
 export const file_kubeswift_v1_telemetry: GenFile = /*@__PURE__*/
-  fileDesc("ChxrdWJlc3dpZnQvdjEvdGVsZW1ldHJ5LnByb3RvEgxrdWJlc3dpZnQudjEiUQoWU3RyZWFtVk1NZXRyaWNzUmVxdWVzdBImCgVndWVzdBgBIAEoCzIXLmt1YmVzd2lmdC52MS5PYmplY3RSZWYSDwoHbWV0cmljcxgCIAMoCSJvCg5WTU1ldHJpY1NhbXBsZRIPCgdjbHVzdGVyGAEgASgJEg4KBm1ldHJpYxgCIAEoCRINCgV2YWx1ZRgDIAEoARItCgl0aW1lc3RhbXAYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wMmsKEFRlbGVtZXRyeVNlcnZpY2USVwoPU3RyZWFtVk1NZXRyaWNzEiQua3ViZXN3aWZ0LnYxLlN0cmVhbVZNTWV0cmljc1JlcXVlc3QaHC5rdWJlc3dpZnQudjEuVk1NZXRyaWNTYW1wbGUwAUJBWj9naXRodWIuY29tL3Byb2plY3RiZXNrYXIva3ViZXN3aWZ0L2dlbi9rdWJlc3dpZnQvdjE7a3ViZXN3aWZ0djFiBnByb3RvMw", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
+  fileDesc("ChxrdWJlc3dpZnQvdjEvdGVsZW1ldHJ5LnByb3RvEgxrdWJlc3dpZnQudjEibAoWR2V0R3Vlc3RNZXRyaWNzUmVxdWVzdBIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEhYKDndpbmRvd19zZWNvbmRzGAIgASgFEhQKDHN0ZXBfc2Vjb25kcxgDIAEoBSJECgtNZXRyaWNQb2ludBImCgJ0cxgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDQoFdmFsdWUYAiABKAEiVQoMTWV0cmljU2VyaWVzEgwKBGtpbmQYASABKAkSDAoEdW5pdBgCIAEoCRIpCgZwb2ludHMYAyADKAsyGS5rdWJlc3dpZnQudjEuTWV0cmljUG9pbnQicAoXR2V0R3Vlc3RNZXRyaWNzUmVzcG9uc2USKgoGc2VyaWVzGAEgAygLMhoua3ViZXN3aWZ0LnYxLk1ldHJpY1NlcmllcxIpCgVlcnJvchgCIAEoCzIaLmt1YmVzd2lmdC52MS5DbHVzdGVyRXJyb3IycgoQVGVsZW1ldHJ5U2VydmljZRJeCg9HZXRHdWVzdE1ldHJpY3MSJC5rdWJlc3dpZnQudjEuR2V0R3Vlc3RNZXRyaWNzUmVxdWVzdBolLmt1YmVzd2lmdC52MS5HZXRHdWVzdE1ldHJpY3NSZXNwb25zZUJBWj9naXRodWIuY29tL3Byb2plY3RiZXNrYXIva3ViZXN3aWZ0L2dlbi9rdWJlc3dpZnQvdjE7a3ViZXN3aWZ0djFiBnByb3RvMw", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
 
 /**
- * StreamVMMetricsRequest asks for a live metric stream for one guest. The
- * gateway resolves the guest's member cluster (ref.cluster), queries that
- * member's Prometheus, and joins on the swift.kubeswift.io/guest label
- * (decision D4). Stubbed in P0; implemented in P1.
+ * GetGuestMetricsRequest asks for one guest's recent resource usage as range
+ * series for charting. The gateway resolves the guest's current launcher pod
+ * on its member cluster (ref.cluster) and range-queries that member's
+ * Prometheus (cAdvisor; O5 swiftletd vm.counters in v2 — decision D4). The
+ * launcher cgroup is the VM (Cloud Hypervisor runs in it).
  *
- * @generated from message kubeswift.v1.StreamVMMetricsRequest
+ * @generated from message kubeswift.v1.GetGuestMetricsRequest
  */
-export type StreamVMMetricsRequest = Message<"kubeswift.v1.StreamVMMetricsRequest"> & {
+export type GetGuestMetricsRequest = Message<"kubeswift.v1.GetGuestMetricsRequest"> & {
   /**
-   * @generated from field: kubeswift.v1.ObjectRef guest = 1;
+   * @generated from field: kubeswift.v1.ObjectRef ref = 1;
    */
-  guest?: ObjectRef | undefined;
+  ref?: ObjectRef | undefined;
 
   /**
-   * metrics names the series the UI charts (e.g. "cpu", "mem", "disk_io",
-   * "net"); empty requests a default set.
+   * WindowSeconds is the look-back duration; default 900 (15m).
    *
-   * @generated from field: repeated string metrics = 2;
+   * @generated from field: int32 window_seconds = 2;
    */
-  metrics: string[];
+  windowSeconds: number;
+
+  /**
+   * StepSeconds is the sample interval; default 30.
+   *
+   * @generated from field: int32 step_seconds = 3;
+   */
+  stepSeconds: number;
 };
 
 /**
- * Describes the message kubeswift.v1.StreamVMMetricsRequest.
- * Use `create(StreamVMMetricsRequestSchema)` to create a new message.
+ * Describes the message kubeswift.v1.GetGuestMetricsRequest.
+ * Use `create(GetGuestMetricsRequestSchema)` to create a new message.
  */
-export const StreamVMMetricsRequestSchema: GenMessage<StreamVMMetricsRequest> = /*@__PURE__*/
+export const GetGuestMetricsRequestSchema: GenMessage<GetGuestMetricsRequest> = /*@__PURE__*/
   messageDesc(file_kubeswift_v1_telemetry, 0);
 
 /**
- * VMMetricSample is one point on one series, tagged with its cluster.
+ * MetricPoint is one sample on one series.
  *
- * @generated from message kubeswift.v1.VMMetricSample
+ * @generated from message kubeswift.v1.MetricPoint
  */
-export type VMMetricSample = Message<"kubeswift.v1.VMMetricSample"> & {
+export type MetricPoint = Message<"kubeswift.v1.MetricPoint"> & {
   /**
-   * @generated from field: string cluster = 1;
+   * @generated from field: google.protobuf.Timestamp ts = 1;
    */
-  cluster: string;
+  ts?: Timestamp | undefined;
 
   /**
-   * @generated from field: string metric = 2;
-   */
-  metric: string;
-
-  /**
-   * @generated from field: double value = 3;
+   * @generated from field: double value = 2;
    */
   value: number;
-
-  /**
-   * @generated from field: google.protobuf.Timestamp timestamp = 4;
-   */
-  timestamp?: Timestamp | undefined;
 };
 
 /**
- * Describes the message kubeswift.v1.VMMetricSample.
- * Use `create(VMMetricSampleSchema)` to create a new message.
+ * Describes the message kubeswift.v1.MetricPoint.
+ * Use `create(MetricPointSchema)` to create a new message.
  */
-export const VMMetricSampleSchema: GenMessage<VMMetricSample> = /*@__PURE__*/
+export const MetricPointSchema: GenMessage<MetricPoint> = /*@__PURE__*/
   messageDesc(file_kubeswift_v1_telemetry, 1);
 
 /**
- * TelemetryService streams per-VM telemetry sourced from each member's
+ * MetricSeries is one named series over the window.
+ *
+ * @generated from message kubeswift.v1.MetricSeries
+ */
+export type MetricSeries = Message<"kubeswift.v1.MetricSeries"> & {
+  /**
+   * Kind: cpu_cores | memory_bytes | net_rx_bps | net_tx_bps.
+   *
+   * @generated from field: string kind = 1;
+   */
+  kind: string;
+
+  /**
+   * Unit: cores | bytes | bytes/sec — a UI formatting hint.
+   *
+   * @generated from field: string unit = 2;
+   */
+  unit: string;
+
+  /**
+   * @generated from field: repeated kubeswift.v1.MetricPoint points = 3;
+   */
+  points: MetricPoint[];
+};
+
+/**
+ * Describes the message kubeswift.v1.MetricSeries.
+ * Use `create(MetricSeriesSchema)` to create a new message.
+ */
+export const MetricSeriesSchema: GenMessage<MetricSeries> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_telemetry, 2);
+
+/**
+ * GetGuestMetricsResponse carries the series, or an error when the member's
+ * Prometheus is unconfigured/unreachable (never a silent empty chart).
+ *
+ * @generated from message kubeswift.v1.GetGuestMetricsResponse
+ */
+export type GetGuestMetricsResponse = Message<"kubeswift.v1.GetGuestMetricsResponse"> & {
+  /**
+   * @generated from field: repeated kubeswift.v1.MetricSeries series = 1;
+   */
+  series: MetricSeries[];
+
+  /**
+   * Error is set (and series empty) when telemetry could not be sourced —
+   * e.g. no prometheusEndpoint registered for the cluster, or it was
+   * unreachable. The cluster field carries ref.cluster.
+   *
+   * @generated from field: kubeswift.v1.ClusterError error = 2;
+   */
+  error?: ClusterError | undefined;
+};
+
+/**
+ * Describes the message kubeswift.v1.GetGuestMetricsResponse.
+ * Use `create(GetGuestMetricsResponseSchema)` to create a new message.
+ */
+export const GetGuestMetricsResponseSchema: GenMessage<GetGuestMetricsResponse> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_telemetry, 3);
+
+/**
+ * TelemetryService serves per-VM telemetry sourced from each member's
  * Prometheus (cAdvisor today, O5 swiftletd vm.counters in v2 — decision D4).
  *
  * @generated from service kubeswift.v1.TelemetryService
  */
 export const TelemetryService: GenService<{
   /**
-   * @generated from rpc kubeswift.v1.TelemetryService.StreamVMMetrics
+   * @generated from rpc kubeswift.v1.TelemetryService.GetGuestMetrics
    */
-  streamVMMetrics: {
-    methodKind: "server_streaming";
-    input: typeof StreamVMMetricsRequestSchema;
-    output: typeof VMMetricSampleSchema;
+  getGuestMetrics: {
+    methodKind: "unary";
+    input: typeof GetGuestMetricsRequestSchema;
+    output: typeof GetGuestMetricsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_kubeswift_v1_telemetry, 0);

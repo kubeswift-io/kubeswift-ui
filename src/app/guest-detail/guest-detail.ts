@@ -1,10 +1,12 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { timestampDate } from '@bufbuild/protobuf/wkt';
 import type { Guest } from '../gen/kubeswift/v1/guest_pb';
+import type { MetricSeries } from '../gen/kubeswift/v1/telemetry_pb';
 import { GatewayService } from '../gateway.service';
+import { Sparkline } from '../sparkline/sparkline';
 
 /**
  * GuestDetail is the right slide-in drawer for one VM. It opens instantly from
@@ -18,7 +20,7 @@ import { GatewayService } from '../gateway.service';
  */
 @Component({
   selector: 'app-guest-detail',
-  imports: [MatIconModule, MatButtonModule, MatProgressBarModule],
+  imports: [MatIconModule, MatButtonModule, MatProgressBarModule, Sparkline],
   templateUrl: './guest-detail.html',
   styleUrl: './guest-detail.scss',
 })
@@ -29,6 +31,55 @@ export class GuestDetail {
 
   readonly acting = signal(false);
   readonly actionError = signal<string | null>(null);
+
+  // Telemetry: range series polled from the gateway while the drawer is open.
+  readonly metrics = signal<MetricSeries[]>([]);
+  readonly metricsError = signal<string | null>(null);
+
+  // Identity key — the poll restarts only when a DIFFERENT guest is shown, not
+  // on every live-Watch field update of the same guest.
+  private readonly refKey = computed(() => {
+    const r = this.guest().ref;
+    return r ? `${r.cluster}/${r.namespace}/${r.name}` : '';
+  });
+
+  constructor() {
+    effect((onCleanup) => {
+      const key = this.refKey(); // tracked: re-runs on guest identity change
+      this.metrics.set([]);
+      this.metricsError.set(null);
+      if (!key) return;
+      const ref = untracked(() => this.guest().ref); // untracked: not on field updates
+      if (!ref) return;
+      let stopped = false;
+      const poll = async () => {
+        try {
+          const res = await this.gw.telemetry.getGuestMetrics({ ref, windowSeconds: 900, stepSeconds: 30 });
+          if (stopped) return;
+          if (res.error) {
+            this.metricsError.set(res.error.message);
+            this.metrics.set([]);
+          } else {
+            this.metricsError.set(null);
+            this.metrics.set(res.series);
+          }
+        } catch (e: unknown) {
+          if (!stopped) this.metricsError.set(e instanceof Error ? e.message : String(e));
+        }
+      };
+      void poll();
+      const id = setInterval(() => void poll(), 15000);
+      onCleanup(() => {
+        stopped = true;
+        clearInterval(id);
+      });
+    });
+  }
+
+  // values for one metric kind (empty until the first poll lands).
+  seriesValues(kind: string): number[] {
+    return this.metrics().find((s) => s.kind === kind)?.points.map((p) => p.value) ?? [];
+  }
 
   created(): string {
     const ts = this.guest().createdAt;
