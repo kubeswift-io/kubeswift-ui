@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file kubeswift/v1/guest.proto.
  */
 export const file_kubeswift_v1_guest: GenFile = /*@__PURE__*/
-  fileDesc("ChhrdWJlc3dpZnQvdjEvZ3Vlc3QucHJvdG8SDGt1YmVzd2lmdC52MSKWAwoFR3Vlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZhINCgVwaGFzZRgCIAEoCRIRCglub2RlX25hbWUYAyABKAkSEgoKaHlwZXJ2aXNvchgEIAEoCRISCgpwcmltYXJ5X2lwGAUgASgJEhMKC2Jvb3Rfc291cmNlGAYgASgJEhMKC2d1ZXN0X2NsYXNzGAcgASgJEhUKDWd1ZXN0X3J1bm5pbmcYCCABKAgSCwoDY3B1GAkgASgFEhIKCm1lbW9yeV9taWIYCiABKAMSLgoKY3JlYXRlZF9hdBgLIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKwoKY29uZGl0aW9ucxgMIAMoCzIXLmt1YmVzd2lmdC52MS5Db25kaXRpb24SLwoGbGFiZWxzGA0gAygLMh8ua3ViZXN3aWZ0LnYxLkd1ZXN0LkxhYmVsc0VudHJ5Gi0KC0xhYmVsc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEijwEKEUxpc3RHdWVzdHNSZXF1ZXN0Ei8KCGNsdXN0ZXJzGAEgASgLMh0ua3ViZXN3aWZ0LnYxLkNsdXN0ZXJTZWxlY3RvchIRCgluYW1lc3BhY2UYAiABKAkSDQoFcGhhc2UYAyABKAkSJwoEcGFnZRgEIAEoCzIZLmt1YmVzd2lmdC52MS5QYWdlUmVxdWVzdCKPAQoSTGlzdEd1ZXN0c1Jlc3BvbnNlEiMKBmd1ZXN0cxgBIAMoCzITLmt1YmVzd2lmdC52MS5HdWVzdBIoCgRwYWdlGAIgASgLMhoua3ViZXN3aWZ0LnYxLlBhZ2VSZXNwb25zZRIqCgZlcnJvcnMYAyADKAsyGi5rdWJlc3dpZnQudjEuQ2x1c3RlckVycm9yIlgKEldhdGNoR3Vlc3RzUmVxdWVzdBIvCghjbHVzdGVycxgBIAEoCzIdLmt1YmVzd2lmdC52MS5DbHVzdGVyU2VsZWN0b3ISEQoJbmFtZXNwYWNlGAIgASgJIoIBCgpHdWVzdEV2ZW50EiUKBHR5cGUYASABKA4yFy5rdWJlc3dpZnQudjEuRXZlbnRUeXBlEiIKBWd1ZXN0GAIgASgLMhMua3ViZXN3aWZ0LnYxLkd1ZXN0EikKBWVycm9yGAMgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvciI9ChVHZXRHdWVzdERldGFpbFJlcXVlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZiI8ChZHZXRHdWVzdERldGFpbFJlc3BvbnNlEiIKBWd1ZXN0GAEgASgLMhMua3ViZXN3aWZ0LnYxLkd1ZXN0IjoKEkd1ZXN0QWN0aW9uUmVxdWVzdBIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmIjkKE0d1ZXN0QWN0aW9uUmVzcG9uc2USIgoFZ3Vlc3QYASABKAsyEy5rdWJlc3dpZnQudjEuR3Vlc3QidwoTTWlncmF0ZUd1ZXN0UmVxdWVzdBIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEhMKC3RhcmdldF9ub2RlGAIgASgJEgwKBG1vZGUYAyABKAkSFwoPYWxsb3dfaXBfY2hhbmdlGAQgASgIIkIKFE1pZ3JhdGVHdWVzdFJlc3BvbnNlEioKCW1pZ3JhdGlvbhgBIAEoCzIXLmt1YmVzd2lmdC52MS5PYmplY3RSZWYyhQQKDEd1ZXN0U2VydmljZRJPCgpMaXN0R3Vlc3RzEh8ua3ViZXN3aWZ0LnYxLkxpc3RHdWVzdHNSZXF1ZXN0GiAua3ViZXN3aWZ0LnYxLkxpc3RHdWVzdHNSZXNwb25zZRJLCgtXYXRjaEd1ZXN0cxIgLmt1YmVzd2lmdC52MS5XYXRjaEd1ZXN0c1JlcXVlc3QaGC5rdWJlc3dpZnQudjEuR3Vlc3RFdmVudDABElsKDkdldEd1ZXN0RGV0YWlsEiMua3ViZXN3aWZ0LnYxLkdldEd1ZXN0RGV0YWlsUmVxdWVzdBokLmt1YmVzd2lmdC52MS5HZXRHdWVzdERldGFpbFJlc3BvbnNlElEKClN0YXJ0R3Vlc3QSIC5rdWJlc3dpZnQudjEuR3Vlc3RBY3Rpb25SZXF1ZXN0GiEua3ViZXN3aWZ0LnYxLkd1ZXN0QWN0aW9uUmVzcG9uc2USUAoJU3RvcEd1ZXN0EiAua3ViZXN3aWZ0LnYxLkd1ZXN0QWN0aW9uUmVxdWVzdBohLmt1YmVzd2lmdC52MS5HdWVzdEFjdGlvblJlc3BvbnNlElUKDE1pZ3JhdGVHdWVzdBIhLmt1YmVzd2lmdC52MS5NaWdyYXRlR3Vlc3RSZXF1ZXN0GiIua3ViZXN3aWZ0LnYxLk1pZ3JhdGVHdWVzdFJlc3BvbnNlQkFaP2dpdGh1Yi5jb20vcHJvamVjdGJlc2thci9rdWJlc3dpZnQvZ2VuL2t1YmVzd2lmdC92MTtrdWJlc3dpZnR2MWIGcHJvdG8z", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
+  fileDesc("ChhrdWJlc3dpZnQvdjEvZ3Vlc3QucHJvdG8SDGt1YmVzd2lmdC52MSKWAwoFR3Vlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZhINCgVwaGFzZRgCIAEoCRIRCglub2RlX25hbWUYAyABKAkSEgoKaHlwZXJ2aXNvchgEIAEoCRISCgpwcmltYXJ5X2lwGAUgASgJEhMKC2Jvb3Rfc291cmNlGAYgASgJEhMKC2d1ZXN0X2NsYXNzGAcgASgJEhUKDWd1ZXN0X3J1bm5pbmcYCCABKAgSCwoDY3B1GAkgASgFEhIKCm1lbW9yeV9taWIYCiABKAMSLgoKY3JlYXRlZF9hdBgLIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKwoKY29uZGl0aW9ucxgMIAMoCzIXLmt1YmVzd2lmdC52MS5Db25kaXRpb24SLwoGbGFiZWxzGA0gAygLMh8ua3ViZXN3aWZ0LnYxLkd1ZXN0LkxhYmVsc0VudHJ5Gi0KC0xhYmVsc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEijwEKEUxpc3RHdWVzdHNSZXF1ZXN0Ei8KCGNsdXN0ZXJzGAEgASgLMh0ua3ViZXN3aWZ0LnYxLkNsdXN0ZXJTZWxlY3RvchIRCgluYW1lc3BhY2UYAiABKAkSDQoFcGhhc2UYAyABKAkSJwoEcGFnZRgEIAEoCzIZLmt1YmVzd2lmdC52MS5QYWdlUmVxdWVzdCKPAQoSTGlzdEd1ZXN0c1Jlc3BvbnNlEiMKBmd1ZXN0cxgBIAMoCzITLmt1YmVzd2lmdC52MS5HdWVzdBIoCgRwYWdlGAIgASgLMhoua3ViZXN3aWZ0LnYxLlBhZ2VSZXNwb25zZRIqCgZlcnJvcnMYAyADKAsyGi5rdWJlc3dpZnQudjEuQ2x1c3RlckVycm9yIlgKEldhdGNoR3Vlc3RzUmVxdWVzdBIvCghjbHVzdGVycxgBIAEoCzIdLmt1YmVzd2lmdC52MS5DbHVzdGVyU2VsZWN0b3ISEQoJbmFtZXNwYWNlGAIgASgJIoIBCgpHdWVzdEV2ZW50EiUKBHR5cGUYASABKA4yFy5rdWJlc3dpZnQudjEuRXZlbnRUeXBlEiIKBWd1ZXN0GAIgASgLMhMua3ViZXN3aWZ0LnYxLkd1ZXN0EikKBWVycm9yGAMgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvciI9ChVHZXRHdWVzdERldGFpbFJlcXVlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZiI8ChZHZXRHdWVzdERldGFpbFJlc3BvbnNlEiIKBWd1ZXN0GAEgASgLMhMua3ViZXN3aWZ0LnYxLkd1ZXN0IjoKEkd1ZXN0QWN0aW9uUmVxdWVzdBIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmIjkKE0d1ZXN0QWN0aW9uUmVzcG9uc2USIgoFZ3Vlc3QYASABKAsyEy5rdWJlc3dpZnQudjEuR3Vlc3QidwoTTWlncmF0ZUd1ZXN0UmVxdWVzdBIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEhMKC3RhcmdldF9ub2RlGAIgASgJEgwKBG1vZGUYAyABKAkSFwoPYWxsb3dfaXBfY2hhbmdlGAQgASgIIkIKFE1pZ3JhdGVHdWVzdFJlc3BvbnNlEioKCW1pZ3JhdGlvbhgBIAEoCzIXLmt1YmVzd2lmdC52MS5PYmplY3RSZWYiYgoNR3Vlc3RQb3J0U3BlYxIMCgRuYW1lGAEgASgJEgwKBHBvcnQYAiABKAUSEwoLdGFyZ2V0X3BvcnQYAyABKAUSEAoIcHJvdG9jb2wYBCABKAkSDgoGZXhwb3NlGAUgASgJIuwCChJDcmVhdGVHdWVzdFJlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIRCgluYW1lc3BhY2UYAiABKAkSDAoEbmFtZRgDIAEoCRIRCglpbWFnZV9yZWYYBCABKAkSEgoKa2VybmVsX3JlZhgFIAEoCRIWCg5rZXJuZWxfY21kbGluZRgGIAEoCRIaChJjbG9uZV9zbmFwc2hvdF9yZWYYByABKAkSGQoRY2xvbmVfdGFyZ2V0X25vZGUYCCABKAkSFwoPZ3Vlc3RfY2xhc3NfcmVmGAkgASgJEhgKEHNlZWRfcHJvZmlsZV9yZWYYCiABKAkSFwoPZ3B1X3Byb2ZpbGVfcmVmGAsgASgJEhIKCnJ1bl9wb2xpY3kYDCABKAkSDwoHb3NfdHlwZRgNIAEoCRIRCglub2RlX25hbWUYDiABKAkSKgoFcG9ydHMYDyADKAsyGy5rdWJlc3dpZnQudjEuR3Vlc3RQb3J0U3BlYyI7ChNDcmVhdGVHdWVzdFJlc3BvbnNlEiQKA3JlZhgBIAEoCzIXLmt1YmVzd2lmdC52MS5PYmplY3RSZWYy2QQKDEd1ZXN0U2VydmljZRJPCgpMaXN0R3Vlc3RzEh8ua3ViZXN3aWZ0LnYxLkxpc3RHdWVzdHNSZXF1ZXN0GiAua3ViZXN3aWZ0LnYxLkxpc3RHdWVzdHNSZXNwb25zZRJLCgtXYXRjaEd1ZXN0cxIgLmt1YmVzd2lmdC52MS5XYXRjaEd1ZXN0c1JlcXVlc3QaGC5rdWJlc3dpZnQudjEuR3Vlc3RFdmVudDABElsKDkdldEd1ZXN0RGV0YWlsEiMua3ViZXN3aWZ0LnYxLkdldEd1ZXN0RGV0YWlsUmVxdWVzdBokLmt1YmVzd2lmdC52MS5HZXRHdWVzdERldGFpbFJlc3BvbnNlElEKClN0YXJ0R3Vlc3QSIC5rdWJlc3dpZnQudjEuR3Vlc3RBY3Rpb25SZXF1ZXN0GiEua3ViZXN3aWZ0LnYxLkd1ZXN0QWN0aW9uUmVzcG9uc2USUAoJU3RvcEd1ZXN0EiAua3ViZXN3aWZ0LnYxLkd1ZXN0QWN0aW9uUmVxdWVzdBohLmt1YmVzd2lmdC52MS5HdWVzdEFjdGlvblJlc3BvbnNlElUKDE1pZ3JhdGVHdWVzdBIhLmt1YmVzd2lmdC52MS5NaWdyYXRlR3Vlc3RSZXF1ZXN0GiIua3ViZXN3aWZ0LnYxLk1pZ3JhdGVHdWVzdFJlc3BvbnNlElIKC0NyZWF0ZUd1ZXN0EiAua3ViZXN3aWZ0LnYxLkNyZWF0ZUd1ZXN0UmVxdWVzdBohLmt1YmVzd2lmdC52MS5DcmVhdGVHdWVzdFJlc3BvbnNlQkFaP2dpdGh1Yi5jb20vcHJvamVjdGJlc2thci9rdWJlc3dpZnQvZ2VuL2t1YmVzd2lmdC92MTtrdWJlc3dpZnR2MWIGcHJvdG8z", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
 
 /**
  * Guest is a UI-shaped, denormalized view of a SwiftGuest across the fleet.
@@ -369,6 +369,194 @@ export const MigrateGuestResponseSchema: GenMessage<MigrateGuestResponse> = /*@_
   messageDesc(file_kubeswift_v1_guest, 10);
 
 /**
+ * GuestPortSpec is one declarative service port for a created guest (the
+ * service-exposure surface). expose mints a per-guest Service; omitted = DNAT
+ * only.
+ *
+ * @generated from message kubeswift.v1.GuestPortSpec
+ */
+export type GuestPortSpec = Message<"kubeswift.v1.GuestPortSpec"> & {
+  /**
+   * required when more than one port
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: int32 port = 2;
+   */
+  port: number;
+
+  /**
+   * defaults to port
+   *
+   * @generated from field: int32 target_port = 3;
+   */
+  targetPort: number;
+
+  /**
+   * TCP (default) | UDP | SCTP
+   *
+   * @generated from field: string protocol = 4;
+   */
+  protocol: string;
+
+  /**
+   * "" | ClusterIP | NodePort | LoadBalancer
+   *
+   * @generated from field: string expose = 5;
+   */
+  expose: string;
+};
+
+/**
+ * Describes the message kubeswift.v1.GuestPortSpec.
+ * Use `create(GuestPortSpecSchema)` to create a new message.
+ */
+export const GuestPortSpecSchema: GenMessage<GuestPortSpec> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_guest, 11);
+
+/**
+ * CreateGuestRequest is the structured input the Create-VM wizard submits. The
+ * gateway builds a SwiftGuest from it and server-side-applies it AS THE
+ * IMPERSONATED USER, so the member's RBAC + the SwiftGuest admission webhook are
+ * the authority (a denial surfaces, never a silent create). Exactly one boot
+ * source (image / kernel / clone) is required.
+ *
+ * @generated from message kubeswift.v1.CreateGuestRequest
+ */
+export type CreateGuestRequest = Message<"kubeswift.v1.CreateGuestRequest"> & {
+  /**
+   * @generated from field: string cluster = 1;
+   */
+  cluster: string;
+
+  /**
+   * @generated from field: string namespace = 2;
+   */
+  namespace: string;
+
+  /**
+   * @generated from field: string name = 3;
+   */
+  name: string;
+
+  /**
+   * Boot source — exactly one of:
+   *
+   * SwiftImage name (disk boot)
+   *
+   * @generated from field: string image_ref = 4;
+   */
+  imageRef: string;
+
+  /**
+   * SwiftKernel name (kernel boot)
+   *
+   * @generated from field: string kernel_ref = 5;
+   */
+  kernelRef: string;
+
+  /**
+   * optional, with kernel_ref
+   *
+   * @generated from field: string kernel_cmdline = 6;
+   */
+  kernelCmdline: string;
+
+  /**
+   * SwiftSnapshot name (cloneFromSnapshot)
+   *
+   * @generated from field: string clone_snapshot_ref = 7;
+   */
+  cloneSnapshotRef: string;
+
+  /**
+   * optional pin (required for an s3 snapshot)
+   *
+   * @generated from field: string clone_target_node = 8;
+   */
+  cloneTargetNode: string;
+
+  /**
+   * REQUIRED (CPU/mem)
+   *
+   * @generated from field: string guest_class_ref = 9;
+   */
+  guestClassRef: string;
+
+  /**
+   * optional (cloud-init; disk boot)
+   *
+   * @generated from field: string seed_profile_ref = 10;
+   */
+  seedProfileRef: string;
+
+  /**
+   * optional (combines with image, not kernel)
+   *
+   * @generated from field: string gpu_profile_ref = 11;
+   */
+  gpuProfileRef: string;
+
+  /**
+   * default Running
+   *
+   * @generated from field: string run_policy = 12;
+   */
+  runPolicy: string;
+
+  /**
+   * "" | linux | windows
+   *
+   * @generated from field: string os_type = 13;
+   */
+  osType: string;
+
+  /**
+   * optional pin
+   *
+   * @generated from field: string node_name = 14;
+   */
+  nodeName: string;
+
+  /**
+   * optional service ports
+   *
+   * @generated from field: repeated kubeswift.v1.GuestPortSpec ports = 15;
+   */
+  ports: GuestPortSpec[];
+};
+
+/**
+ * Describes the message kubeswift.v1.CreateGuestRequest.
+ * Use `create(CreateGuestRequestSchema)` to create a new message.
+ */
+export const CreateGuestRequestSchema: GenMessage<CreateGuestRequest> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_guest, 12);
+
+/**
+ * CreateGuestResponse returns the new guest's ref; the live WatchGuests stream
+ * carries its phase from there.
+ *
+ * @generated from message kubeswift.v1.CreateGuestResponse
+ */
+export type CreateGuestResponse = Message<"kubeswift.v1.CreateGuestResponse"> & {
+  /**
+   * @generated from field: kubeswift.v1.ObjectRef ref = 1;
+   */
+  ref?: ObjectRef | undefined;
+};
+
+/**
+ * Describes the message kubeswift.v1.CreateGuestResponse.
+ * Use `create(CreateGuestResponseSchema)` to create a new message.
+ */
+export const CreateGuestResponseSchema: GenMessage<CreateGuestResponse> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_guest, 13);
+
+/**
  * GuestService is the read plane for VM inventory plus the P1/P2 write actions.
  * List/Watch fan out across the selected member clusters and merge, stamping
  * the cluster dimension on every row; a per-cluster error surface preserves
@@ -431,6 +619,18 @@ export const GuestService: GenService<{
     methodKind: "unary";
     input: typeof MigrateGuestRequestSchema;
     output: typeof MigrateGuestResponseSchema;
+  },
+  /**
+   * Create (write plane, P3): build + server-side-apply a SwiftGuest from the
+   * wizard's structured input. The impersonated user must be allowed to create
+   * swiftguests on the member; the admission webhook validates the spec.
+   *
+   * @generated from rpc kubeswift.v1.GuestService.CreateGuest
+   */
+  createGuest: {
+    methodKind: "unary";
+    input: typeof CreateGuestRequestSchema;
+    output: typeof CreateGuestResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_kubeswift_v1_guest, 0);

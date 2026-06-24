@@ -1,0 +1,222 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <div class="title">
+      <span class="name">New VM</span>
+      <span class="sub">create a SwiftGuest</span>
+    </div>
+    <select
+      class="cluster"
+      [value]="cluster()"
+      (change)="selectCluster($any($event.target).value)"
+      title="Target cluster"
+    >
+      @for (c of clusters(); track c.name) {
+        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
+      }
+    </select>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  <div class="body">
+    <div class="row2">
+      <label class="field">
+        <span>Namespace</span>
+        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
+          @for (ns of namespaces(); track ns) {
+            <option [value]="ns">{{ ns }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>Name</span>
+        <input placeholder="my-vm" [value]="name()" (input)="name.set($any($event.target).value)" />
+      </label>
+    </div>
+
+    <h4>Boot source</h4>
+    <div class="seg">
+      <button [class.on]="bootSource() === 'image'" (click)="bootSource.set('image')">Image</button>
+      <button [class.on]="bootSource() === 'kernel'" (click)="bootSource.set('kernel')">
+        Kernel
+      </button>
+      <button [class.on]="bootSource() === 'clone'" (click)="bootSource.set('clone')">Clone</button>
+    </div>
+
+    @if (bootSource() === 'image') {
+      <label class="field">
+        <span>SwiftImage</span>
+        <select [value]="imageRef()" (change)="imageRef.set($any($event.target).value)">
+          <option value="">— select an image —</option>
+          @for (i of images(); track i) {
+            <option [value]="i">{{ i }}</option>
+          }
+        </select>
+      </label>
+    } @else if (bootSource() === 'kernel') {
+      <label class="field">
+        <span>SwiftKernel</span>
+        <select [value]="kernelRef()" (change)="kernelRef.set($any($event.target).value)">
+          <option value="">— select a kernel —</option>
+          @for (k of kernels(); track k) {
+            <option [value]="k">{{ k }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>Kernel cmdline (optional)</span>
+        <input
+          placeholder="console=ttyS0 ..."
+          [value]="kernelCmdline()"
+          (input)="kernelCmdline.set($any($event.target).value)"
+        />
+      </label>
+    } @else {
+      <label class="field">
+        <span>SwiftSnapshot</span>
+        <select
+          [value]="cloneSnapshotRef()"
+          (change)="cloneSnapshotRef.set($any($event.target).value)"
+        >
+          <option value="">— select a snapshot —</option>
+          @for (s of snapshots(); track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>Target node (required for s3 snapshots)</span>
+        <select
+          [value]="cloneTargetNode()"
+          (change)="cloneTargetNode.set($any($event.target).value)"
+        >
+          <option value="">— pinned to capture node —</option>
+          @for (n of nodes(); track n) {
+            <option [value]="n">{{ n }}</option>
+          }
+        </select>
+      </label>
+    }
+
+    <h4>Configuration</h4>
+    <div class="row2">
+      <label class="field">
+        <span>Guest class *</span>
+        <select [value]="guestClassRef()" (change)="guestClassRef.set($any($event.target).value)">
+          <option value="">— select a class —</option>
+          @for (c of classes(); track c) {
+            <option [value]="c">{{ c }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>Run policy</span>
+        <select [value]="runPolicy()" (change)="runPolicy.set($any($event.target).value)">
+          <option value="Running">Running</option>
+          <option value="Stopped">Stopped</option>
+          <option value="RestartOnFailure">RestartOnFailure</option>
+          <option value="Always">Always</option>
+        </select>
+      </label>
+    </div>
+    <div class="row2">
+      <label class="field">
+        <span>Seed profile (optional)</span>
+        <select [value]="seedProfileRef()" (change)="seedProfileRef.set($any($event.target).value)">
+          <option value="">— none —</option>
+          @for (s of seeds(); track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>Node pin (optional)</span>
+        <select [value]="nodeName()" (change)="nodeName.set($any($event.target).value)">
+          <option value="">— scheduler chooses —</option>
+          @for (n of nodes(); track n) {
+            <option [value]="n">{{ n }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    @if (bootSource() === 'image') {
+      <div class="row2">
+        <label class="field">
+          <span>GPU profile (optional)</span>
+          <select [value]="gpuProfileRef()" (change)="gpuProfileRef.set($any($event.target).value)">
+            <option value="">— none —</option>
+            @for (g of gpuProfiles(); track g) {
+              <option [value]="g">{{ g }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>OS type</span>
+          <select [value]="osType()" (change)="osType.set($any($event.target).value)">
+            <option value="">Linux (default)</option>
+            <option value="windows">Windows</option>
+          </select>
+        </label>
+      </div>
+    }
+
+    <h4>
+      Service ports
+      <span class="spacer"></span>
+      <button class="link" (click)="addPort()">+ Add port</button>
+    </h4>
+    @if (ports().length) {
+      <div class="ports">
+        <div class="phead">
+          <span>Name</span><span>Port</span><span>Target</span><span>Expose</span><span></span>
+        </div>
+        @for (p of ports(); track $index) {
+          <div class="prow">
+            <input
+              placeholder="ssh"
+              [value]="p.name"
+              (input)="setPort($index, 'name', $any($event.target).value)"
+            />
+            <input
+              type="number"
+              placeholder="22"
+              [value]="p.port || ''"
+              (input)="setPort($index, 'port', $any($event.target).value)"
+            />
+            <input
+              type="number"
+              placeholder="22"
+              [value]="p.targetPort || ''"
+              (input)="setPort($index, 'targetPort', $any($event.target).value)"
+            />
+            <select
+              [value]="p.expose"
+              (change)="setPort($index, 'expose', $any($event.target).value)"
+            >
+              <option value="">DNAT only</option>
+              <option value="ClusterIP">ClusterIP</option>
+              <option value="NodePort">NodePort</option>
+              <option value="LoadBalancer">LoadBalancer</option>
+            </select>
+            <button class="rowx" (click)="removePort($index)" title="Remove">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="actions">
+    <button class="primary" [disabled]="!canCreate() || busy()" (click)="create()">
+      {{ busy() ? 'Creating…' : 'Create VM' }}
+    </button>
+    <button class="ghost" (click)="closed.emit()">Cancel</button>
+  </div>
+</aside>
