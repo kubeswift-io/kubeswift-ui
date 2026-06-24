@@ -4,6 +4,7 @@ import { GatewayService } from '../gateway.service';
 import type { ResourceKind, Resource } from '../gen/kubeswift/v1/resource_pb';
 import type { Cluster } from '../gen/kubeswift/v1/cluster_pb';
 import type { ClusterError } from '../gen/kubeswift/v1/common_pb';
+import { NodeDrawer } from '../node-drawer/node-drawer';
 
 interface KindGroup {
   category: string;
@@ -19,7 +20,7 @@ interface KindGroup {
  */
 @Component({
   selector: 'app-explorer',
-  imports: [MatIconModule],
+  imports: [MatIconModule, NodeDrawer],
   templateUrl: './explorer.html',
   styleUrl: './explorer.scss',
 })
@@ -36,6 +37,7 @@ export class Explorer implements OnInit {
   readonly error = signal<ClusterError | null>(null); // per-cluster (partial) failure
   readonly loading = signal(false);
   readonly loadError = signal<string | null>(null); // hard RPC failure
+  readonly selectedNode = signal<string | null>(null); // open the node drawer (Nodes kind)
 
   private readonly categoryOrder = [
     'Cluster',
@@ -149,6 +151,23 @@ export class Explorer implements OnInit {
 
   key(r: Resource): string {
     return `${r.ref?.namespace ?? ''}/${r.ref?.name ?? ''}`;
+  }
+
+  // Node rows are clickable -> the node drawer (health + capacity + metrics).
+  isNodesKind(): boolean {
+    return this.selectedKind()?.key === 'nodes';
+  }
+  openRow(r: Resource): void {
+    if (this.isNodesKind()) this.selectedNode.set(r.ref?.name ?? null);
+  }
+  closeNode(): void {
+    this.selectedNode.set(null);
+  }
+  // Health-dot colour from a node's projected status string.
+  nodeDot(status: string): 'green' | 'amber' | 'red' {
+    if (status.includes('NotReady')) return 'red';
+    if (status.includes('SchedulingDisabled') || status.includes('Pressure')) return 'amber';
+    return status.includes('Ready') ? 'green' : 'amber';
   }
 
   cell(r: Resource, col: string): string {

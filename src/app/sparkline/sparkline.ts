@@ -101,6 +101,8 @@ function formatValue(v: number, unit: string): string {
       return humanBytes(v);
     case 'bytes/sec':
       return humanBytes(v) + '/s';
+    case 'ratio':
+      return (v * 100).toFixed(1) + '%';
     default:
       return v.toFixed(2);
   }

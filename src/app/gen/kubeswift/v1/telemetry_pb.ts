@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file kubeswift/v1/telemetry.proto.
  */
 export const file_kubeswift_v1_telemetry: GenFile = /*@__PURE__*/
-  fileDesc("ChxrdWJlc3dpZnQvdjEvdGVsZW1ldHJ5LnByb3RvEgxrdWJlc3dpZnQudjEibAoWR2V0R3Vlc3RNZXRyaWNzUmVxdWVzdBIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEhYKDndpbmRvd19zZWNvbmRzGAIgASgFEhQKDHN0ZXBfc2Vjb25kcxgDIAEoBSJECgtNZXRyaWNQb2ludBImCgJ0cxgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDQoFdmFsdWUYAiABKAEiVQoMTWV0cmljU2VyaWVzEgwKBGtpbmQYASABKAkSDAoEdW5pdBgCIAEoCRIpCgZwb2ludHMYAyADKAsyGS5rdWJlc3dpZnQudjEuTWV0cmljUG9pbnQicAoXR2V0R3Vlc3RNZXRyaWNzUmVzcG9uc2USKgoGc2VyaWVzGAEgAygLMhoua3ViZXN3aWZ0LnYxLk1ldHJpY1NlcmllcxIpCgVlcnJvchgCIAEoCzIaLmt1YmVzd2lmdC52MS5DbHVzdGVyRXJyb3IycgoQVGVsZW1ldHJ5U2VydmljZRJeCg9HZXRHdWVzdE1ldHJpY3MSJC5rdWJlc3dpZnQudjEuR2V0R3Vlc3RNZXRyaWNzUmVxdWVzdBolLmt1YmVzd2lmdC52MS5HZXRHdWVzdE1ldHJpY3NSZXNwb25zZUJBWj9naXRodWIuY29tL3Byb2plY3RiZXNrYXIva3ViZXN3aWZ0L2dlbi9rdWJlc3dpZnQvdjE7a3ViZXN3aWZ0djFiBnByb3RvMw", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
+  fileDesc("ChxrdWJlc3dpZnQvdjEvdGVsZW1ldHJ5LnByb3RvEgxrdWJlc3dpZnQudjEibAoWR2V0R3Vlc3RNZXRyaWNzUmVxdWVzdBIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEhYKDndpbmRvd19zZWNvbmRzGAIgASgFEhQKDHN0ZXBfc2Vjb25kcxgDIAEoBSJECgtNZXRyaWNQb2ludBImCgJ0cxgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDQoFdmFsdWUYAiABKAEiVQoMTWV0cmljU2VyaWVzEgwKBGtpbmQYASABKAkSDAoEdW5pdBgCIAEoCRIpCgZwb2ludHMYAyADKAsyGS5rdWJlc3dpZnQudjEuTWV0cmljUG9pbnQicAoXR2V0R3Vlc3RNZXRyaWNzUmVzcG9uc2USKgoGc2VyaWVzGAEgAygLMhoua3ViZXN3aWZ0LnYxLk1ldHJpY1NlcmllcxIpCgVlcnJvchgCIAEoCzIaLmt1YmVzd2lmdC52MS5DbHVzdGVyRXJyb3IiZAoVR2V0Tm9kZU1ldHJpY3NSZXF1ZXN0Eg8KB2NsdXN0ZXIYASABKAkSDAoEbm9kZRgCIAEoCRIWCg53aW5kb3dfc2Vjb25kcxgDIAEoBRIUCgxzdGVwX3NlY29uZHMYBCABKAUibwoWR2V0Tm9kZU1ldHJpY3NSZXNwb25zZRIqCgZzZXJpZXMYASADKAsyGi5rdWJlc3dpZnQudjEuTWV0cmljU2VyaWVzEikKBWVycm9yGAIgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvcjLPAQoQVGVsZW1ldHJ5U2VydmljZRJeCg9HZXRHdWVzdE1ldHJpY3MSJC5rdWJlc3dpZnQudjEuR2V0R3Vlc3RNZXRyaWNzUmVxdWVzdBolLmt1YmVzd2lmdC52MS5HZXRHdWVzdE1ldHJpY3NSZXNwb25zZRJbCg5HZXROb2RlTWV0cmljcxIjLmt1YmVzd2lmdC52MS5HZXROb2RlTWV0cmljc1JlcXVlc3QaJC5rdWJlc3dpZnQudjEuR2V0Tm9kZU1ldHJpY3NSZXNwb25zZUJBWj9naXRodWIuY29tL3Byb2plY3RiZXNrYXIva3ViZXN3aWZ0L2dlbi9rdWJlc3dpZnQvdjE7a3ViZXN3aWZ0djFiBnByb3RvMw", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
 
 /**
  * GetGuestMetricsRequest asks for one guest's recent resource usage as range
@@ -140,8 +140,75 @@ export const GetGuestMetricsResponseSchema: GenMessage<GetGuestMetricsResponse> 
   messageDesc(file_kubeswift_v1_telemetry, 3);
 
 /**
- * TelemetryService serves per-VM telemetry sourced from each member's
- * Prometheus (cAdvisor today, O5 swiftletd vm.counters in v2 — decision D4).
+ * GetNodeMetricsRequest asks for one node's recent utilization. The gateway
+ * resolves the node's InternalIP and range-queries the member's Prometheus:
+ * node-exporter for CPU/mem/net, DCGM for GPU (absent → empty GPU series).
+ *
+ * @generated from message kubeswift.v1.GetNodeMetricsRequest
+ */
+export type GetNodeMetricsRequest = Message<"kubeswift.v1.GetNodeMetricsRequest"> & {
+  /**
+   * @generated from field: string cluster = 1;
+   */
+  cluster: string;
+
+  /**
+   * @generated from field: string node = 2;
+   */
+  node: string;
+
+  /**
+   * default 900
+   *
+   * @generated from field: int32 window_seconds = 3;
+   */
+  windowSeconds: number;
+
+  /**
+   * default 30
+   *
+   * @generated from field: int32 step_seconds = 4;
+   */
+  stepSeconds: number;
+};
+
+/**
+ * Describes the message kubeswift.v1.GetNodeMetricsRequest.
+ * Use `create(GetNodeMetricsRequestSchema)` to create a new message.
+ */
+export const GetNodeMetricsRequestSchema: GenMessage<GetNodeMetricsRequest> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_telemetry, 4);
+
+/**
+ * GetNodeMetricsResponse carries the series (cpu_util/mem_util/net_rx_bps/
+ * net_tx_bps/gpu_util — the utilization series are 0–1 ratios), or an error
+ * when the member's Prometheus is unconfigured/unreachable.
+ *
+ * @generated from message kubeswift.v1.GetNodeMetricsResponse
+ */
+export type GetNodeMetricsResponse = Message<"kubeswift.v1.GetNodeMetricsResponse"> & {
+  /**
+   * @generated from field: repeated kubeswift.v1.MetricSeries series = 1;
+   */
+  series: MetricSeries[];
+
+  /**
+   * @generated from field: kubeswift.v1.ClusterError error = 2;
+   */
+  error?: ClusterError | undefined;
+};
+
+/**
+ * Describes the message kubeswift.v1.GetNodeMetricsResponse.
+ * Use `create(GetNodeMetricsResponseSchema)` to create a new message.
+ */
+export const GetNodeMetricsResponseSchema: GenMessage<GetNodeMetricsResponse> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_telemetry, 5);
+
+/**
+ * TelemetryService serves per-VM + per-node telemetry sourced from each member's
+ * Prometheus (cAdvisor + node-exporter + DCGM; O5 swiftletd vm.counters in v2 —
+ * decision D4).
  *
  * @generated from service kubeswift.v1.TelemetryService
  */
@@ -153,6 +220,14 @@ export const TelemetryService: GenService<{
     methodKind: "unary";
     input: typeof GetGuestMetricsRequestSchema;
     output: typeof GetGuestMetricsResponseSchema;
+  },
+  /**
+   * @generated from rpc kubeswift.v1.TelemetryService.GetNodeMetrics
+   */
+  getNodeMetrics: {
+    methodKind: "unary";
+    input: typeof GetNodeMetricsRequestSchema;
+    output: typeof GetNodeMetricsResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_kubeswift_v1_telemetry, 0);

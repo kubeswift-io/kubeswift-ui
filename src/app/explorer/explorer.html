@@ -78,9 +78,14 @@
           </thead>
           <tbody>
             @for (r of resources(); track key(r)) {
-              <tr>
+              <tr [class.clickable]="isNodesKind()" (click)="openRow(r)">
                 @for (col of columns(); track col) {
-                  <td [class.strong]="col === 'name'">{{ cell(r, col) }}</td>
+                  <td [class.strong]="col === 'name'">
+                    @if (isNodesKind() && col === 'status') {
+                      <span class="dot" [class]="nodeDot(cell(r, col))"></span>
+                    }
+                    {{ cell(r, col) }}
+                  </td>
                 }
               </tr>
             }
@@ -89,4 +94,8 @@
       </div>
     }
   </section>
+
+  @if (selectedNode(); as node) {
+    <app-node-drawer [cluster]="selectedCluster()" [node]="node" (closed)="closeNode()" />
+  }
 </div>
