@@ -1,0 +1,20 @@
+#!/bin/sh
+# 10-kubeswift-resolver.envsh
+#
+# Export KUBESWIFT_RESOLVER (the cluster DNS server) for the gateway
+# reverse-proxy's variable proxy_pass. Sourced (.envsh) by the stock nginx
+# entrypoint BEFORE 20-envsubst-on-templates.sh, so the value lands in the
+# rendered nginx config.
+#
+# A variable proxy_pass requires an explicit `resolver`; we take it from the
+# pod's /etc/resolv.conf (Kubernetes writes the cluster DNS ClusterIP there).
+# Falling back to Docker's embedded DNS keeps a plain `docker run` working.
+
+if [ -z "${KUBESWIFT_RESOLVER:-}" ]; then
+    KUBESWIFT_RESOLVER="$(awk '/^nameserver/ { print $2; exit }' /etc/resolv.conf 2>/dev/null || true)"
+fi
+if [ -z "${KUBESWIFT_RESOLVER:-}" ]; then
+    KUBESWIFT_RESOLVER="127.0.0.11"
+fi
+export KUBESWIFT_RESOLVER
+echo "kubeswift-ui: using DNS resolver ${KUBESWIFT_RESOLVER} for gateway proxy"

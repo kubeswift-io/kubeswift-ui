@@ -1,0 +1,106 @@
+# kubeswift-ui: static SPA server + optional same-origin reverse-proxy to the
+# kubeswift-gateway.
+#
+# Rendered into /etc/nginx/conf.d/default.conf at container start by the stock
+# nginx envsubst entrypoint (20-envsubst-on-templates.sh). Only ${KUBESWIFT_*}
+# tokens are substituted (they are env vars); nginx's own $variables are
+# preserved because they are NOT in the environment. See docker/entrypoint.d/.
+
+# WebSocket upgrade map for the /console plane. http{} context (conf.d files are
+# included inside http{}); must sit outside the server block.
+map $http_upgrade $kubeswift_connection_upgrade {
+    default upgrade;
+    ''      close;
+}
+
+gzip on;
+gzip_comp_level 5;
+gzip_min_length 256;
+gzip_proxied any;
+gzip_types text/plain text/css application/javascript application/json
+           image/svg+xml application/wasm;
+
+server {
+    listen       8080;
+    listen       [::]:8080;
+    server_name  _;
+
+    root  /usr/share/nginx/html;
+    index index.html;
+
+    # Cluster DNS, extracted from /etc/resolv.conf at startup
+    # (10-kubeswift-resolver.envsh). Lets the variable proxy_pass below resolve
+    # the gateway Service name at REQUEST time, so nginx still starts when no
+    # gateway is reachable yet (pod ordering) or at all (gateway.mode=url).
+    resolver ${KUBESWIFT_RESOLVER} valid=30s ipv6=off;
+    set $kubeswift_gateway_upstream ${KUBESWIFT_GATEWAY_UPSTREAM};
+
+    # Runtime gateway-URL shim (window.__KUBESWIFT_GATEWAY_URL__). Regenerated
+    # each start from KUBESWIFT_GATEWAY_URL; never cache it, or a URL change
+    # would not take effect on redeploy.
+    location = /config.js {
+        add_header Cache-Control "no-store" always;
+        default_type application/javascript;
+        try_files $uri =404;
+    }
+
+    # The UI pod's OWN health (NOT proxied) — reports whether nginx is serving.
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    # ---- Reverse-proxy to the gateway (gateway.mode=proxy) ------------------
+    # The browser then uses ONE origin (the UI's): Connect RPCs and the console
+    # WebSocket are forwarded to the in-cluster kubeswift-gateway Service. In
+    # gateway.mode=url these locations are simply never hit (the SPA calls the
+    # gateway's absolute URL directly).
+
+    # Connect / gRPC-Web RPCs: every kubeswift.v1 service shares this prefix
+    # (POST /kubeswift.v1.<Service>/<Method>).
+    location /kubeswift.v1. {
+        proxy_pass http://$kubeswift_gateway_upstream;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # Clear hop-by-hop Connection so keep-alive works; the gateway speaks
+        # the Connect protocol over HTTP/1.1 (h2c falls back to 1.1).
+        proxy_set_header Connection "";
+        # Server-streaming RPCs (WatchGuests/WatchMigrations/WatchClusters) must
+        # flush incrementally rather than buffer to completion.
+        proxy_buffering off;
+        proxy_request_buffering off;
+        proxy_read_timeout 1h;
+        proxy_send_timeout 1h;
+    }
+
+    # Serial-console plane: a raw WebSocket (not Connect), with a query string.
+    location = /console {
+        proxy_pass http://$kubeswift_gateway_upstream;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $kubeswift_connection_upgrade;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_buffering off;
+        proxy_read_timeout 1h;
+        proxy_send_timeout 1h;
+    }
+
+    # ---- Static SPA ---------------------------------------------------------
+    # Hashed build assets (main-XXXX.js, styles-XXXX.css, ...) are immutable.
+    location ~* \.(?:js|css|woff2?|ttf|eot|otf|svg|png|jpg|jpeg|gif|ico|webp|map)$ {
+        try_files $uri =404;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Angular client-side routing: every other path falls back to index.html so
+    # deep links (e.g. /migrations) load the app shell.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

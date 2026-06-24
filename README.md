@@ -33,8 +33,53 @@ CORS allows the dev origin). Override at runtime with
 ## Build
 
 ```bash
-npm run build        # → dist/kubeswift-ui (static assets)
+npm run build        # → dist/kubeswift-ui/browser (static assets)
 ```
+
+## Container image
+
+A multi-stage [`Dockerfile`](Dockerfile) builds the app (`npm ci && ng build`)
+and serves `dist/kubeswift-ui/browser` from an unprivileged (non-root) nginx on
+port **8080**. CI publishes it to `ghcr.io/projectbeskar/kubeswift-ui`
+(`:sha-<short>` + `:latest` on `main`, `:vX.Y.Z` on tags — see
+[`.github/workflows/release.yml`](.github/workflows/release.yml)).
+
+The gateway URL is injected at **runtime** (no rebuild) via the
+`KUBESWIFT_GATEWAY_URL` env var, which the entrypoint turns into the
+`window.__KUBESWIFT_GATEWAY_URL__` shim the app reads (`config.js`):
+
+| `KUBESWIFT_GATEWAY_URL` | Behaviour |
+| --- | --- |
+| _(unset)_ | SPA falls back to its built-in default (`<page-host>:18080`) |
+| `@origin` | Same-origin: nginx **reverse-proxies** the gateway's Connect RPCs (`/kubeswift.v1.*`) and the `/console` WebSocket to `KUBESWIFT_GATEWAY_UPSTREAM` (default `kubeswift-gateway:8080`) |
+| an absolute URL | The browser calls the gateway **directly** at that URL (its Ingress/LB; the gateway's CORS must allow the UI origin) |
+
+```bash
+docker build -t kubeswift-ui:dev .
+# Same-origin proxy to a gateway reachable at host.docker.internal:18080:
+docker run --rm -p 8080:8080 \
+  -e KUBESWIFT_GATEWAY_UPSTREAM=host.docker.internal:18080 \
+  kubeswift-ui:dev
+# → http://localhost:8080
+```
+
+## Deploy with the KubeSwift chart
+
+The KubeSwift Helm chart ships an opt-in `ui` block (paired with `gateway`):
+
+```bash
+helm upgrade --install kubeswift oci://ghcr.io/projectbeskar/charts/kubeswift \
+  -n kubeswift-system --create-namespace \
+  --set gateway.enabled=true \
+  --set ui.enabled=true \
+  --set ui.image.tag=<published-kubeswift-ui-tag>
+```
+
+By default the UI nginx reverse-proxies the in-cluster `kubeswift-gateway`
+Service (`ui.gateway.mode=proxy`), so the browser only needs to reach the UI.
+Set `ui.gateway.mode=url` + `ui.gateway.url=<gateway-ingress-url>` to have the
+browser call the gateway directly instead. See the chart's `values.yaml`
+`ui:` block.
 
 ## Regenerating the proto client
 

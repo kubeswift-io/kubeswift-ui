@@ -8,6 +8,10 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Runtime config (window.__KUBESWIFT_GATEWAY_URL__). Classic, non-deferred
+       script so it runs before the Angular module bundle bootstraps. Served by
+       the container as an env-substituted snippet; a placeholder in dev. -->
+  <script src="config.js"></script>
 </head>
 <body>
   <app-root></app-root>

@@ -1,0 +1,20 @@
+# Rebuilt inside the image; never ship the host copies into the build context.
+node_modules
+dist
+.angular
+
+# VCS + CI + editor cruft.
+.git
+.github
+.vscode
+.editorconfig
+.gitignore
+
+# Docs / local artifacts not needed for the build.
+*.md
+coverage
+__screenshots__
+npm-debug.log
+yarn-error.log
+Dockerfile
+.dockerignore

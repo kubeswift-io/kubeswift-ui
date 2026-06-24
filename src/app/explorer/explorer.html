@@ -1,0 +1,92 @@
+<div class="explorer">
+  <aside class="sidenav">
+    <div class="picker">
+      <label>Cluster</label>
+      <select [value]="selectedCluster()" (change)="selectCluster($any($event.target).value)">
+        @for (c of clusters(); track c.name) {
+          <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
+        }
+      </select>
+    </div>
+
+    @for (g of groups(); track g.category) {
+      <div class="group">
+        <div class="group-title">{{ g.category }}</div>
+        @for (k of g.kinds; track k.key) {
+          <button
+            class="kind"
+            [class.active]="selectedKind()?.key === k.key"
+            (click)="selectKind(k)"
+          >
+            {{ k.displayName }}
+          </button>
+        }
+      </div>
+    }
+  </aside>
+
+  <section class="main">
+    @if (loadError(); as e) {
+      <div class="banner error">
+        <mat-icon>error</mat-icon> <span>{{ e }}</span>
+      </div>
+    }
+
+    <div class="head">
+      <h2>{{ selectedKind()?.displayName ?? 'Select a resource' }}</h2>
+      <span class="count">{{ resources().length }}</span>
+      <span class="spacer"></span>
+      @if (selectedKind()?.namespaced) {
+        <label class="ns">
+          Namespace
+          <select
+            [value]="selectedNamespace()"
+            (change)="selectNamespace($any($event.target).value)"
+          >
+            <option value="">All namespaces</option>
+            @for (ns of namespaces(); track ns) {
+              <option [value]="ns">{{ ns }}</option>
+            }
+          </select>
+        </label>
+      }
+    </div>
+
+    @if (error(); as err) {
+      <div class="banner warn">
+        <mat-icon>warning</mat-icon>
+        <span
+          ><strong>{{ err.cluster }}</strong
+          >: {{ err.message }}</span
+        >
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="empty">Loading…</div>
+    } @else if (!resources().length && !error()) {
+      <div class="empty">No {{ selectedKind()?.displayName }} found.</div>
+    } @else if (resources().length) {
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              @for (col of columns(); track col) {
+                <th>{{ col }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of resources(); track key(r)) {
+              <tr>
+                @for (col of columns(); track col) {
+                  <td [class.strong]="col === 'name'">{{ cell(r, col) }}</td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+</div>
