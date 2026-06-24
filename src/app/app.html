@@ -26,6 +26,13 @@
         <mat-icon>logout</mat-icon>
       </button>
     }
+    <button
+      class="theme-toggle"
+      (click)="theme.toggle()"
+      [title]="theme.theme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
+    >
+      <mat-icon>{{ theme.theme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
     <span class="tag">v1alpha1</span>
   </mat-toolbar>
 
