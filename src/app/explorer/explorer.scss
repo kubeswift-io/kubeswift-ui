@@ -191,6 +191,51 @@
       background: #d93025;
     }
   }
+  th.acts,
+  td.acts {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+  }
+}
+
+.newbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
+}
+
+.rowbtn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--mat-sys-on-surface-variant);
+  padding: 4px;
+  border-radius: 6px;
+  vertical-align: middle;
+  &:hover {
+    background: var(--mat-sys-surface-container-high);
+  }
+  &.danger:hover {
+    color: var(--mat-sys-error);
+  }
+  mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
 }
 
 .empty {

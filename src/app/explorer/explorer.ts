@@ -5,6 +5,7 @@ import type { ResourceKind, Resource } from '../gen/kubeswift/v1/resource_pb';
 import type { Cluster } from '../gen/kubeswift/v1/cluster_pb';
 import type { ClusterError } from '../gen/kubeswift/v1/common_pb';
 import { NodeDrawer } from '../node-drawer/node-drawer';
+import { YamlEditor } from '../yaml-editor/yaml-editor';
 
 interface KindGroup {
   category: string;
@@ -20,7 +21,7 @@ interface KindGroup {
  */
 @Component({
   selector: 'app-explorer',
-  imports: [MatIconModule, NodeDrawer],
+  imports: [MatIconModule, NodeDrawer, YamlEditor],
   templateUrl: './explorer.html',
   styleUrl: './explorer.scss',
 })
@@ -38,6 +39,10 @@ export class Explorer implements OnInit {
   readonly loading = signal(false);
   readonly loadError = signal<string | null>(null); // hard RPC failure
   readonly selectedNode = signal<string | null>(null); // open the node drawer (Nodes kind)
+  readonly editorOpen = signal(false); // YAML editor (create/edit)
+  readonly editorName = signal(''); // '' = create
+  readonly editorNs = signal('');
+  readonly actionError = signal<string | null>(null); // delete/apply denials, surfaced
 
   private readonly categoryOrder = [
     'Cluster',
@@ -168,6 +173,51 @@ export class Explorer implements OnInit {
     if (status.includes('NotReady')) return 'red';
     if (status.includes('SchedulingDisabled') || status.includes('Pressure')) return 'amber';
     return status.includes('Ready') ? 'green' : 'amber';
+  }
+
+  // --- CRUD (RBAC-gated; the gateway impersonates the user, so denials surface
+  // in the action banner — never a silent no-op). ---
+  openCreate(): void {
+    this.editorName.set(''); // '' -> create
+    this.editorNs.set(this.selectedKind()?.namespaced ? this.selectedNamespace() : '');
+    this.actionError.set(null);
+    this.editorOpen.set(true);
+  }
+  openEdit(r: Resource, ev: Event): void {
+    ev.stopPropagation(); // don't also trigger a node-row click
+    this.editorName.set(r.ref?.name ?? '');
+    this.editorNs.set(r.ref?.namespace ?? '');
+    this.actionError.set(null);
+    this.editorOpen.set(true);
+  }
+  closeEditor(): void {
+    this.editorOpen.set(false);
+  }
+  async onSaved(): Promise<void> {
+    this.editorOpen.set(false);
+    await this.reload();
+  }
+  async deleteRow(r: Resource, ev: Event): Promise<void> {
+    ev.stopPropagation();
+    const name = r.ref?.name ?? '';
+    if (
+      !name ||
+      !confirm(`Delete ${this.selectedKind()?.displayName} "${name}"? This cannot be undone.`)
+    ) {
+      return;
+    }
+    this.actionError.set(null);
+    try {
+      await this.gw.resources.deleteResource({
+        cluster: this.selectedCluster(),
+        kind: this.selectedKind()?.key ?? '',
+        namespace: r.ref?.namespace ?? '',
+        name,
+      });
+      await this.reload();
+    } catch (e) {
+      this.actionError.set(e instanceof Error ? e.message : String(e));
+    }
   }
 
   cell(r: Resource, col: string): string {
