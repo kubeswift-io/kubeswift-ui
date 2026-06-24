@@ -1,0 +1,228 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.32);
+  z-index: 20;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 560px;
+  max-width: 96vw;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  background: var(--mat-sys-surface);
+  border-left: 1px solid var(--mat-sys-outline-variant);
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    .title {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    }
+    .name {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .sub {
+      font-size: 13px;
+      color: var(--mat-sys-on-surface-variant);
+    }
+    .cluster {
+      max-width: 180px;
+    }
+    .icon {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--mat-sys-on-surface-variant);
+      padding: 4px;
+      border-radius: 8px;
+      &:hover {
+        background: var(--mat-sys-surface-container-high);
+      }
+    }
+  }
+
+  .body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 20px 16px;
+  }
+
+  h4 {
+    display: flex;
+    align-items: center;
+    margin: 20px 0 10px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--mat-sys-on-surface-variant);
+    .spacer {
+      flex: 1;
+    }
+    .link {
+      border: none;
+      background: transparent;
+      color: var(--mat-sys-primary);
+      cursor: pointer;
+      font-size: 13px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+  }
+}
+
+.banner.error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 20px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+  span {
+    font-size: 12px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+  input,
+  select {
+    width: 100%;
+  }
+}
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.seg {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+  button {
+    flex: 1;
+    border: 1px solid var(--mat-sys-outline-variant);
+    background: var(--mat-sys-surface);
+    color: var(--mat-sys-on-surface-variant);
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 14px;
+    &:first-child {
+      border-radius: 8px 0 0 8px;
+    }
+    &:last-child {
+      border-radius: 0 8px 8px 0;
+    }
+    &:not(:first-child) {
+      border-left: none;
+    }
+    &.on {
+      background: var(--mat-sys-secondary-container);
+      color: var(--mat-sys-on-secondary-container);
+    }
+  }
+}
+
+.ports {
+  .phead,
+  .prow {
+    display: grid;
+    grid-template-columns: 1.4fr 0.8fr 0.8fr 1.2fr 28px;
+    gap: 6px;
+    align-items: center;
+  }
+  .phead {
+    font-size: 11px;
+    color: var(--mat-sys-on-surface-variant);
+    margin-bottom: 4px;
+  }
+  .prow {
+    margin-bottom: 6px;
+  }
+  input,
+  select {
+    width: 100%;
+  }
+  .rowx {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--mat-sys-on-surface-variant);
+    padding: 2px;
+    border-radius: 6px;
+    mat-icon {
+      font-size: 18px;
+      height: 18px;
+      width: 18px;
+    }
+    &:hover {
+      color: var(--mat-sys-error);
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  button {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+  .primary {
+    background: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+  }
+  .ghost {
+    background: transparent;
+    color: var(--mat-sys-on-surface-variant);
+    &:hover {
+      background: var(--mat-sys-surface-container-high);
+    }
+  }
+}
+
+input,
+select {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 7px 9px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  box-sizing: border-box;
+  &:focus {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -1px;
+  }
+}

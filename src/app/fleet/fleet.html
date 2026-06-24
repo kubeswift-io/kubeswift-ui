@@ -6,6 +6,9 @@
     </span>
     <span class="count">{{ filtered().length }} VM{{ filtered().length === 1 ? '' : 's' }}</span>
     <span class="spacer"></span>
+    <button mat-flat-button color="primary" class="newvm" (click)="openCreate()">
+      <mat-icon>add</mat-icon> New VM
+    </button>
     @if (selectedCluster(); as sel) {
       <button mat-button (click)="selectCluster(sel)">
         <mat-icon>filter_alt_off</mat-icon> {{ sel }}
@@ -46,7 +49,9 @@
   @for (e of errors(); track e.cluster) {
     <div class="banner warn">
       <mat-icon>cloud_off</mat-icon>
-      <span><strong>{{ e.cluster }}</strong> — {{ e.message }}</span>
+      <span
+        ><strong>{{ e.cluster }}</strong> — {{ e.message }}</span
+      >
     </div>
   }
 
@@ -94,5 +99,14 @@
 
   @if (selected(); as g) {
     <app-guest-detail [guest]="g" (closed)="closeDetail()" />
+  }
+
+  @if (showCreate()) {
+    <app-create-guest
+      [clusters]="clusters()"
+      [initialCluster]="selectedCluster() ?? ''"
+      (created)="onCreated()"
+      (closed)="closeCreate()"
+    />
   }
 </div>
