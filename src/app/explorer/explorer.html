@@ -50,6 +50,11 @@
           </select>
         </label>
       }
+      @if (selectedKind()) {
+        <button class="newbtn" (click)="openCreate()" title="Create a new resource">
+          <mat-icon>add</mat-icon> New
+        </button>
+      }
     </div>
 
     @if (error(); as err) {
@@ -59,6 +64,12 @@
           ><strong>{{ err.cluster }}</strong
           >: {{ err.message }}</span
         >
+      </div>
+    }
+
+    @if (actionError(); as ae) {
+      <div class="banner error">
+        <mat-icon>error</mat-icon> <span>{{ ae }}</span>
       </div>
     }
 
@@ -74,6 +85,7 @@
               @for (col of columns(); track col) {
                 <th>{{ col }}</th>
               }
+              <th class="acts"></th>
             </tr>
           </thead>
           <tbody>
@@ -87,6 +99,14 @@
                     {{ cell(r, col) }}
                   </td>
                 }
+                <td class="acts">
+                  <button class="rowbtn" (click)="openEdit(r, $event)" title="View / edit YAML">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button class="rowbtn danger" (click)="deleteRow(r, $event)" title="Delete">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
               </tr>
             }
           </tbody>
@@ -97,5 +117,16 @@
 
   @if (selectedNode(); as node) {
     <app-node-drawer [cluster]="selectedCluster()" [node]="node" (closed)="closeNode()" />
+  }
+
+  @if (editorOpen() && selectedKind(); as kind) {
+    <app-yaml-editor
+      [cluster]="selectedCluster()"
+      [kind]="kind"
+      [namespace]="editorNs()"
+      [name]="editorName()"
+      (saved)="onSaved()"
+      (closed)="closeEditor()"
+    />
   }
 </div>

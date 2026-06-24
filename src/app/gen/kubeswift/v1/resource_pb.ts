@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file kubeswift/v1/resource.proto.
  */
 export const file_kubeswift_v1_resource: GenFile = /*@__PURE__*/
-  fileDesc("ChtrdWJlc3dpZnQvdjEvcmVzb3VyY2UucHJvdG8SDGt1YmVzd2lmdC52MSKaAQoMUmVzb3VyY2VLaW5kEgsKA2tleRgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkSDQoFZ3JvdXAYAyABKAkSDwoHdmVyc2lvbhgEIAEoCRIQCghyZXNvdXJjZRgFIAEoCRISCgpuYW1lc3BhY2VkGAYgASgIEhAKCGNhdGVnb3J5GAcgASgJEg8KB2NvbHVtbnMYCCADKAkiGgoYTGlzdFJlc291cmNlS2luZHNSZXF1ZXN0IkYKGUxpc3RSZXNvdXJjZUtpbmRzUmVzcG9uc2USKQoFa2luZHMYASADKAsyGi5rdWJlc3dpZnQudjEuUmVzb3VyY2VLaW5kItQBCghSZXNvdXJjZRIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEgwKBGtpbmQYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASNAoHY29sdW1ucxgEIAMoCzIjLmt1YmVzd2lmdC52MS5SZXNvdXJjZS5Db2x1bW5zRW50cnkaLgoMQ29sdW1uc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiSAoUTGlzdFJlc291cmNlc1JlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIMCgRraW5kGAIgASgJEhEKCW5hbWVzcGFjZRgDIAEoCSJtChVMaXN0UmVzb3VyY2VzUmVzcG9uc2USKQoJcmVzb3VyY2VzGAEgAygLMhYua3ViZXN3aWZ0LnYxLlJlc291cmNlEikKBWVycm9yGAIgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvciJUChJHZXRSZXNvdXJjZVJlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIMCgRraW5kGAIgASgJEhEKCW5hbWVzcGFjZRgDIAEoCRIMCgRuYW1lGAQgASgJIjEKE0dldFJlc291cmNlUmVzcG9uc2USDAoEeWFtbBgBIAEoCRIMCgRqc29uGAIgASgJMqUCCg9SZXNvdXJjZVNlcnZpY2USZAoRTGlzdFJlc291cmNlS2luZHMSJi5rdWJlc3dpZnQudjEuTGlzdFJlc291cmNlS2luZHNSZXF1ZXN0Gicua3ViZXN3aWZ0LnYxLkxpc3RSZXNvdXJjZUtpbmRzUmVzcG9uc2USWAoNTGlzdFJlc291cmNlcxIiLmt1YmVzd2lmdC52MS5MaXN0UmVzb3VyY2VzUmVxdWVzdBojLmt1YmVzd2lmdC52MS5MaXN0UmVzb3VyY2VzUmVzcG9uc2USUgoLR2V0UmVzb3VyY2USIC5rdWJlc3dpZnQudjEuR2V0UmVzb3VyY2VSZXF1ZXN0GiEua3ViZXN3aWZ0LnYxLkdldFJlc291cmNlUmVzcG9uc2VCQVo/Z2l0aHViLmNvbS9wcm9qZWN0YmVza2FyL2t1YmVzd2lmdC9nZW4va3ViZXN3aWZ0L3YxO2t1YmVzd2lmdHYxYgZwcm90bzM", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
+  fileDesc("ChtrdWJlc3dpZnQvdjEvcmVzb3VyY2UucHJvdG8SDGt1YmVzd2lmdC52MSKaAQoMUmVzb3VyY2VLaW5kEgsKA2tleRgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkSDQoFZ3JvdXAYAyABKAkSDwoHdmVyc2lvbhgEIAEoCRIQCghyZXNvdXJjZRgFIAEoCRISCgpuYW1lc3BhY2VkGAYgASgIEhAKCGNhdGVnb3J5GAcgASgJEg8KB2NvbHVtbnMYCCADKAkiGgoYTGlzdFJlc291cmNlS2luZHNSZXF1ZXN0IkYKGUxpc3RSZXNvdXJjZUtpbmRzUmVzcG9uc2USKQoFa2luZHMYASADKAsyGi5rdWJlc3dpZnQudjEuUmVzb3VyY2VLaW5kItQBCghSZXNvdXJjZRIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEgwKBGtpbmQYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASNAoHY29sdW1ucxgEIAMoCzIjLmt1YmVzd2lmdC52MS5SZXNvdXJjZS5Db2x1bW5zRW50cnkaLgoMQ29sdW1uc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiSAoUTGlzdFJlc291cmNlc1JlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIMCgRraW5kGAIgASgJEhEKCW5hbWVzcGFjZRgDIAEoCSJtChVMaXN0UmVzb3VyY2VzUmVzcG9uc2USKQoJcmVzb3VyY2VzGAEgAygLMhYua3ViZXN3aWZ0LnYxLlJlc291cmNlEikKBWVycm9yGAIgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvciJUChJHZXRSZXNvdXJjZVJlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIMCgRraW5kGAIgASgJEhEKCW5hbWVzcGFjZRgDIAEoCRIMCgRuYW1lGAQgASgJIjEKE0dldFJlc291cmNlUmVzcG9uc2USDAoEeWFtbBgBIAEoCRIMCgRqc29uGAIgASgJIlYKFEFwcGx5UmVzb3VyY2VSZXF1ZXN0Eg8KB2NsdXN0ZXIYASABKAkSDAoEa2luZBgCIAEoCRIRCgluYW1lc3BhY2UYAyABKAkSDAoEeWFtbBgEIAEoCSIzChVBcHBseVJlc291cmNlUmVzcG9uc2USDAoEeWFtbBgBIAEoCRIMCgRqc29uGAIgASgJIlcKFURlbGV0ZVJlc291cmNlUmVxdWVzdBIPCgdjbHVzdGVyGAEgASgJEgwKBGtpbmQYAiABKAkSEQoJbmFtZXNwYWNlGAMgASgJEgwKBG5hbWUYBCABKAkiGAoWRGVsZXRlUmVzb3VyY2VSZXNwb25zZTLcAwoPUmVzb3VyY2VTZXJ2aWNlEmQKEUxpc3RSZXNvdXJjZUtpbmRzEiYua3ViZXN3aWZ0LnYxLkxpc3RSZXNvdXJjZUtpbmRzUmVxdWVzdBonLmt1YmVzd2lmdC52MS5MaXN0UmVzb3VyY2VLaW5kc1Jlc3BvbnNlElgKDUxpc3RSZXNvdXJjZXMSIi5rdWJlc3dpZnQudjEuTGlzdFJlc291cmNlc1JlcXVlc3QaIy5rdWJlc3dpZnQudjEuTGlzdFJlc291cmNlc1Jlc3BvbnNlElIKC0dldFJlc291cmNlEiAua3ViZXN3aWZ0LnYxLkdldFJlc291cmNlUmVxdWVzdBohLmt1YmVzd2lmdC52MS5HZXRSZXNvdXJjZVJlc3BvbnNlElgKDUFwcGx5UmVzb3VyY2USIi5rdWJlc3dpZnQudjEuQXBwbHlSZXNvdXJjZVJlcXVlc3QaIy5rdWJlc3dpZnQudjEuQXBwbHlSZXNvdXJjZVJlc3BvbnNlElsKDkRlbGV0ZVJlc291cmNlEiMua3ViZXN3aWZ0LnYxLkRlbGV0ZVJlc291cmNlUmVxdWVzdBokLmt1YmVzd2lmdC52MS5EZWxldGVSZXNvdXJjZVJlc3BvbnNlQkFaP2dpdGh1Yi5jb20vcHJvamVjdGJlc2thci9rdWJlc3dpZnQvZ2VuL2t1YmVzd2lmdC92MTtrdWJlc3dpZnR2MWIGcHJvdG8z", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
 
 /**
  * ResourceKind is one browsable resource type in the explorer catalog. The
@@ -278,9 +278,124 @@ export const GetResourceResponseSchema: GenMessage<GetResourceResponse> = /*@__P
   messageDesc(file_kubeswift_v1_resource, 7);
 
 /**
+ * ApplyResourceRequest creates-or-updates one object from edited YAML via
+ * server-side apply, AS THE IMPERSONATED USER — RBAC is the only gate. The
+ * kind's GVR comes from the catalog; the object's name comes from the YAML
+ * (namespace from the YAML, falling back to the request field for scoping).
+ *
+ * @generated from message kubeswift.v1.ApplyResourceRequest
+ */
+export type ApplyResourceRequest = Message<"kubeswift.v1.ApplyResourceRequest"> & {
+  /**
+   * @generated from field: string cluster = 1;
+   */
+  cluster: string;
+
+  /**
+   * a ResourceKind.key
+   *
+   * @generated from field: string kind = 2;
+   */
+  kind: string;
+
+  /**
+   * @generated from field: string namespace = 3;
+   */
+  namespace: string;
+
+  /**
+   * @generated from field: string yaml = 4;
+   */
+  yaml: string;
+};
+
+/**
+ * Describes the message kubeswift.v1.ApplyResourceRequest.
+ * Use `create(ApplyResourceRequestSchema)` to create a new message.
+ */
+export const ApplyResourceRequestSchema: GenMessage<ApplyResourceRequest> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_resource, 8);
+
+/**
+ * @generated from message kubeswift.v1.ApplyResourceResponse
+ */
+export type ApplyResourceResponse = Message<"kubeswift.v1.ApplyResourceResponse"> & {
+  /**
+   * the applied object re-rendered (managedFields stripped) — the editor
+   * refreshes from this.
+   *
+   * @generated from field: string yaml = 1;
+   */
+  yaml: string;
+
+  /**
+   * @generated from field: string json = 2;
+   */
+  json: string;
+};
+
+/**
+ * Describes the message kubeswift.v1.ApplyResourceResponse.
+ * Use `create(ApplyResourceResponseSchema)` to create a new message.
+ */
+export const ApplyResourceResponseSchema: GenMessage<ApplyResourceResponse> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_resource, 9);
+
+/**
+ * DeleteResourceRequest deletes one object AS THE IMPERSONATED USER.
+ *
+ * @generated from message kubeswift.v1.DeleteResourceRequest
+ */
+export type DeleteResourceRequest = Message<"kubeswift.v1.DeleteResourceRequest"> & {
+  /**
+   * @generated from field: string cluster = 1;
+   */
+  cluster: string;
+
+  /**
+   * a ResourceKind.key
+   *
+   * @generated from field: string kind = 2;
+   */
+  kind: string;
+
+  /**
+   * @generated from field: string namespace = 3;
+   */
+  namespace: string;
+
+  /**
+   * @generated from field: string name = 4;
+   */
+  name: string;
+};
+
+/**
+ * Describes the message kubeswift.v1.DeleteResourceRequest.
+ * Use `create(DeleteResourceRequestSchema)` to create a new message.
+ */
+export const DeleteResourceRequestSchema: GenMessage<DeleteResourceRequest> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_resource, 10);
+
+/**
+ * @generated from message kubeswift.v1.DeleteResourceResponse
+ */
+export type DeleteResourceResponse = Message<"kubeswift.v1.DeleteResourceResponse"> & {
+};
+
+/**
+ * Describes the message kubeswift.v1.DeleteResourceResponse.
+ * Use `create(DeleteResourceResponseSchema)` to create a new message.
+ */
+export const DeleteResourceResponseSchema: GenMessage<DeleteResourceResponse> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_resource, 11);
+
+/**
  * ResourceService is the cluster explorer + object editor. ListResourceKinds /
- * ListResources / GetResource read; the read plane is the default and the
- * write RPCs (P3.3) are gated entirely by the impersonated user's RBAC.
+ * ListResources / GetResource read; ApplyResource / DeleteResource write. Every
+ * call impersonates the end user, so both the read and write planes are gated
+ * entirely by that user's Kubernetes RBAC — a denial surfaces as a permission
+ * error, never a silent success.
  *
  * @generated from service kubeswift.v1.ResourceService
  */
@@ -308,6 +423,22 @@ export const ResourceService: GenService<{
     methodKind: "unary";
     input: typeof GetResourceRequestSchema;
     output: typeof GetResourceResponseSchema;
+  },
+  /**
+   * @generated from rpc kubeswift.v1.ResourceService.ApplyResource
+   */
+  applyResource: {
+    methodKind: "unary";
+    input: typeof ApplyResourceRequestSchema;
+    output: typeof ApplyResourceResponseSchema;
+  },
+  /**
+   * @generated from rpc kubeswift.v1.ResourceService.DeleteResource
+   */
+  deleteResource: {
+    methodKind: "unary";
+    input: typeof DeleteResourceRequestSchema;
+    output: typeof DeleteResourceResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_kubeswift_v1_resource, 0);

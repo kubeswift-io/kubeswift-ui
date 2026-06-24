@@ -1,0 +1,38 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <div class="title">
+      <span class="name">{{ isCreate() ? 'New ' + kind().displayName : name() }}</span>
+      <span class="sub"
+        >{{ kind().displayName }}{{ namespace() ? ' · ' + namespace() : '' }} ·
+        {{ cluster() }}</span
+      >
+    </div>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="muted">Loading…</div>
+  } @else {
+    <textarea
+      class="yaml"
+      spellcheck="false"
+      autocomplete="off"
+      [value]="text()"
+      (input)="text.set($any($event.target).value)"
+    ></textarea>
+  }
+
+  <div class="actions">
+    <button class="primary" [disabled]="saving() || loading() || !text().trim()" (click)="save()">
+      {{ saving() ? 'Applying…' : isCreate() ? 'Create' : 'Apply' }}
+    </button>
+    <button class="ghost" (click)="closed.emit()">Cancel</button>
+  </div>
+</aside>
