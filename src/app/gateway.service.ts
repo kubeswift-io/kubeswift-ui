@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
-import { createClient } from '@connectrpc/connect';
+import { Injectable, inject } from '@angular/core';
+import { createClient, type Interceptor } from '@connectrpc/connect';
 import { createConnectTransport } from '@connectrpc/connect-web';
+import { AuthService } from './auth.service';
 import { ClusterService } from './gen/kubeswift/v1/cluster_pb';
 import { GuestService } from './gen/kubeswift/v1/guest_pb';
 import { MigrationService } from './gen/kubeswift/v1/migration_pb';
@@ -22,8 +23,22 @@ const GATEWAY_URL: string =
  */
 @Injectable({ providedIn: 'root' })
 export class GatewayService {
+  private readonly auth = inject(AuthService);
   readonly baseUrl = GATEWAY_URL;
-  private readonly transport = createConnectTransport({ baseUrl: GATEWAY_URL });
+
+  // When OIDC is enabled, every Connect call carries the user's bearer token so
+  // the gateway impersonates them (auth-mode=oidc). When auth is off, freshToken
+  // returns null and the header is omitted (insecure/dev mode) — unchanged.
+  private readonly authInterceptor: Interceptor = (next) => async (req) => {
+    const token = await this.auth.freshToken();
+    if (token) req.header.set('Authorization', `Bearer ${token}`);
+    return next(req);
+  };
+
+  private readonly transport = createConnectTransport({
+    baseUrl: GATEWAY_URL,
+    interceptors: [this.authInterceptor],
+  });
 
   readonly clusters = createClient(ClusterService, this.transport);
   readonly guests = createClient(GuestService, this.transport);
@@ -32,11 +47,14 @@ export class GatewayService {
   readonly resources = createClient(ResourceService, this.transport);
 
   // The console plane is a raw WebSocket (not Connect), so build its URL by hand
-  // off the gateway base (http→ws, https→wss). A token-auth deployment would
-  // append &token=<jwt>; insecure mode (the dev default) needs none.
+  // off the gateway base (http→ws, https→wss). Browsers can't set a WS
+  // Authorization header, so when OIDC is on the bearer rides the ?token= query
+  // param; insecure mode (the dev default) needs none.
   consoleWsUrl(cluster: string, namespace: string, name: string): string {
     const base = GATEWAY_URL.replace(/^http/, 'ws');
     const q = new URLSearchParams({ cluster, namespace, name });
+    const token = this.auth.token();
+    if (token) q.set('token', token);
     return `${base}/console?${q.toString()}`;
   }
 }

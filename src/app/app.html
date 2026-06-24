@@ -1,17 +1,34 @@
-<mat-toolbar class="topbar">
-  <mat-icon class="logo">dns</mat-icon>
-  <span class="brand">KubeSwift</span>
-  <nav class="nav">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-      >Fleet</a
-    >
-    <a routerLink="/explorer" routerLinkActive="active">Explorer</a>
-    <a routerLink="/migrations" routerLinkActive="active">Migrations</a>
-  </nav>
-  <span class="spacer"></span>
-  <span class="tag">v1alpha1</span>
-</mat-toolbar>
+@if (auth.enabled && !auth.isAuthenticated()) {
+  <div class="login">
+    <mat-icon class="logo">dns</mat-icon>
+    <h1>KubeSwift</h1>
+    <p>Sign in to manage the fleet.</p>
+    <button class="signin" (click)="auth.login()">Sign in</button>
+  </div>
+} @else {
+  <mat-toolbar class="topbar">
+    <mat-icon class="logo">dns</mat-icon>
+    <span class="brand">KubeSwift</span>
+    <nav class="nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+        >Fleet</a
+      >
+      <a routerLink="/explorer" routerLinkActive="active">Explorer</a>
+      <a routerLink="/migrations" routerLinkActive="active">Migrations</a>
+    </nav>
+    <span class="spacer"></span>
+    @if (auth.enabled && auth.user(); as user) {
+      <span class="user" [title]="user">
+        <mat-icon class="user-icon">account_circle</mat-icon>{{ user }}
+      </span>
+      <button class="logout" (click)="auth.logout()" title="Sign out">
+        <mat-icon>logout</mat-icon>
+      </button>
+    }
+    <span class="tag">v1alpha1</span>
+  </mat-toolbar>
 
-<main class="content">
-  <router-outlet></router-outlet>
-</main>
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+}
