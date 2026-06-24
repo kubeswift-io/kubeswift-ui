@@ -3,6 +3,7 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from './auth.service';
+import { ThemeService } from './theme.service';
 
 @Component({
   selector: 'app-root',
@@ -13,4 +14,5 @@ import { AuthService } from './auth.service';
 export class App {
   protected readonly title = signal('KubeSwift');
   protected readonly auth = inject(AuthService);
+  protected readonly theme = inject(ThemeService);
 }
