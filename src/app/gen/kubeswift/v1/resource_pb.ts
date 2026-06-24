@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file kubeswift/v1/resource.proto.
  */
 export const file_kubeswift_v1_resource: GenFile = /*@__PURE__*/
-  fileDesc("ChtrdWJlc3dpZnQvdjEvcmVzb3VyY2UucHJvdG8SDGt1YmVzd2lmdC52MSKaAQoMUmVzb3VyY2VLaW5kEgsKA2tleRgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkSDQoFZ3JvdXAYAyABKAkSDwoHdmVyc2lvbhgEIAEoCRIQCghyZXNvdXJjZRgFIAEoCRISCgpuYW1lc3BhY2VkGAYgASgIEhAKCGNhdGVnb3J5GAcgASgJEg8KB2NvbHVtbnMYCCADKAkiGgoYTGlzdFJlc291cmNlS2luZHNSZXF1ZXN0IkYKGUxpc3RSZXNvdXJjZUtpbmRzUmVzcG9uc2USKQoFa2luZHMYASADKAsyGi5rdWJlc3dpZnQudjEuUmVzb3VyY2VLaW5kItQBCghSZXNvdXJjZRIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEgwKBGtpbmQYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASNAoHY29sdW1ucxgEIAMoCzIjLmt1YmVzd2lmdC52MS5SZXNvdXJjZS5Db2x1bW5zRW50cnkaLgoMQ29sdW1uc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiSAoUTGlzdFJlc291cmNlc1JlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIMCgRraW5kGAIgASgJEhEKCW5hbWVzcGFjZRgDIAEoCSJtChVMaXN0UmVzb3VyY2VzUmVzcG9uc2USKQoJcmVzb3VyY2VzGAEgAygLMhYua3ViZXN3aWZ0LnYxLlJlc291cmNlEikKBWVycm9yGAIgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvcjLRAQoPUmVzb3VyY2VTZXJ2aWNlEmQKEUxpc3RSZXNvdXJjZUtpbmRzEiYua3ViZXN3aWZ0LnYxLkxpc3RSZXNvdXJjZUtpbmRzUmVxdWVzdBonLmt1YmVzd2lmdC52MS5MaXN0UmVzb3VyY2VLaW5kc1Jlc3BvbnNlElgKDUxpc3RSZXNvdXJjZXMSIi5rdWJlc3dpZnQudjEuTGlzdFJlc291cmNlc1JlcXVlc3QaIy5rdWJlc3dpZnQudjEuTGlzdFJlc291cmNlc1Jlc3BvbnNlQkFaP2dpdGh1Yi5jb20vcHJvamVjdGJlc2thci9rdWJlc3dpZnQvZ2VuL2t1YmVzd2lmdC92MTtrdWJlc3dpZnR2MWIGcHJvdG8z", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
+  fileDesc("ChtrdWJlc3dpZnQvdjEvcmVzb3VyY2UucHJvdG8SDGt1YmVzd2lmdC52MSKaAQoMUmVzb3VyY2VLaW5kEgsKA2tleRgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkSDQoFZ3JvdXAYAyABKAkSDwoHdmVyc2lvbhgEIAEoCRIQCghyZXNvdXJjZRgFIAEoCRISCgpuYW1lc3BhY2VkGAYgASgIEhAKCGNhdGVnb3J5GAcgASgJEg8KB2NvbHVtbnMYCCADKAkiGgoYTGlzdFJlc291cmNlS2luZHNSZXF1ZXN0IkYKGUxpc3RSZXNvdXJjZUtpbmRzUmVzcG9uc2USKQoFa2luZHMYASADKAsyGi5rdWJlc3dpZnQudjEuUmVzb3VyY2VLaW5kItQBCghSZXNvdXJjZRIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEgwKBGtpbmQYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASNAoHY29sdW1ucxgEIAMoCzIjLmt1YmVzd2lmdC52MS5SZXNvdXJjZS5Db2x1bW5zRW50cnkaLgoMQ29sdW1uc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiSAoUTGlzdFJlc291cmNlc1JlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIMCgRraW5kGAIgASgJEhEKCW5hbWVzcGFjZRgDIAEoCSJtChVMaXN0UmVzb3VyY2VzUmVzcG9uc2USKQoJcmVzb3VyY2VzGAEgAygLMhYua3ViZXN3aWZ0LnYxLlJlc291cmNlEikKBWVycm9yGAIgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvciJUChJHZXRSZXNvdXJjZVJlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIMCgRraW5kGAIgASgJEhEKCW5hbWVzcGFjZRgDIAEoCRIMCgRuYW1lGAQgASgJIjEKE0dldFJlc291cmNlUmVzcG9uc2USDAoEeWFtbBgBIAEoCRIMCgRqc29uGAIgASgJMqUCCg9SZXNvdXJjZVNlcnZpY2USZAoRTGlzdFJlc291cmNlS2luZHMSJi5rdWJlc3dpZnQudjEuTGlzdFJlc291cmNlS2luZHNSZXF1ZXN0Gicua3ViZXN3aWZ0LnYxLkxpc3RSZXNvdXJjZUtpbmRzUmVzcG9uc2USWAoNTGlzdFJlc291cmNlcxIiLmt1YmVzd2lmdC52MS5MaXN0UmVzb3VyY2VzUmVxdWVzdBojLmt1YmVzd2lmdC52MS5MaXN0UmVzb3VyY2VzUmVzcG9uc2USUgoLR2V0UmVzb3VyY2USIC5rdWJlc3dpZnQudjEuR2V0UmVzb3VyY2VSZXF1ZXN0GiEua3ViZXN3aWZ0LnYxLkdldFJlc291cmNlUmVzcG9uc2VCQVo/Z2l0aHViLmNvbS9wcm9qZWN0YmVza2FyL2t1YmVzd2lmdC9nZW4va3ViZXN3aWZ0L3YxO2t1YmVzd2lmdHYxYgZwcm90bzM", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
 
 /**
  * ResourceKind is one browsable resource type in the explorer catalog. The
@@ -213,10 +213,74 @@ export const ListResourcesResponseSchema: GenMessage<ListResourcesResponse> = /*
   messageDesc(file_kubeswift_v1_resource, 5);
 
 /**
- * ResourceService is the read-only cluster explorer. ListResourceKinds returns
- * the browsable catalog; ListResources lists one kind on one member as the
- * impersonated user. Read-only by design — VM lifecycle stays the typed
- * Start/Stop/Migrate path.
+ * GetResourceRequest fetches one object's full content (for the detail drawer +
+ * the YAML editor).
+ *
+ * @generated from message kubeswift.v1.GetResourceRequest
+ */
+export type GetResourceRequest = Message<"kubeswift.v1.GetResourceRequest"> & {
+  /**
+   * @generated from field: string cluster = 1;
+   */
+  cluster: string;
+
+  /**
+   * a ResourceKind.key
+   *
+   * @generated from field: string kind = 2;
+   */
+  kind: string;
+
+  /**
+   * @generated from field: string namespace = 3;
+   */
+  namespace: string;
+
+  /**
+   * @generated from field: string name = 4;
+   */
+  name: string;
+};
+
+/**
+ * Describes the message kubeswift.v1.GetResourceRequest.
+ * Use `create(GetResourceRequestSchema)` to create a new message.
+ */
+export const GetResourceRequestSchema: GenMessage<GetResourceRequest> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_resource, 6);
+
+/**
+ * @generated from message kubeswift.v1.GetResourceResponse
+ */
+export type GetResourceResponse = Message<"kubeswift.v1.GetResourceResponse"> & {
+  /**
+   * yaml is the object rendered as YAML (managedFields stripped) — what the
+   * editor shows and what ApplyResource accepts back.
+   *
+   * @generated from field: string yaml = 1;
+   */
+  yaml: string;
+
+  /**
+   * json is the same object as a compact JSON string, so the UI can read fields
+   * (conditions, capacity, …) without a YAML parser.
+   *
+   * @generated from field: string json = 2;
+   */
+  json: string;
+};
+
+/**
+ * Describes the message kubeswift.v1.GetResourceResponse.
+ * Use `create(GetResourceResponseSchema)` to create a new message.
+ */
+export const GetResourceResponseSchema: GenMessage<GetResourceResponse> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_resource, 7);
+
+/**
+ * ResourceService is the cluster explorer + object editor. ListResourceKinds /
+ * ListResources / GetResource read; the read plane is the default and the
+ * write RPCs (P3.3) are gated entirely by the impersonated user's RBAC.
  *
  * @generated from service kubeswift.v1.ResourceService
  */
@@ -236,6 +300,14 @@ export const ResourceService: GenService<{
     methodKind: "unary";
     input: typeof ListResourcesRequestSchema;
     output: typeof ListResourcesResponseSchema;
+  },
+  /**
+   * @generated from rpc kubeswift.v1.ResourceService.GetResource
+   */
+  getResource: {
+    methodKind: "unary";
+    input: typeof GetResourceRequestSchema;
+    output: typeof GetResourceResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_kubeswift_v1_resource, 0);

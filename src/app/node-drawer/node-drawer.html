@@ -1,0 +1,105 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <span class="dot" [class]="health()" [title]="health()"></span>
+    <div class="title">
+      <span class="name">{{ node() }}</span>
+      <span class="sub">{{ roles() }} · {{ version() }}</span>
+    </div>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (loadError(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  <section>
+    <h4>Info</h4>
+    <dl class="kv">
+      <dt>Status</dt>
+      <dd>
+        {{
+          health() === 'green'
+            ? 'Ready'
+            : health() === 'red'
+              ? 'NotReady'
+              : 'Ready (cordoned / pressure)'
+        }}
+      </dd>
+      <dt>Internal IP</dt>
+      <dd>{{ internalIP() }}</dd>
+      <dt>OS</dt>
+      <dd>{{ osImage() }}</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h4>Utilization</h4>
+    @if (metricsError(); as e) {
+      <div class="muted">{{ e }}</div>
+    }
+    <app-sparkline label="CPU" [values]="seriesValues('cpu_util')" unit="ratio" color="#1a73e8" />
+    <app-sparkline
+      label="Memory"
+      [values]="seriesValues('mem_util')"
+      unit="ratio"
+      color="#1e8e3e"
+    />
+    <app-sparkline
+      label="Net RX"
+      [values]="seriesValues('net_rx_bps')"
+      unit="bytes/sec"
+      color="#9334e6"
+    />
+    <app-sparkline
+      label="Net TX"
+      [values]="seriesValues('net_tx_bps')"
+      unit="bytes/sec"
+      color="#e8710a"
+    />
+    @if (gpuHasData()) {
+      <app-sparkline label="GPU" [values]="seriesValues('gpu_util')" unit="ratio" color="#d93025" />
+    } @else {
+      <div class="gpu-none"><span class="name">GPU</span><span>no DCGM metrics</span></div>
+    }
+  </section>
+
+  <section>
+    <h4>Capacity</h4>
+    <table class="cap">
+      <thead>
+        <tr>
+          <th>Resource</th>
+          <th>Allocatable</th>
+          <th>Capacity</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (e of capEntries(); track e.k) {
+          <tr>
+            <td>{{ e.k }}</td>
+            <td>{{ e.alloc }}</td>
+            <td>{{ e.cap }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h4>Conditions</h4>
+    <div class="conds">
+      @for (c of conditions(); track c.type) {
+        <div
+          class="cond"
+          [class.bad]="c.type === 'Ready' ? c.status !== 'True' : c.status === 'True'"
+        >
+          <span class="ctype">{{ c.type }}</span>
+          <span class="cstatus">{{ c.status }}</span>
+        </div>
+      }
+    </div>
+  </section>
+</aside>

@@ -167,9 +167,29 @@
   tbody tr:hover {
     background: var(--mat-sys-surface-container-low);
   }
+  tbody tr.clickable {
+    cursor: pointer;
+  }
   .strong {
     font-weight: 500;
     color: var(--mat-sys-on-surface);
+  }
+  .dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+    &.green {
+      background: #1e8e3e;
+    }
+    &.amber {
+      background: #f9ab00;
+    }
+    &.red {
+      background: #d93025;
+    }
   }
 }
 
