@@ -1,0 +1,157 @@
+<div class="page">
+  <div class="head">
+    <h2>Access</h2>
+    <select
+      class="cluster"
+      [value]="selectedCluster()"
+      (change)="selectCluster($any($event.target).value)"
+    >
+      @for (c of clusters(); track c.name) {
+        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
+      }
+    </select>
+  </div>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  <!-- Assign a role to a user/group -->
+  <section class="card">
+    <h3>Assign a role</h3>
+    <div class="assign">
+      <select [value]="aSubjectKind()" (change)="aSubjectKind.set($any($event.target).value)">
+        <option value="User">User</option>
+        <option value="Group">Group</option>
+      </select>
+      <input
+        class="grow"
+        placeholder="name — e.g. alice@example.com or a group"
+        [value]="aSubjectName()"
+        (input)="aSubjectName.set($any($event.target).value)"
+      />
+      <select [value]="aRole()" (change)="aRole.set($any($event.target).value)">
+        @for (r of roles(); track r.name) {
+          <option [value]="r.name">{{ r.displayName || r.name }}</option>
+        }
+      </select>
+      <select [value]="aNamespace()" (change)="aNamespace.set($any($event.target).value)">
+        <option value="">Cluster-wide</option>
+        @for (ns of namespaces(); track ns) {
+          <option [value]="ns">ns: {{ ns }}</option>
+        }
+      </select>
+      <button class="primary" [disabled]="busy() || !aSubjectName() || !aRole()" (click)="assign()">
+        Assign
+      </button>
+    </div>
+  </section>
+
+  <!-- Current assignments -->
+  <section class="card">
+    <h3>
+      Assignments <span class="count">{{ assignments().length }}</span>
+    </h3>
+    @if (assignments().length) {
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Role</th>
+            <th>Scope</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of assignments(); track a.bindingName) {
+            <tr>
+              <td>
+                <span class="kind">{{ a.subject?.kind }}</span> {{ a.subject?.name }}
+              </td>
+              <td>{{ a.role }}</td>
+              <td>{{ a.scope === 'Namespace' ? 'ns: ' + a.namespace : 'Cluster-wide' }}</td>
+              <td class="right">
+                <button class="link danger" [disabled]="busy()" (click)="remove(a)">Remove</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <div class="empty">No assignments yet.</div>
+    }
+  </section>
+
+  <!-- Roles + custom-role builder -->
+  <section class="card">
+    <h3>
+      Roles
+      <span class="spacer"></span>
+      <button class="link" (click)="showCreate.set(!showCreate())">
+        {{ showCreate() ? 'Cancel' : '+ New custom role' }}
+      </button>
+    </h3>
+
+    @if (showCreate()) {
+      <div class="create">
+        <div class="create-row">
+          <input
+            placeholder="role name — e.g. team-operator"
+            [value]="newRoleName()"
+            (input)="newRoleName.set($any($event.target).value)"
+          />
+          <input
+            placeholder="display name (optional)"
+            [value]="newRoleDisplay()"
+            (input)="newRoleDisplay.set($any($event.target).value)"
+          />
+        </div>
+        <div class="caps">
+          @for (c of capabilities(); track c.key) {
+            <label class="cap" [title]="c.description">
+              <input
+                type="checkbox"
+                [checked]="newRoleCaps().has(c.key)"
+                (change)="toggleCap(c.key)"
+              />
+              {{ c.displayName }}
+            </label>
+          }
+        </div>
+        <button
+          class="primary"
+          [disabled]="busy() || !newRoleName() || newRoleCaps().size === 0"
+          (click)="createRole()"
+        >
+          Create role
+        </button>
+      </div>
+    }
+
+    <div class="roles">
+      @for (r of roles(); track r.name) {
+        <div class="role">
+          <div class="role-head">
+            <strong>{{ r.displayName || r.name }}</strong>
+            <code>{{ r.name }}</code>
+            <span class="spacer"></span>
+            @if (r.predefined) {
+              <span class="badge">predefined</span>
+            } @else {
+              <button class="link danger" [disabled]="busy()" (click)="deleteRole(r)">
+                Delete
+              </button>
+            }
+          </div>
+          <div class="chips">
+            @for (cap of r.capabilities; track cap) {
+              <span class="chip">{{ capName(cap) }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+</div>
