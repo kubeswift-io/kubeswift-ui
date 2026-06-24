@@ -5,6 +5,7 @@ import { ClusterService } from './gen/kubeswift/v1/cluster_pb';
 import { GuestService } from './gen/kubeswift/v1/guest_pb';
 import { MigrationService } from './gen/kubeswift/v1/migration_pb';
 import { TelemetryService } from './gen/kubeswift/v1/telemetry_pb';
+import { ResourceService } from './gen/kubeswift/v1/resource_pb';
 
 // The kubeswift-gateway endpoint. By default it targets the gateway on the
 // SAME host that serves the UI, port 18080 — so a dev port-forward on that host
@@ -28,6 +29,7 @@ export class GatewayService {
   readonly guests = createClient(GuestService, this.transport);
   readonly migrations = createClient(MigrationService, this.transport);
   readonly telemetry = createClient(TelemetryService, this.transport);
+  readonly resources = createClient(ResourceService, this.transport);
 
   // The console plane is a raw WebSocket (not Connect), so build its URL by hand
   // off the gateway base (http→ws, https→wss). A token-auth deployment would
