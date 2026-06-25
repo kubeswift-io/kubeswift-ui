@@ -167,6 +167,55 @@
     }
   </section>
 
+  @if (network(); as net) {
+    <section>
+      <h4>Networking</h4>
+      <div class="net-head">
+        <span class="chip">{{ net.binding || 'nat' }}</span>
+        @if (net.egress) {
+          <span class="chip" [class.ok]="net.egressReady">egress: {{ net.egress }}</span>
+        }
+        @if (net.serviceRef) {
+          <span class="chip" [class.ok]="net.serviceReady">svc: {{ net.serviceRef }}</span>
+        }
+      </div>
+      @if (net.ports.length) {
+        <table class="ports">
+          <thead>
+            <tr>
+              <th>Port</th>
+              <th>Target</th>
+              <th>Proto</th>
+              <th>Expose</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of net.ports; track $index) {
+              <tr>
+                <td>{{ p.port }}{{ p.name ? ' (' + p.name + ')' : '' }}</td>
+                <td>{{ p.targetPort || p.port }}</td>
+                <td>{{ p.protocol || 'TCP' }}</td>
+                <td>{{ p.expose || '—' }}</td>
+                <td>
+                  @if (p.expose) {
+                    <span
+                      class="dot"
+                      [class.ok]="p.programmed"
+                      [title]="p.programmed ? 'programmed' : 'pending'"
+                    ></span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <div class="muted">No declared ports (DNAT-only / none).</div>
+      }
+    </section>
+  }
+
   @if (labelEntries().length) {
     <section>
       <h4>Labels</h4>

@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file kubeswift/v1/guest.proto.
  */
 export const file_kubeswift_v1_guest: GenFile = /*@__PURE__*/
-  fileDesc("ChhrdWJlc3dpZnQvdjEvZ3Vlc3QucHJvdG8SDGt1YmVzd2lmdC52MSKWAwoFR3Vlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZhINCgVwaGFzZRgCIAEoCRIRCglub2RlX25hbWUYAyABKAkSEgoKaHlwZXJ2aXNvchgEIAEoCRISCgpwcmltYXJ5X2lwGAUgASgJEhMKC2Jvb3Rfc291cmNlGAYgASgJEhMKC2d1ZXN0X2NsYXNzGAcgASgJEhUKDWd1ZXN0X3J1bm5pbmcYCCABKAgSCwoDY3B1GAkgASgFEhIKCm1lbW9yeV9taWIYCiABKAMSLgoKY3JlYXRlZF9hdBgLIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKwoKY29uZGl0aW9ucxgMIAMoCzIXLmt1YmVzd2lmdC52MS5Db25kaXRpb24SLwoGbGFiZWxzGA0gAygLMh8ua3ViZXN3aWZ0LnYxLkd1ZXN0LkxhYmVsc0VudHJ5Gi0KC0xhYmVsc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEijwEKEUxpc3RHdWVzdHNSZXF1ZXN0Ei8KCGNsdXN0ZXJzGAEgASgLMh0ua3ViZXN3aWZ0LnYxLkNsdXN0ZXJTZWxlY3RvchIRCgluYW1lc3BhY2UYAiABKAkSDQoFcGhhc2UYAyABKAkSJwoEcGFnZRgEIAEoCzIZLmt1YmVzd2lmdC52MS5QYWdlUmVxdWVzdCKPAQoSTGlzdEd1ZXN0c1Jlc3BvbnNlEiMKBmd1ZXN0cxgBIAMoCzITLmt1YmVzd2lmdC52MS5HdWVzdBIoCgRwYWdlGAIgASgLMhoua3ViZXN3aWZ0LnYxLlBhZ2VSZXNwb25zZRIqCgZlcnJvcnMYAyADKAsyGi5rdWJlc3dpZnQudjEuQ2x1c3RlckVycm9yIlgKEldhdGNoR3Vlc3RzUmVxdWVzdBIvCghjbHVzdGVycxgBIAEoCzIdLmt1YmVzd2lmdC52MS5DbHVzdGVyU2VsZWN0b3ISEQoJbmFtZXNwYWNlGAIgASgJIoIBCgpHdWVzdEV2ZW50EiUKBHR5cGUYASABKA4yFy5rdWJlc3dpZnQudjEuRXZlbnRUeXBlEiIKBWd1ZXN0GAIgASgLMhMua3ViZXN3aWZ0LnYxLkd1ZXN0EikKBWVycm9yGAMgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvciI9ChVHZXRHdWVzdERldGFpbFJlcXVlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZiLXAQoJR3Vlc3RTcGVjEhEKCWltYWdlX3JlZhgBIAEoCRISCgprZXJuZWxfcmVmGAIgASgJEhYKDmtlcm5lbF9jbWRsaW5lGAMgASgJEhoKEmNsb25lX3NuYXBzaG90X3JlZhgEIAEoCRIXCg9ndWVzdF9jbGFzc19yZWYYBSABKAkSGAoQc2VlZF9wcm9maWxlX3JlZhgGIAEoCRIXCg9ncHVfcHJvZmlsZV9yZWYYByABKAkSEgoKcnVuX3BvbGljeRgIIAEoCRIPCgdvc190eXBlGAkgASgJImMKFkdldEd1ZXN0RGV0YWlsUmVzcG9uc2USIgoFZ3Vlc3QYASABKAsyEy5rdWJlc3dpZnQudjEuR3Vlc3QSJQoEc3BlYxgCIAEoCzIXLmt1YmVzd2lmdC52MS5HdWVzdFNwZWMiOgoSR3Vlc3RBY3Rpb25SZXF1ZXN0EiQKA3JlZhgBIAEoCzIXLmt1YmVzd2lmdC52MS5PYmplY3RSZWYiOQoTR3Vlc3RBY3Rpb25SZXNwb25zZRIiCgVndWVzdBgBIAEoCzITLmt1YmVzd2lmdC52MS5HdWVzdCJ3ChNNaWdyYXRlR3Vlc3RSZXF1ZXN0EiQKA3JlZhgBIAEoCzIXLmt1YmVzd2lmdC52MS5PYmplY3RSZWYSEwoLdGFyZ2V0X25vZGUYAiABKAkSDAoEbW9kZRgDIAEoCRIXCg9hbGxvd19pcF9jaGFuZ2UYBCABKAgiQgoUTWlncmF0ZUd1ZXN0UmVzcG9uc2USKgoJbWlncmF0aW9uGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZiJiCg1HdWVzdFBvcnRTcGVjEgwKBG5hbWUYASABKAkSDAoEcG9ydBgCIAEoBRITCgt0YXJnZXRfcG9ydBgDIAEoBRIQCghwcm90b2NvbBgEIAEoCRIOCgZleHBvc2UYBSABKAki7AIKEkNyZWF0ZUd1ZXN0UmVxdWVzdBIPCgdjbHVzdGVyGAEgASgJEhEKCW5hbWVzcGFjZRgCIAEoCRIMCgRuYW1lGAMgASgJEhEKCWltYWdlX3JlZhgEIAEoCRISCgprZXJuZWxfcmVmGAUgASgJEhYKDmtlcm5lbF9jbWRsaW5lGAYgASgJEhoKEmNsb25lX3NuYXBzaG90X3JlZhgHIAEoCRIZChFjbG9uZV90YXJnZXRfbm9kZRgIIAEoCRIXCg9ndWVzdF9jbGFzc19yZWYYCSABKAkSGAoQc2VlZF9wcm9maWxlX3JlZhgKIAEoCRIXCg9ncHVfcHJvZmlsZV9yZWYYCyABKAkSEgoKcnVuX3BvbGljeRgMIAEoCRIPCgdvc190eXBlGA0gASgJEhEKCW5vZGVfbmFtZRgOIAEoCRIqCgVwb3J0cxgPIAMoCzIbLmt1YmVzd2lmdC52MS5HdWVzdFBvcnRTcGVjIjsKE0NyZWF0ZUd1ZXN0UmVzcG9uc2USJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZiI6ChJEZWxldGVHdWVzdFJlcXVlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZiIVChNEZWxldGVHdWVzdFJlc3BvbnNlIo4BCg9HdWVzdEV2ZW50RW50cnkSDAoEdHlwZRgBIAEoCRIOCgZyZWFzb24YAiABKAkSDwoHbWVzc2FnZRgDIAEoCRINCgVjb3VudBgEIAEoBRIOCgZvYmplY3QYBSABKAkSLQoJbGFzdF9zZWVuGAYgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCI9ChVHZXRHdWVzdEV2ZW50c1JlcXVlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZiJHChZHZXRHdWVzdEV2ZW50c1Jlc3BvbnNlEi0KBmV2ZW50cxgBIAMoCzIdLmt1YmVzd2lmdC52MS5HdWVzdEV2ZW50RW50cnkyigYKDEd1ZXN0U2VydmljZRJPCgpMaXN0R3Vlc3RzEh8ua3ViZXN3aWZ0LnYxLkxpc3RHdWVzdHNSZXF1ZXN0GiAua3ViZXN3aWZ0LnYxLkxpc3RHdWVzdHNSZXNwb25zZRJLCgtXYXRjaEd1ZXN0cxIgLmt1YmVzd2lmdC52MS5XYXRjaEd1ZXN0c1JlcXVlc3QaGC5rdWJlc3dpZnQudjEuR3Vlc3RFdmVudDABElsKDkdldEd1ZXN0RGV0YWlsEiMua3ViZXN3aWZ0LnYxLkdldEd1ZXN0RGV0YWlsUmVxdWVzdBokLmt1YmVzd2lmdC52MS5HZXRHdWVzdERldGFpbFJlc3BvbnNlElEKClN0YXJ0R3Vlc3QSIC5rdWJlc3dpZnQudjEuR3Vlc3RBY3Rpb25SZXF1ZXN0GiEua3ViZXN3aWZ0LnYxLkd1ZXN0QWN0aW9uUmVzcG9uc2USUAoJU3RvcEd1ZXN0EiAua3ViZXN3aWZ0LnYxLkd1ZXN0QWN0aW9uUmVxdWVzdBohLmt1YmVzd2lmdC52MS5HdWVzdEFjdGlvblJlc3BvbnNlElUKDE1pZ3JhdGVHdWVzdBIhLmt1YmVzd2lmdC52MS5NaWdyYXRlR3Vlc3RSZXF1ZXN0GiIua3ViZXN3aWZ0LnYxLk1pZ3JhdGVHdWVzdFJlc3BvbnNlElIKC0NyZWF0ZUd1ZXN0EiAua3ViZXN3aWZ0LnYxLkNyZWF0ZUd1ZXN0UmVxdWVzdBohLmt1YmVzd2lmdC52MS5DcmVhdGVHdWVzdFJlc3BvbnNlElIKC0RlbGV0ZUd1ZXN0EiAua3ViZXN3aWZ0LnYxLkRlbGV0ZUd1ZXN0UmVxdWVzdBohLmt1YmVzd2lmdC52MS5EZWxldGVHdWVzdFJlc3BvbnNlElsKDkdldEd1ZXN0RXZlbnRzEiMua3ViZXN3aWZ0LnYxLkdldEd1ZXN0RXZlbnRzUmVxdWVzdBokLmt1YmVzd2lmdC52MS5HZXRHdWVzdEV2ZW50c1Jlc3BvbnNlQkFaP2dpdGh1Yi5jb20vcHJvamVjdGJlc2thci9rdWJlc3dpZnQvZ2VuL2t1YmVzd2lmdC92MTtrdWJlc3dpZnR2MWIGcHJvdG8z", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
+  fileDesc("ChhrdWJlc3dpZnQvdjEvZ3Vlc3QucHJvdG8SDGt1YmVzd2lmdC52MSKWAwoFR3Vlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZhINCgVwaGFzZRgCIAEoCRIRCglub2RlX25hbWUYAyABKAkSEgoKaHlwZXJ2aXNvchgEIAEoCRISCgpwcmltYXJ5X2lwGAUgASgJEhMKC2Jvb3Rfc291cmNlGAYgASgJEhMKC2d1ZXN0X2NsYXNzGAcgASgJEhUKDWd1ZXN0X3J1bm5pbmcYCCABKAgSCwoDY3B1GAkgASgFEhIKCm1lbW9yeV9taWIYCiABKAMSLgoKY3JlYXRlZF9hdBgLIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASKwoKY29uZGl0aW9ucxgMIAMoCzIXLmt1YmVzd2lmdC52MS5Db25kaXRpb24SLwoGbGFiZWxzGA0gAygLMh8ua3ViZXN3aWZ0LnYxLkd1ZXN0LkxhYmVsc0VudHJ5Gi0KC0xhYmVsc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEijwEKEUxpc3RHdWVzdHNSZXF1ZXN0Ei8KCGNsdXN0ZXJzGAEgASgLMh0ua3ViZXN3aWZ0LnYxLkNsdXN0ZXJTZWxlY3RvchIRCgluYW1lc3BhY2UYAiABKAkSDQoFcGhhc2UYAyABKAkSJwoEcGFnZRgEIAEoCzIZLmt1YmVzd2lmdC52MS5QYWdlUmVxdWVzdCKPAQoSTGlzdEd1ZXN0c1Jlc3BvbnNlEiMKBmd1ZXN0cxgBIAMoCzITLmt1YmVzd2lmdC52MS5HdWVzdBIoCgRwYWdlGAIgASgLMhoua3ViZXN3aWZ0LnYxLlBhZ2VSZXNwb25zZRIqCgZlcnJvcnMYAyADKAsyGi5rdWJlc3dpZnQudjEuQ2x1c3RlckVycm9yIlgKEldhdGNoR3Vlc3RzUmVxdWVzdBIvCghjbHVzdGVycxgBIAEoCzIdLmt1YmVzd2lmdC52MS5DbHVzdGVyU2VsZWN0b3ISEQoJbmFtZXNwYWNlGAIgASgJIoIBCgpHdWVzdEV2ZW50EiUKBHR5cGUYASABKA4yFy5rdWJlc3dpZnQudjEuRXZlbnRUeXBlEiIKBWd1ZXN0GAIgASgLMhMua3ViZXN3aWZ0LnYxLkd1ZXN0EikKBWVycm9yGAMgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvciI9ChVHZXRHdWVzdERldGFpbFJlcXVlc3QSJAoDcmVmGAEgASgLMhcua3ViZXN3aWZ0LnYxLk9iamVjdFJlZiLXAQoJR3Vlc3RTcGVjEhEKCWltYWdlX3JlZhgBIAEoCRISCgprZXJuZWxfcmVmGAIgASgJEhYKDmtlcm5lbF9jbWRsaW5lGAMgASgJEhoKEmNsb25lX3NuYXBzaG90X3JlZhgEIAEoCRIXCg9ndWVzdF9jbGFzc19yZWYYBSABKAkSGAoQc2VlZF9wcm9maWxlX3JlZhgGIAEoCRIXCg9ncHVfcHJvZmlsZV9yZWYYByABKAkSEgoKcnVuX3BvbGljeRgIIAEoCRIPCgdvc190eXBlGAkgASgJIpABChZHZXRHdWVzdERldGFpbFJlc3BvbnNlEiIKBWd1ZXN0GAEgASgLMhMua3ViZXN3aWZ0LnYxLkd1ZXN0EiUKBHNwZWMYAiABKAsyFy5rdWJlc3dpZnQudjEuR3Vlc3RTcGVjEisKB25ldHdvcmsYAyABKAsyGi5rdWJlc3dpZnQudjEuR3Vlc3ROZXR3b3JrIroBCgxHdWVzdE5ldHdvcmsSDwoHYmluZGluZxgBIAEoCRIOCgZlZ3Jlc3MYAiABKAkSEwoLc2VydmljZV9yZWYYAyABKAkSGAoQcG9ydHNfcHJvZ3JhbW1lZBgEIAEoCBIVCg1zZXJ2aWNlX3JlYWR5GAUgASgIEhQKDGVncmVzc19yZWFkeRgGIAEoCBItCgVwb3J0cxgHIAMoCzIeLmt1YmVzd2lmdC52MS5HdWVzdE5ldHdvcmtQb3J0InkKEEd1ZXN0TmV0d29ya1BvcnQSDAoEbmFtZRgBIAEoCRIMCgRwb3J0GAIgASgFEhMKC3RhcmdldF9wb3J0GAMgASgFEhAKCHByb3RvY29sGAQgASgJEg4KBmV4cG9zZRgFIAEoCRISCgpwcm9ncmFtbWVkGAYgASgIIjoKEkd1ZXN0QWN0aW9uUmVxdWVzdBIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmIjkKE0d1ZXN0QWN0aW9uUmVzcG9uc2USIgoFZ3Vlc3QYASABKAsyEy5rdWJlc3dpZnQudjEuR3Vlc3QidwoTTWlncmF0ZUd1ZXN0UmVxdWVzdBIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEhMKC3RhcmdldF9ub2RlGAIgASgJEgwKBG1vZGUYAyABKAkSFwoPYWxsb3dfaXBfY2hhbmdlGAQgASgIIkIKFE1pZ3JhdGVHdWVzdFJlc3BvbnNlEioKCW1pZ3JhdGlvbhgBIAEoCzIXLmt1YmVzd2lmdC52MS5PYmplY3RSZWYiYgoNR3Vlc3RQb3J0U3BlYxIMCgRuYW1lGAEgASgJEgwKBHBvcnQYAiABKAUSEwoLdGFyZ2V0X3BvcnQYAyABKAUSEAoIcHJvdG9jb2wYBCABKAkSDgoGZXhwb3NlGAUgASgJIuwCChJDcmVhdGVHdWVzdFJlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIRCgluYW1lc3BhY2UYAiABKAkSDAoEbmFtZRgDIAEoCRIRCglpbWFnZV9yZWYYBCABKAkSEgoKa2VybmVsX3JlZhgFIAEoCRIWCg5rZXJuZWxfY21kbGluZRgGIAEoCRIaChJjbG9uZV9zbmFwc2hvdF9yZWYYByABKAkSGQoRY2xvbmVfdGFyZ2V0X25vZGUYCCABKAkSFwoPZ3Vlc3RfY2xhc3NfcmVmGAkgASgJEhgKEHNlZWRfcHJvZmlsZV9yZWYYCiABKAkSFwoPZ3B1X3Byb2ZpbGVfcmVmGAsgASgJEhIKCnJ1bl9wb2xpY3kYDCABKAkSDwoHb3NfdHlwZRgNIAEoCRIRCglub2RlX25hbWUYDiABKAkSKgoFcG9ydHMYDyADKAsyGy5rdWJlc3dpZnQudjEuR3Vlc3RQb3J0U3BlYyI7ChNDcmVhdGVHdWVzdFJlc3BvbnNlEiQKA3JlZhgBIAEoCzIXLmt1YmVzd2lmdC52MS5PYmplY3RSZWYiOgoSRGVsZXRlR3Vlc3RSZXF1ZXN0EiQKA3JlZhgBIAEoCzIXLmt1YmVzd2lmdC52MS5PYmplY3RSZWYiFQoTRGVsZXRlR3Vlc3RSZXNwb25zZSKOAQoPR3Vlc3RFdmVudEVudHJ5EgwKBHR5cGUYASABKAkSDgoGcmVhc29uGAIgASgJEg8KB21lc3NhZ2UYAyABKAkSDQoFY291bnQYBCABKAUSDgoGb2JqZWN0GAUgASgJEi0KCWxhc3Rfc2VlbhgGIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAiPQoVR2V0R3Vlc3RFdmVudHNSZXF1ZXN0EiQKA3JlZhgBIAEoCzIXLmt1YmVzd2lmdC52MS5PYmplY3RSZWYiRwoWR2V0R3Vlc3RFdmVudHNSZXNwb25zZRItCgZldmVudHMYASADKAsyHS5rdWJlc3dpZnQudjEuR3Vlc3RFdmVudEVudHJ5MooGCgxHdWVzdFNlcnZpY2USTwoKTGlzdEd1ZXN0cxIfLmt1YmVzd2lmdC52MS5MaXN0R3Vlc3RzUmVxdWVzdBogLmt1YmVzd2lmdC52MS5MaXN0R3Vlc3RzUmVzcG9uc2USSwoLV2F0Y2hHdWVzdHMSIC5rdWJlc3dpZnQudjEuV2F0Y2hHdWVzdHNSZXF1ZXN0Ghgua3ViZXN3aWZ0LnYxLkd1ZXN0RXZlbnQwARJbCg5HZXRHdWVzdERldGFpbBIjLmt1YmVzd2lmdC52MS5HZXRHdWVzdERldGFpbFJlcXVlc3QaJC5rdWJlc3dpZnQudjEuR2V0R3Vlc3REZXRhaWxSZXNwb25zZRJRCgpTdGFydEd1ZXN0EiAua3ViZXN3aWZ0LnYxLkd1ZXN0QWN0aW9uUmVxdWVzdBohLmt1YmVzd2lmdC52MS5HdWVzdEFjdGlvblJlc3BvbnNlElAKCVN0b3BHdWVzdBIgLmt1YmVzd2lmdC52MS5HdWVzdEFjdGlvblJlcXVlc3QaIS5rdWJlc3dpZnQudjEuR3Vlc3RBY3Rpb25SZXNwb25zZRJVCgxNaWdyYXRlR3Vlc3QSIS5rdWJlc3dpZnQudjEuTWlncmF0ZUd1ZXN0UmVxdWVzdBoiLmt1YmVzd2lmdC52MS5NaWdyYXRlR3Vlc3RSZXNwb25zZRJSCgtDcmVhdGVHdWVzdBIgLmt1YmVzd2lmdC52MS5DcmVhdGVHdWVzdFJlcXVlc3QaIS5rdWJlc3dpZnQudjEuQ3JlYXRlR3Vlc3RSZXNwb25zZRJSCgtEZWxldGVHdWVzdBIgLmt1YmVzd2lmdC52MS5EZWxldGVHdWVzdFJlcXVlc3QaIS5rdWJlc3dpZnQudjEuRGVsZXRlR3Vlc3RSZXNwb25zZRJbCg5HZXRHdWVzdEV2ZW50cxIjLmt1YmVzd2lmdC52MS5HZXRHdWVzdEV2ZW50c1JlcXVlc3QaJC5rdWJlc3dpZnQudjEuR2V0R3Vlc3RFdmVudHNSZXNwb25zZUJBWj9naXRodWIuY29tL3Byb2plY3RiZXNrYXIva3ViZXN3aWZ0L2dlbi9rdWJlc3dpZnQvdjE7a3ViZXN3aWZ0djFiBnByb3RvMw", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
 
 /**
  * Guest is a UI-shaped, denormalized view of a SwiftGuest across the fleet.
@@ -326,6 +326,14 @@ export type GetGuestDetailResponse = Message<"kubeswift.v1.GetGuestDetailRespons
    * @generated from field: kubeswift.v1.GuestSpec spec = 2;
    */
   spec?: GuestSpec | undefined;
+
+  /**
+   * network is the service-exposure + egress view (the Networking drawer
+   * section). Nil when the guest declares no spec.network.
+   *
+   * @generated from field: kubeswift.v1.GuestNetwork network = 3;
+   */
+  network?: GuestNetwork | undefined;
 };
 
 /**
@@ -334,6 +342,121 @@ export type GetGuestDetailResponse = Message<"kubeswift.v1.GetGuestDetailRespons
  */
 export const GetGuestDetailResponseSchema: GenMessage<GetGuestDetailResponse> = /*@__PURE__*/
   messageDesc(file_kubeswift_v1_guest, 7);
+
+/**
+ * GuestNetwork is the service-exposure + egress view of a SwiftGuest — the
+ * Networking section of the VM drawer. Spec (binding/ports) joined with the
+ * status the controller + swiftletd report (programmed ports, Service, egress
+ * reachability, conditions).
+ *
+ * @generated from message kubeswift.v1.GuestNetwork
+ */
+export type GuestNetwork = Message<"kubeswift.v1.GuestNetwork"> & {
+  /**
+   * binding is spec.network.binding (nat | bridge).
+   *
+   * @generated from field: string binding = 1;
+   */
+  binding: string;
+
+  /**
+   * egress is status.network.egress (ClusterServices | DirectOnly | "").
+   *
+   * @generated from field: string egress = 2;
+   */
+  egress: string;
+
+  /**
+   * service_ref is status.network.serviceRef.name (the minted per-guest Service).
+   *
+   * @generated from field: string service_ref = 3;
+   */
+  serviceRef: string;
+
+  /**
+   * Condition mirrors (no-silent-failure surfaces).
+   *
+   * PortsProgrammed=True
+   *
+   * @generated from field: bool ports_programmed = 4;
+   */
+  portsProgrammed: boolean;
+
+  /**
+   * ServiceReady=True
+   *
+   * @generated from field: bool service_ready = 5;
+   */
+  serviceReady: boolean;
+
+  /**
+   * EgressReady=True
+   *
+   * @generated from field: bool egress_ready = 6;
+   */
+  egressReady: boolean;
+
+  /**
+   * @generated from field: repeated kubeswift.v1.GuestNetworkPort ports = 7;
+   */
+  ports: GuestNetworkPort[];
+};
+
+/**
+ * Describes the message kubeswift.v1.GuestNetwork.
+ * Use `create(GuestNetworkSchema)` to create a new message.
+ */
+export const GuestNetworkSchema: GenMessage<GuestNetwork> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_guest, 8);
+
+/**
+ * @generated from message kubeswift.v1.GuestNetworkPort
+ */
+export type GuestNetworkPort = Message<"kubeswift.v1.GuestNetworkPort"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: int32 port = 2;
+   */
+  port: number;
+
+  /**
+   * @generated from field: int32 target_port = 3;
+   */
+  targetPort: number;
+
+  /**
+   * TCP | UDP | SCTP
+   *
+   * @generated from field: string protocol = 4;
+   */
+  protocol: string;
+
+  /**
+   * expose is the Service type (ClusterIP|NodePort|LoadBalancer) or "" for
+   * DNAT-only (reachable pod->VM by the pod IP, no Service object).
+   *
+   * @generated from field: string expose = 5;
+   */
+  expose: string;
+
+  /**
+   * programmed is true when this port appears in status.network.exposedPorts.
+   *
+   * @generated from field: bool programmed = 6;
+   */
+  programmed: boolean;
+};
+
+/**
+ * Describes the message kubeswift.v1.GuestNetworkPort.
+ * Use `create(GuestNetworkPortSchema)` to create a new message.
+ */
+export const GuestNetworkPortSchema: GenMessage<GuestNetworkPort> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_guest, 9);
 
 /**
  * GuestActionRequest identifies the target VM for a lifecycle action.
@@ -352,7 +475,7 @@ export type GuestActionRequest = Message<"kubeswift.v1.GuestActionRequest"> & {
  * Use `create(GuestActionRequestSchema)` to create a new message.
  */
 export const GuestActionRequestSchema: GenMessage<GuestActionRequest> = /*@__PURE__*/
-  messageDesc(file_kubeswift_v1_guest, 8);
+  messageDesc(file_kubeswift_v1_guest, 10);
 
 /**
  * GuestActionResponse returns the guest immediately after the action is
@@ -373,7 +496,7 @@ export type GuestActionResponse = Message<"kubeswift.v1.GuestActionResponse"> & 
  * Use `create(GuestActionResponseSchema)` to create a new message.
  */
 export const GuestActionResponseSchema: GenMessage<GuestActionResponse> = /*@__PURE__*/
-  messageDesc(file_kubeswift_v1_guest, 9);
+  messageDesc(file_kubeswift_v1_guest, 11);
 
 /**
  * MigrateGuestRequest moves a guest to another node by creating a
@@ -413,7 +536,7 @@ export type MigrateGuestRequest = Message<"kubeswift.v1.MigrateGuestRequest"> & 
  * Use `create(MigrateGuestRequestSchema)` to create a new message.
  */
 export const MigrateGuestRequestSchema: GenMessage<MigrateGuestRequest> = /*@__PURE__*/
-  messageDesc(file_kubeswift_v1_guest, 10);
+  messageDesc(file_kubeswift_v1_guest, 12);
 
 /**
  * MigrateGuestResponse returns the created SwiftMigration's ref; the migration
@@ -434,7 +557,7 @@ export type MigrateGuestResponse = Message<"kubeswift.v1.MigrateGuestResponse"> 
  * Use `create(MigrateGuestResponseSchema)` to create a new message.
  */
 export const MigrateGuestResponseSchema: GenMessage<MigrateGuestResponse> = /*@__PURE__*/
-  messageDesc(file_kubeswift_v1_guest, 11);
+  messageDesc(file_kubeswift_v1_guest, 13);
 
 /**
  * GuestPortSpec is one declarative service port for a created guest (the
@@ -483,7 +606,7 @@ export type GuestPortSpec = Message<"kubeswift.v1.GuestPortSpec"> & {
  * Use `create(GuestPortSpecSchema)` to create a new message.
  */
 export const GuestPortSpecSchema: GenMessage<GuestPortSpec> = /*@__PURE__*/
-  messageDesc(file_kubeswift_v1_guest, 12);
+  messageDesc(file_kubeswift_v1_guest, 14);
 
 /**
  * CreateGuestRequest is the structured input the Create-VM wizard submits. The
@@ -602,7 +725,7 @@ export type CreateGuestRequest = Message<"kubeswift.v1.CreateGuestRequest"> & {
  * Use `create(CreateGuestRequestSchema)` to create a new message.
  */
 export const CreateGuestRequestSchema: GenMessage<CreateGuestRequest> = /*@__PURE__*/
-  messageDesc(file_kubeswift_v1_guest, 13);
+  messageDesc(file_kubeswift_v1_guest, 15);
 
 /**
  * CreateGuestResponse returns the new guest's ref; the live WatchGuests stream
@@ -622,7 +745,7 @@ export type CreateGuestResponse = Message<"kubeswift.v1.CreateGuestResponse"> & 
  * Use `create(CreateGuestResponseSchema)` to create a new message.
  */
 export const CreateGuestResponseSchema: GenMessage<CreateGuestResponse> = /*@__PURE__*/
-  messageDesc(file_kubeswift_v1_guest, 14);
+  messageDesc(file_kubeswift_v1_guest, 16);
 
 /**
  * DeleteGuestRequest deletes one SwiftGuest AS THE IMPERSONATED USER.
@@ -641,7 +764,7 @@ export type DeleteGuestRequest = Message<"kubeswift.v1.DeleteGuestRequest"> & {
  * Use `create(DeleteGuestRequestSchema)` to create a new message.
  */
 export const DeleteGuestRequestSchema: GenMessage<DeleteGuestRequest> = /*@__PURE__*/
-  messageDesc(file_kubeswift_v1_guest, 15);
+  messageDesc(file_kubeswift_v1_guest, 17);
 
 /**
  * @generated from message kubeswift.v1.DeleteGuestResponse
@@ -654,7 +777,7 @@ export type DeleteGuestResponse = Message<"kubeswift.v1.DeleteGuestResponse"> & 
  * Use `create(DeleteGuestResponseSchema)` to create a new message.
  */
 export const DeleteGuestResponseSchema: GenMessage<DeleteGuestResponse> = /*@__PURE__*/
-  messageDesc(file_kubeswift_v1_guest, 16);
+  messageDesc(file_kubeswift_v1_guest, 18);
 
 /**
  * GuestEventEntry is one Kubernetes Event involving the guest or its launcher
@@ -703,7 +826,7 @@ export type GuestEventEntry = Message<"kubeswift.v1.GuestEventEntry"> & {
  * Use `create(GuestEventEntrySchema)` to create a new message.
  */
 export const GuestEventEntrySchema: GenMessage<GuestEventEntry> = /*@__PURE__*/
-  messageDesc(file_kubeswift_v1_guest, 17);
+  messageDesc(file_kubeswift_v1_guest, 19);
 
 /**
  * @generated from message kubeswift.v1.GetGuestEventsRequest
@@ -720,7 +843,7 @@ export type GetGuestEventsRequest = Message<"kubeswift.v1.GetGuestEventsRequest"
  * Use `create(GetGuestEventsRequestSchema)` to create a new message.
  */
 export const GetGuestEventsRequestSchema: GenMessage<GetGuestEventsRequest> = /*@__PURE__*/
-  messageDesc(file_kubeswift_v1_guest, 18);
+  messageDesc(file_kubeswift_v1_guest, 20);
 
 /**
  * @generated from message kubeswift.v1.GetGuestEventsResponse
@@ -739,7 +862,7 @@ export type GetGuestEventsResponse = Message<"kubeswift.v1.GetGuestEventsRespons
  * Use `create(GetGuestEventsResponseSchema)` to create a new message.
  */
 export const GetGuestEventsResponseSchema: GenMessage<GetGuestEventsResponse> = /*@__PURE__*/
-  messageDesc(file_kubeswift_v1_guest, 19);
+  messageDesc(file_kubeswift_v1_guest, 21);
 
 /**
  * GuestService is the read plane for VM inventory plus the P1/P2 write actions.
