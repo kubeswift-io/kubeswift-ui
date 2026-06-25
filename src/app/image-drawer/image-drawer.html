@@ -1,0 +1,45 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <mat-icon>disc_full</mat-icon>
+    <div class="title">
+      <span class="name">{{ name() }}</span>
+      <span class="sub">{{ namespace() }} · {{ cluster() }}</span>
+    </div>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  <section>
+    <h4>Image</h4>
+    <dl class="kv">
+      <dt>Phase</dt>
+      <dd>{{ phase() || '—' }}</dd>
+      <dt>Source</dt>
+      <dd>{{ source() }}</dd>
+      <dt>Format</dt>
+      <dd>{{ format() || '—' }}</dd>
+      @if (cloneStrategy()) {
+        <dt>Clone strategy</dt>
+        <dd>{{ cloneStrategy() }}</dd>
+      }
+      @if (sourceFormat()) {
+        <dt>Source format</dt>
+        <dd>{{ sourceFormat() }}</dd>
+      }
+      @if (preparedFormat()) {
+        <dt>Prepared format</dt>
+        <dd>{{ preparedFormat() }}</dd>
+      }
+      @if (size()) {
+        <dt>Size</dt>
+        <dd>{{ humanBytes(size()) }}</dd>
+      }
+    </dl>
+  </section>
+</aside>

@@ -1,0 +1,51 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <mat-icon>stacked_bar_chart</mat-icon>
+    <div class="title">
+      <span class="name">{{ name() }}</span>
+      <span class="sub">{{ namespace() }} · {{ cluster() }}</span>
+    </div>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  <section>
+    <h4>Scale</h4>
+    <div class="scale">
+      <button (click)="dec()" [disabled]="target() === 0" aria-label="Decrease">
+        <mat-icon>remove</mat-icon>
+      </button>
+      <span class="count">{{ target() }}</span>
+      <button (click)="inc()" aria-label="Increase"><mat-icon>add</mat-icon></button>
+      <button class="apply" [disabled]="!dirty() || busy()" (click)="scale()">
+        {{ busy() ? 'Applying…' : 'Apply' }}
+      </button>
+    </div>
+    <div class="counts">
+      <span>{{ ready() }} ready</span>
+      <span>{{ available() }} available</span>
+      @if (failed()) {
+        <span class="bad">{{ failed() }} failed</span>
+      }
+      <span class="muted">of {{ desired() }} desired</span>
+    </div>
+  </section>
+
+  <section>
+    <h4>Template</h4>
+    <dl class="kv">
+      <dt>Boot source</dt>
+      <dd>{{ bootSource() }}</dd>
+      <dt>Guest class</dt>
+      <dd>{{ guestClass() || '—' }}</dd>
+      <dt>Service</dt>
+      <dd>{{ serviceRef() || '—' }}</dd>
+    </dl>
+  </section>
+</aside>
