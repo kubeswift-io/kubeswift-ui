@@ -27,6 +27,12 @@
     <button mat-stroked-button (click)="openSnapshot()">
       <mat-icon>camera_alt</mat-icon> Snapshot
     </button>
+    <button mat-stroked-button (click)="clone()" [disabled]="acting()">
+      <mat-icon>content_copy</mat-icon> Clone
+    </button>
+    <button mat-stroked-button class="danger" (click)="del()" [disabled]="acting()">
+      <mat-icon>delete</mat-icon> Delete
+    </button>
     @if (acting()) {
       <span class="working">working…</span>
     }

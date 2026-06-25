@@ -19,6 +19,7 @@ import { Sparkline } from '../sparkline/sparkline';
 import { Console } from '../console/console';
 import { MigrateDialog } from '../migrate-dialog/migrate-dialog';
 import { SnapshotDialog } from '../snapshot-dialog/snapshot-dialog';
+import type { GuestPrefill } from '../create-guest/create-guest';
 
 /**
  * GuestDetail is the right slide-in drawer for one VM. It opens instantly from
@@ -48,6 +49,7 @@ export class GuestDetail {
   private readonly gw = inject(GatewayService);
   readonly guest = input.required<Guest>();
   readonly closed = output<void>();
+  readonly cloneRequest = output<{ cluster: string; prefill: GuestPrefill }>();
 
   readonly acting = signal(false);
   readonly actionError = signal<string | null>(null);
@@ -159,6 +161,53 @@ export class GuestDetail {
   }
   closeSnapshot(): void {
     this.showSnapshot.set(false);
+  }
+
+  // Delete the VM (RBAC-gated; the live Watch removes it from the table).
+  async del(): Promise<void> {
+    const ref = this.guest().ref;
+    if (!ref || this.acting()) return;
+    if (!confirm(`Delete VM "${ref.name}"? This cannot be undone.`)) return;
+    this.acting.set(true);
+    this.actionError.set(null);
+    try {
+      await this.gw.guests.deleteGuest({ ref });
+      this.closed.emit();
+    } catch (e: unknown) {
+      this.actionError.set(e instanceof Error ? e.message : String(e));
+      this.acting.set(false);
+    }
+  }
+
+  // Clone: fetch the structured spec, then ask the Fleet page to open the
+  // Create-VM wizard pre-filled (name = <src>-copy).
+  async clone(): Promise<void> {
+    const ref = this.guest().ref;
+    if (!ref || this.acting()) return;
+    this.acting.set(true);
+    this.actionError.set(null);
+    try {
+      const res = await this.gw.guests.getGuestDetail({ ref });
+      const s = res.spec;
+      const prefill: GuestPrefill = {
+        namespace: ref.namespace,
+        name: `${ref.name}-copy`,
+        imageRef: s?.imageRef ?? '',
+        kernelRef: s?.kernelRef ?? '',
+        kernelCmdline: s?.kernelCmdline ?? '',
+        cloneSnapshotRef: s?.cloneSnapshotRef ?? '',
+        guestClassRef: s?.guestClassRef ?? '',
+        seedProfileRef: s?.seedProfileRef ?? '',
+        gpuProfileRef: s?.gpuProfileRef ?? '',
+        runPolicy: s?.runPolicy ?? 'Running',
+        osType: s?.osType ?? '',
+      };
+      this.cloneRequest.emit({ cluster: ref.cluster, prefill });
+    } catch (e: unknown) {
+      this.actionError.set(e instanceof Error ? e.message : String(e));
+    } finally {
+      this.acting.set(false);
+    }
   }
 
   start(): void {
