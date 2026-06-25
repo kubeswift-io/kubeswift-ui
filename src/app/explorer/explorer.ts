@@ -7,11 +7,19 @@ import type { ClusterError } from '../gen/kubeswift/v1/common_pb';
 import { NodeDrawer } from '../node-drawer/node-drawer';
 import { GpuNodeDrawer } from '../gpu-node-drawer/gpu-node-drawer';
 import { SnapshotDetail } from '../snapshot-detail/snapshot-detail';
+import { PoolDrawer } from '../pool-drawer/pool-drawer';
+import { ImageDrawer } from '../image-drawer/image-drawer';
 import { YamlEditor } from '../yaml-editor/yaml-editor';
 
 // Kinds that open a resource-aware detail drawer on row-click (instead of the
 // generic Edit/Delete row buttons). Everything else is browsed in the table.
-const DRAWER_KINDS = new Set(['nodes', 'swiftgpunodes', 'swiftsnapshots']);
+const DRAWER_KINDS = new Set([
+  'nodes',
+  'swiftgpunodes',
+  'swiftsnapshots',
+  'swiftguestpools',
+  'swiftimages',
+]);
 
 interface KindGroup {
   category: string;
@@ -27,7 +35,15 @@ interface KindGroup {
  */
 @Component({
   selector: 'app-explorer',
-  imports: [MatIconModule, NodeDrawer, GpuNodeDrawer, SnapshotDetail, YamlEditor],
+  imports: [
+    MatIconModule,
+    NodeDrawer,
+    GpuNodeDrawer,
+    SnapshotDetail,
+    PoolDrawer,
+    ImageDrawer,
+    YamlEditor,
+  ],
   templateUrl: './explorer.html',
   styleUrl: './explorer.scss',
 })

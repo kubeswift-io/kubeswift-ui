@@ -1,0 +1,153 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.32);
+  z-index: 20;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 420px;
+  max-width: 92vw;
+  z-index: 21;
+  background: var(--mat-sys-surface);
+  border-left: 1px solid var(--mat-sys-outline-variant);
+  overflow-y: auto;
+  padding: 0 20px 24px;
+
+  header {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0 12px;
+    background: var(--mat-sys-surface);
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+    mat-icon {
+      color: var(--mat-sys-on-surface-variant);
+    }
+    .title {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    }
+    .name {
+      font-size: 18px;
+      font-weight: 500;
+      word-break: break-all;
+    }
+    .sub {
+      font-size: 13px;
+      color: var(--mat-sys-on-surface-variant);
+    }
+    .icon {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--mat-sys-on-surface-variant);
+      padding: 4px;
+      border-radius: 8px;
+      &:hover {
+        background: var(--mat-sys-surface-container-high);
+      }
+    }
+  }
+  section {
+    margin-top: 18px;
+  }
+  h4 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.banner.error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 10px 0;
+  font-size: 14px;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.scale {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--mat-sys-outline-variant);
+    background: var(--mat-sys-surface);
+    color: var(--mat-sys-on-surface);
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    mat-icon {
+      font-size: 20px;
+      height: 20px;
+      width: 20px;
+    }
+  }
+  .count {
+    font-size: 22px;
+    font-weight: 500;
+    min-width: 36px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .apply {
+    width: auto;
+    padding: 0 16px;
+    background: var(--mat-sys-primary);
+    color: var(--mat-sys-on-primary);
+    border: none;
+    font-size: 14px;
+  }
+}
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--mat-sys-on-surface);
+  .muted {
+    color: var(--mat-sys-on-surface-variant);
+  }
+  .bad {
+    color: var(--mat-sys-error);
+  }
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 13px;
+  dt {
+    color: var(--mat-sys-on-surface-variant);
+  }
+  dd {
+    margin: 0;
+    word-break: break-word;
+  }
+}
