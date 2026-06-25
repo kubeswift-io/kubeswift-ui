@@ -1,3 +1,55 @@
+.events {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ev {
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-left: 3px solid var(--mat-sys-outline-variant);
+  border-radius: 0 8px 8px 0;
+  padding: 8px 10px;
+  font-size: 13px;
+  &.warn {
+    border-left-color: var(--mat-sys-error);
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+  .ev-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .reason {
+    font-weight: 500;
+  }
+  .count {
+    font-size: 11px;
+    opacity: 0.8;
+  }
+  .spacer {
+    flex: 1;
+  }
+  .when {
+    font-size: 11px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+  &.warn .when {
+    color: var(--mat-sys-on-error-container);
+  }
+  .ev-msg {
+    margin-top: 2px;
+  }
+  .ev-obj {
+    margin-top: 2px;
+    font-size: 11px;
+    font-family: monospace;
+    color: var(--mat-sys-on-surface-variant);
+  }
+  &.warn .ev-obj {
+    color: var(--mat-sys-on-error-container);
+  }
+}
+
 .backdrop {
   position: fixed;
   inset: 0;

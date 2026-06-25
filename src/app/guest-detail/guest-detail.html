@@ -141,6 +141,32 @@
     </section>
   }
 
+  <section>
+    <h4>Diagnostics</h4>
+    @if (eventsError(); as err) {
+      <div class="muted">{{ err }}</div>
+    } @else if (events().length) {
+      <div class="events">
+        @for (e of events(); track $index) {
+          <div class="ev" [class.warn]="e.type === 'Warning'">
+            <div class="ev-top">
+              <span class="reason">{{ e.reason }}</span>
+              @if (e.count > 1) {
+                <span class="count">×{{ e.count }}</span>
+              }
+              <span class="spacer"></span>
+              <span class="when">{{ eventTime(e) }}</span>
+            </div>
+            <div class="ev-msg">{{ e.message }}</div>
+            <div class="ev-obj">{{ e.object }}</div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="muted">No recent events.</div>
+    }
+  </section>
+
   @if (labelEntries().length) {
     <section>
       <h4>Labels</h4>

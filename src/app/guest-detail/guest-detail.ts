@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { timestampDate } from '@bufbuild/protobuf/wkt';
-import type { Guest } from '../gen/kubeswift/v1/guest_pb';
+import type { Guest, GuestEventEntry } from '../gen/kubeswift/v1/guest_pb';
 import type { MetricSeries } from '../gen/kubeswift/v1/telemetry_pb';
 import { GatewayService } from '../gateway.service';
 import { Sparkline } from '../sparkline/sparkline';
@@ -61,6 +61,10 @@ export class GuestDetail {
   readonly metrics = signal<MetricSeries[]>([]);
   readonly metricsError = signal<string | null>(null);
 
+  // Diagnostics: Kubernetes Events for the guest + its launcher pod.
+  readonly events = signal<GuestEventEntry[]>([]);
+  readonly eventsError = signal<string | null>(null);
+
   // Identity key — the poll restarts only when a DIFFERENT guest is shown, not
   // on every live-Watch field update of the same guest.
   private readonly refKey = computed(() => {
@@ -73,6 +77,8 @@ export class GuestDetail {
       const key = this.refKey(); // tracked: re-runs on guest identity change
       this.metrics.set([]);
       this.metricsError.set(null);
+      this.events.set([]);
+      this.eventsError.set(null);
       if (!key) return;
       const ref = untracked(() => this.guest().ref); // untracked: not on field updates
       if (!ref) return;
@@ -96,11 +102,24 @@ export class GuestDetail {
           if (!stopped) this.metricsError.set(e instanceof Error ? e.message : String(e));
         }
       };
+      const pollEvents = async () => {
+        try {
+          const res = await this.gw.guests.getGuestEvents({ ref });
+          if (stopped) return;
+          this.events.set(res.events);
+          this.eventsError.set(null);
+        } catch (e: unknown) {
+          if (!stopped) this.eventsError.set(e instanceof Error ? e.message : String(e));
+        }
+      };
       void poll();
+      void pollEvents();
       const id = setInterval(() => void poll(), 15000);
+      const eid = setInterval(() => void pollEvents(), 15000);
       onCleanup(() => {
         stopped = true;
         clearInterval(id);
+        clearInterval(eid);
       });
     });
   }
@@ -121,6 +140,10 @@ export class GuestDetail {
 
   labelEntries(): { k: string; v: string }[] {
     return Object.entries(this.guest().labels ?? {}).map(([k, v]) => ({ k, v }));
+  }
+
+  eventTime(e: GuestEventEntry): string {
+    return e.lastSeen ? timestampDate(e.lastSeen).toLocaleString() : '—';
   }
 
   // A guest with nothing to stop (already Stopped) hides Stop; one that is
