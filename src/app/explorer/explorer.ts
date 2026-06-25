@@ -5,7 +5,13 @@ import type { ResourceKind, Resource } from '../gen/kubeswift/v1/resource_pb';
 import type { Cluster } from '../gen/kubeswift/v1/cluster_pb';
 import type { ClusterError } from '../gen/kubeswift/v1/common_pb';
 import { NodeDrawer } from '../node-drawer/node-drawer';
+import { GpuNodeDrawer } from '../gpu-node-drawer/gpu-node-drawer';
+import { SnapshotDetail } from '../snapshot-detail/snapshot-detail';
 import { YamlEditor } from '../yaml-editor/yaml-editor';
+
+// Kinds that open a resource-aware detail drawer on row-click (instead of the
+// generic Edit/Delete row buttons). Everything else is browsed in the table.
+const DRAWER_KINDS = new Set(['nodes', 'swiftgpunodes', 'swiftsnapshots']);
 
 interface KindGroup {
   category: string;
@@ -21,7 +27,7 @@ interface KindGroup {
  */
 @Component({
   selector: 'app-explorer',
-  imports: [MatIconModule, NodeDrawer, YamlEditor],
+  imports: [MatIconModule, NodeDrawer, GpuNodeDrawer, SnapshotDetail, YamlEditor],
   templateUrl: './explorer.html',
   styleUrl: './explorer.scss',
 })
@@ -38,7 +44,8 @@ export class Explorer implements OnInit {
   readonly error = signal<ClusterError | null>(null); // per-cluster (partial) failure
   readonly loading = signal(false);
   readonly loadError = signal<string | null>(null); // hard RPC failure
-  readonly selectedNode = signal<string | null>(null); // open the node drawer (Nodes kind)
+  // Kind-aware detail drawer: row-click opens the right drawer for the kind.
+  readonly detail = signal<{ kind: string; name: string; namespace: string } | null>(null);
   readonly editorOpen = signal(false); // YAML editor (create/edit)
   readonly editorName = signal(''); // '' = create
   readonly editorNs = signal('');
@@ -158,15 +165,27 @@ export class Explorer implements OnInit {
     return `${r.ref?.namespace ?? ''}/${r.ref?.name ?? ''}`;
   }
 
-  // Node rows are clickable -> the node drawer (health + capacity + metrics).
   isNodesKind(): boolean {
     return this.selectedKind()?.key === 'nodes';
   }
-  openRow(r: Resource): void {
-    if (this.isNodesKind()) this.selectedNode.set(r.ref?.name ?? null);
+  // Rows of a drawer-bearing kind are clickable -> the kind's detail drawer.
+  hasDrawer(): boolean {
+    return DRAWER_KINDS.has(this.selectedKind()?.key ?? '');
   }
-  closeNode(): void {
-    this.selectedNode.set(null);
+  openRow(r: Resource): void {
+    if (!this.hasDrawer()) return;
+    this.detail.set({
+      kind: this.selectedKind()?.key ?? '',
+      name: r.ref?.name ?? '',
+      namespace: r.ref?.namespace ?? '',
+    });
+  }
+  closeDetail(): void {
+    this.detail.set(null);
+  }
+  // A drawer action changed the resource (e.g. a restore was created): refresh.
+  onDrawerChanged(): void {
+    void this.reload();
   }
   // Health-dot colour from a node's projected status string.
   nodeDot(status: string): 'green' | 'amber' | 'red' {
