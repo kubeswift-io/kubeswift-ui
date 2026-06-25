@@ -12,6 +12,21 @@ interface PortRow {
 
 type BootSource = 'image' | 'kernel' | 'clone';
 
+/** GuestPrefill seeds the wizard when cloning an existing guest. */
+export interface GuestPrefill {
+  namespace: string;
+  name: string;
+  imageRef: string;
+  kernelRef: string;
+  kernelCmdline: string;
+  cloneSnapshotRef: string;
+  guestClassRef: string;
+  seedProfileRef: string;
+  gpuProfileRef: string;
+  runPolicy: string;
+  osType: string;
+}
+
 /**
  * CreateGuest is the right slide-in Create-VM wizard. It loads its pickers
  * (images / kernels / classes / seed profiles / GPU profiles / snapshots /
@@ -31,6 +46,7 @@ export class CreateGuest {
   private readonly gw = inject(GatewayService);
   readonly clusters = input.required<Cluster[]>();
   readonly initialCluster = input<string>('');
+  readonly prefill = input<GuestPrefill | null>(null); // set when cloning
   readonly created = output<void>();
   readonly closed = output<void>();
 
@@ -65,6 +81,8 @@ export class CreateGuest {
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
 
+  private prefillApplied = false;
+
   constructor() {
     // Pick the default cluster once the input lands, then load its pickers.
     effect(() => {
@@ -75,6 +93,30 @@ export class CreateGuest {
       if (first) {
         this.cluster.set(first);
         void this.loadPickers(first);
+      }
+    });
+    // Seed the form from a clone source, once.
+    effect(() => {
+      const p = this.prefill();
+      if (!p || this.prefillApplied) return;
+      this.prefillApplied = true;
+      this.namespace.set(p.namespace || 'default');
+      this.name.set(p.name);
+      this.guestClassRef.set(p.guestClassRef);
+      this.seedProfileRef.set(p.seedProfileRef);
+      this.gpuProfileRef.set(p.gpuProfileRef);
+      this.runPolicy.set(p.runPolicy || 'Running');
+      this.osType.set(p.osType);
+      if (p.imageRef) {
+        this.bootSource.set('image');
+        this.imageRef.set(p.imageRef);
+      } else if (p.kernelRef) {
+        this.bootSource.set('kernel');
+        this.kernelRef.set(p.kernelRef);
+        this.kernelCmdline.set(p.kernelCmdline);
+      } else if (p.cloneSnapshotRef) {
+        this.bootSource.set('clone');
+        this.cloneSnapshotRef.set(p.cloneSnapshotRef);
       }
     });
   }

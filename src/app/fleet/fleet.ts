@@ -5,7 +5,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { GatewayService } from '../gateway.service';
 import { GuestDetail } from '../guest-detail/guest-detail';
-import { CreateGuest } from '../create-guest/create-guest';
+import { CreateGuest, type GuestPrefill } from '../create-guest/create-guest';
 import type { Cluster } from '../gen/kubeswift/v1/cluster_pb';
 import type { Guest, GuestEvent } from '../gen/kubeswift/v1/guest_pb';
 import type { ClusterError } from '../gen/kubeswift/v1/common_pb';
@@ -43,8 +43,21 @@ export class Fleet implements OnInit, OnDestroy {
   readonly loadError = signal<string | null>(null);
   readonly live = signal(false);
   readonly showCreate = signal(false); // Create-VM wizard
+  readonly wizardCluster = signal(''); // cluster the wizard targets
+  readonly clonePrefill = signal<GuestPrefill | null>(null); // set when cloning
 
   openCreate(): void {
+    this.clonePrefill.set(null);
+    this.wizardCluster.set(
+      this.selectedCluster() ?? this.clusters().find((c) => c.ready)?.name ?? '',
+    );
+    this.showCreate.set(true);
+  }
+  // Clone from a guest's drawer: open the wizard pre-filled on the guest's cluster.
+  onClone(ev: { cluster: string; prefill: GuestPrefill }): void {
+    this.selected.set(null); // close the drawer
+    this.wizardCluster.set(ev.cluster);
+    this.clonePrefill.set(ev.prefill);
     this.showCreate.set(true);
   }
   closeCreate(): void {

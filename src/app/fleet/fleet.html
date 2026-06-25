@@ -98,13 +98,14 @@
   }
 
   @if (selected(); as g) {
-    <app-guest-detail [guest]="g" (closed)="closeDetail()" />
+    <app-guest-detail [guest]="g" (closed)="closeDetail()" (cloneRequest)="onClone($event)" />
   }
 
   @if (showCreate()) {
     <app-create-guest
       [clusters]="clusters()"
-      [initialCluster]="selectedCluster() ?? ''"
+      [initialCluster]="wizardCluster()"
+      [prefill]="clonePrefill()"
       (created)="onCreated()"
       (closed)="closeCreate()"
     />
