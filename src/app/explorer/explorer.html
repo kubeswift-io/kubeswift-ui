@@ -90,7 +90,7 @@
           </thead>
           <tbody>
             @for (r of resources(); track key(r)) {
-              <tr [class.clickable]="isNodesKind()" (click)="openRow(r)">
+              <tr [class.clickable]="hasDrawer()" (click)="openRow(r)">
                 @for (col of columns(); track col) {
                   <td [class.strong]="col === 'name'">
                     @if (isNodesKind() && col === 'status') {
@@ -115,8 +115,28 @@
     }
   </section>
 
-  @if (selectedNode(); as node) {
-    <app-node-drawer [cluster]="selectedCluster()" [node]="node" (closed)="closeNode()" />
+  @if (detail(); as d) {
+    @switch (d.kind) {
+      @case ('nodes') {
+        <app-node-drawer [cluster]="selectedCluster()" [node]="d.name" (closed)="closeDetail()" />
+      }
+      @case ('swiftgpunodes') {
+        <app-gpu-node-drawer
+          [cluster]="selectedCluster()"
+          [name]="d.name"
+          (closed)="closeDetail()"
+        />
+      }
+      @case ('swiftsnapshots') {
+        <app-snapshot-detail
+          [cluster]="selectedCluster()"
+          [namespace]="d.namespace"
+          [name]="d.name"
+          (closed)="closeDetail()"
+          (changed)="onDrawerChanged()"
+        />
+      }
+    }
   }
 
   @if (editorOpen() && selectedKind(); as kind) {

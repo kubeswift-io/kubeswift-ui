@@ -1,0 +1,66 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <mat-icon>memory</mat-icon>
+    <div class="title">
+      <span class="name">{{ name() }}</span>
+      <span class="sub">{{ model() || '—' }}</span>
+    </div>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  <div class="badges">
+    <span class="free">{{ free() }}/{{ total() }} free</span>
+    <span class="badge" [class.ok]="vfioReady()">{{ vfioReady() ? 'vfio-ready' : 'no vfio' }}</span>
+    @if (fmRunning()) {
+      <span class="badge ok">Fabric Manager</span>
+    }
+    @if (phase()) {
+      <span class="badge">{{ phase() }}</span>
+    }
+  </div>
+
+  <section>
+    <h4>GPUs</h4>
+    @if (gpus().length) {
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>PCI</th>
+            <th>Model</th>
+            <th>NUMA</th>
+            <th>Driver</th>
+            <th>Allocated to</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (g of gpus(); track g.pciAddress) {
+            <tr>
+              <td>{{ g.index }}</td>
+              <td class="mono">{{ g.pciAddress }}</td>
+              <td>{{ g.model }}</td>
+              <td>{{ g.numaNode }}</td>
+              <td>{{ g.driver }}</td>
+              <td>
+                @if (g.allocatedTo) {
+                  <span class="alloc">{{ g.allocatedTo }}</span>
+                } @else {
+                  <span class="muted">free</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <div class="muted">No GPU detail yet (discovery pending).</div>
+    }
+  </section>
+</aside>

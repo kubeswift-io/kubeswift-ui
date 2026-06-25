@@ -1,0 +1,63 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <mat-icon>camera_alt</mat-icon>
+    <div class="title">
+      <span class="name">{{ name() }}</span>
+      <span class="sub">{{ namespace() }} · {{ cluster() }}</span>
+    </div>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  <div class="actions">
+    <button class="primary" (click)="openRestore()"><mat-icon>restore</mat-icon> Restore</button>
+    <button class="ghost danger" [disabled]="busy()" (click)="del()">
+      <mat-icon>delete</mat-icon> Delete
+    </button>
+  </div>
+
+  <section>
+    <h4>Snapshot</h4>
+    <dl class="kv">
+      <dt>Guest</dt>
+      <dd>{{ guest() || '—' }}</dd>
+      <dt>Backend</dt>
+      <dd>{{ backend() || '—' }}</dd>
+      <dt>Phase</dt>
+      <dd>{{ phase() || '—' }}</dd>
+      <dt>Include memory</dt>
+      <dd>{{ includeMemory() ? 'yes' : 'no' }}</dd>
+      <dt>Deletion policy</dt>
+      <dd>{{ deletionPolicy() || '—' }}</dd>
+      @if (hypervisor()) {
+        <dt>Hypervisor</dt>
+        <dd>{{ hypervisor() }}</dd>
+      }
+      @if (pauseMs()) {
+        <dt>Pause window</dt>
+        <dd>{{ pauseMs() }} ms</dd>
+      }
+      @if (bytes()) {
+        <dt>Uploaded</dt>
+        <dd>{{ humanBytes(bytes()) }}</dd>
+      }
+    </dl>
+  </section>
+</aside>
+
+@if (showRestore()) {
+  <app-restore-dialog
+    [cluster]="cluster()"
+    [namespace]="namespace()"
+    [snapshot]="name()"
+    [sourceGuest]="guest()"
+    (saved)="onRestored()"
+    (closed)="showRestore.set(false)"
+  />
+}
