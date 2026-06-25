@@ -1,0 +1,112 @@
+.page {
+  padding: 20px 24px;
+}
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+  }
+  .sub {
+    font-size: 13px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  &.error {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+  &.warn {
+    background: var(--mat-sys-tertiary-container);
+    color: var(--mat-sys-on-tertiary-container);
+  }
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container);
+  border: 1px solid var(--mat-sys-outline-variant);
+  .lbl {
+    font-size: 13px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+  .val {
+    font-size: 28px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    &.ok {
+      color: var(--mat-sys-primary);
+    }
+    &.bad {
+      color: var(--mat-sys-error);
+    }
+  }
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.panel {
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  padding: 16px;
+  h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .empty {
+    font-size: 13px;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant);
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+  }
+  td {
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--mat-sys-surface-container-high);
+    font-variant-numeric: tabular-nums;
+    &.strong {
+      font-weight: 500;
+      font-variant-numeric: normal;
+    }
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
+}

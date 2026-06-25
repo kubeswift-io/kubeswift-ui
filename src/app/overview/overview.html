@@ -1,0 +1,91 @@
+<div class="page">
+  <div class="head">
+    <h2>Overview</h2>
+    <span class="sub">{{ readyClusters() }}/{{ clusters().length }} clusters ready</span>
+  </div>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+  @if (clusterErrors()) {
+    <div class="banner warn">
+      <mat-icon>cloud_off</mat-icon>
+      <span>{{ clusterErrors() }} cluster(s) unreachable — counts are partial.</span>
+    </div>
+  }
+
+  <div class="cards">
+    <div class="card">
+      <span class="lbl">Total VMs</span><span class="val">{{ total() }}</span>
+    </div>
+    <div class="card">
+      <span class="lbl">Running</span><span class="val ok">{{ count('Running') }}</span>
+    </div>
+    <div class="card">
+      <span class="lbl">Pending</span><span class="val">{{ count('Pending', 'Scheduling') }}</span>
+    </div>
+    <div class="card">
+      <span class="lbl">Stopped</span><span class="val">{{ count('Stopped') }}</span>
+    </div>
+    <div class="card">
+      <span class="lbl">Failed</span><span class="val bad">{{ count('Failed') }}</span>
+    </div>
+    <div class="card">
+      <span class="lbl">Active migrations</span><span class="val">{{ activeMigrations() }}</span>
+    </div>
+  </div>
+
+  <div class="cols">
+    <section class="panel">
+      <h3>By cluster</h3>
+      @if (perCluster().length) {
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Cluster</th>
+              <th>VMs</th>
+              <th>Running</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of perCluster(); track c.cluster) {
+              <tr>
+                <td class="strong">{{ c.cluster }}</td>
+                <td>{{ c.total }}</td>
+                <td>{{ c.running }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <div class="empty">No VMs.</div>
+      }
+    </section>
+
+    <section class="panel">
+      <h3>By node</h3>
+      @if (perNode().length) {
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Node</th>
+              <th>VMs</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (n of perNode(); track n.node) {
+              <tr>
+                <td class="strong">{{ n.node }}</td>
+                <td>{{ n.count }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <div class="empty">No VMs.</div>
+      }
+    </section>
+  </div>
+</div>
