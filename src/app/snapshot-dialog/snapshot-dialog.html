@@ -1,0 +1,113 @@
+<div class="overlay" (click)="closed.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header>
+      <span class="title">Snapshot {{ guest() || 'a VM' }}</span>
+      <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+    </header>
+
+    @if (error(); as e) {
+      <div class="banner error">
+        <mat-icon>error</mat-icon> <span>{{ e }}</span>
+      </div>
+    }
+
+    <div class="body">
+      @if (!fixedGuest()) {
+        <label class="field">
+          <span>Guest</span>
+          <select [value]="guest()" (change)="selectGuest($any($event.target).value)">
+            <option value="">— select a VM —</option>
+            @for (g of guests(); track g) {
+              <option [value]="g">{{ g }}</option>
+            }
+          </select>
+        </label>
+      }
+      <label class="field">
+        <span>Snapshot name</span>
+        <input
+          [value]="name()"
+          (input)="name.set($any($event.target).value)"
+          placeholder="my-snap"
+        />
+      </label>
+      <label class="field">
+        <span>Backend</span>
+        <select [value]="backend()" (change)="backend.set($any($event.target).value)">
+          <option value="local">local — memory (Tier B)</option>
+          <option value="csi-volume-snapshot">csi-volume-snapshot — disk</option>
+          <option value="s3">s3 — object storage</option>
+        </select>
+      </label>
+
+      @if (backend() === 'csi-volume-snapshot') {
+        <label class="field">
+          <span>VolumeSnapshotClass (optional)</span>
+          <input
+            [value]="volumeSnapshotClass()"
+            (input)="volumeSnapshotClass.set($any($event.target).value)"
+            placeholder="longhorn-snapshot"
+          />
+        </label>
+      }
+      @if (backend() === 's3') {
+        <label class="field">
+          <span>Bucket *</span>
+          <input [value]="s3Bucket()" (input)="s3Bucket.set($any($event.target).value)" />
+        </label>
+        <label class="field">
+          <span>Endpoint (optional)</span>
+          <input
+            [value]="s3Endpoint()"
+            (input)="s3Endpoint.set($any($event.target).value)"
+            placeholder="https://minio.example"
+          />
+        </label>
+        <label class="field">
+          <span>Prefix (optional)</span>
+          <input [value]="s3Prefix()" (input)="s3Prefix.set($any($event.target).value)" />
+        </label>
+        <label class="field">
+          <span>Credentials Secret (optional)</span>
+          <input [value]="s3Secret()" (input)="s3Secret.set($any($event.target).value)" />
+        </label>
+        <label class="check">
+          <input
+            type="checkbox"
+            [checked]="s3Insecure()"
+            (change)="s3Insecure.set($any($event.target).checked)"
+          />
+          Insecure (plain HTTP)
+        </label>
+      }
+
+      <div class="row2">
+        <label class="check">
+          <input
+            type="checkbox"
+            [checked]="includeMemory()"
+            (change)="includeMemory.set($any($event.target).checked)"
+          />
+          Include memory
+        </label>
+        <label class="field">
+          <span>Deletion policy</span>
+          <select
+            [value]="deletionPolicy()"
+            (change)="deletionPolicy.set($any($event.target).value)"
+          >
+            <option value="Delete">Delete — purge artifacts</option>
+            <option value="Retain">Retain</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="primary" [disabled]="!canSave() || busy()" (click)="save()">
+        {{ busy() ? 'Creating…' : 'Create snapshot' }}
+      </button>
+      <button class="ghost" (click)="closed.emit()">Cancel</button>
+    </div>
+  </div>
+</div>

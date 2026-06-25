@@ -1,4 +1,13 @@
-import { Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  untracked,
+} from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -9,6 +18,7 @@ import { GatewayService } from '../gateway.service';
 import { Sparkline } from '../sparkline/sparkline';
 import { Console } from '../console/console';
 import { MigrateDialog } from '../migrate-dialog/migrate-dialog';
+import { SnapshotDialog } from '../snapshot-dialog/snapshot-dialog';
 
 /**
  * GuestDetail is the right slide-in drawer for one VM. It opens instantly from
@@ -22,7 +32,15 @@ import { MigrateDialog } from '../migrate-dialog/migrate-dialog';
  */
 @Component({
   selector: 'app-guest-detail',
-  imports: [MatIconModule, MatButtonModule, MatProgressBarModule, Sparkline, Console, MigrateDialog],
+  imports: [
+    MatIconModule,
+    MatButtonModule,
+    MatProgressBarModule,
+    Sparkline,
+    Console,
+    MigrateDialog,
+    SnapshotDialog,
+  ],
   templateUrl: './guest-detail.html',
   styleUrl: './guest-detail.scss',
 })
@@ -35,6 +53,7 @@ export class GuestDetail {
   readonly actionError = signal<string | null>(null);
   readonly showConsole = signal(false);
   readonly showMigrate = signal(false);
+  readonly showSnapshot = signal(false);
 
   // Telemetry: range series polled from the gateway while the drawer is open.
   readonly metrics = signal<MetricSeries[]>([]);
@@ -58,7 +77,11 @@ export class GuestDetail {
       let stopped = false;
       const poll = async () => {
         try {
-          const res = await this.gw.telemetry.getGuestMetrics({ ref, windowSeconds: 900, stepSeconds: 30 });
+          const res = await this.gw.telemetry.getGuestMetrics({
+            ref,
+            windowSeconds: 900,
+            stepSeconds: 30,
+          });
           if (stopped) return;
           if (res.error) {
             this.metricsError.set(res.error.message);
@@ -82,7 +105,11 @@ export class GuestDetail {
 
   // values for one metric kind (empty until the first poll lands).
   seriesValues(kind: string): number[] {
-    return this.metrics().find((s) => s.kind === kind)?.points.map((p) => p.value) ?? [];
+    return (
+      this.metrics()
+        .find((s) => s.kind === kind)
+        ?.points.map((p) => p.value) ?? []
+    );
   }
 
   created(): string {
@@ -125,6 +152,13 @@ export class GuestDetail {
   }
   closeMigrate(): void {
     this.showMigrate.set(false);
+  }
+
+  openSnapshot(): void {
+    this.showSnapshot.set(true);
+  }
+  closeSnapshot(): void {
+    this.showSnapshot.set(false);
   }
 
   start(): void {

@@ -1,0 +1,67 @@
+<div class="overlay" (click)="closed.emit()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header>
+      <span class="title">Restore from {{ snapshot() }}</span>
+      <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+    </header>
+
+    @if (error(); as e) {
+      <div class="banner error">
+        <mat-icon>error</mat-icon> <span>{{ e }}</span>
+      </div>
+    }
+
+    <div class="body">
+      <label class="field">
+        <span>Restore name</span>
+        <input [value]="name()" (input)="name.set($any($event.target).value)" />
+      </label>
+      <label class="field">
+        <span>Target guest</span>
+        <input [value]="targetGuest()" (input)="targetGuest.set($any($event.target).value)" />
+      </label>
+      <p class="hint">
+        @if (isInPlace()) {
+          Same name as the source — <strong>in-place restore</strong> (requires overwrite).
+        } @else {
+          Different name — restores as a <strong>clone</strong>.
+        }
+      </p>
+
+      @if (isInPlace()) {
+        <label class="check">
+          <input
+            type="checkbox"
+            [checked]="overwrite()"
+            (change)="overwrite.set($any($event.target).checked)"
+          />
+          Overwrite the existing guest
+        </label>
+      } @else {
+        <label class="check">
+          <input
+            type="checkbox"
+            [checked]="regen()"
+            (change)="regen.set($any($event.target).checked)"
+          />
+          Regenerate identity (hostname / machine-id / SSH keys / MAC)
+        </label>
+      }
+      <label class="field">
+        <span>Target node (required for s3 cross-node)</span>
+        <input
+          [value]="targetNode()"
+          (input)="targetNode.set($any($event.target).value)"
+          placeholder="— capture node —"
+        />
+      </label>
+    </div>
+
+    <div class="actions">
+      <button class="primary" [disabled]="!canSave() || busy()" (click)="save()">
+        {{ busy() ? 'Restoring…' : 'Restore' }}
+      </button>
+      <button class="ghost" (click)="closed.emit()">Cancel</button>
+    </div>
+  </div>
+</div>
