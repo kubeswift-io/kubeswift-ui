@@ -24,20 +24,29 @@
     <button mat-stroked-button (click)="openMigrate()" [disabled]="!canMigrate()">
       <mat-icon>swap_horiz</mat-icon> Migrate
     </button>
-    @if (acting()) { <span class="working">working…</span> }
+    <button mat-stroked-button (click)="openSnapshot()">
+      <mat-icon>camera_alt</mat-icon> Snapshot
+    </button>
+    @if (acting()) {
+      <span class="working">working…</span>
+    }
   </div>
   @if (acting()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   }
   @if (actionError(); as err) {
-    <div class="action-error"><mat-icon>error</mat-icon> <span>{{ err }}</span></div>
+    <div class="action-error">
+      <mat-icon>error</mat-icon> <span>{{ err }}</span>
+    </div>
   }
 
   <section>
     <h4>Status</h4>
     <dl>
       <dt>Phase</dt>
-      <dd><span class="phase" [attr.data-phase]="guest().phase">{{ guest().phase || '—' }}</span></dd>
+      <dd>
+        <span class="phase" [attr.data-phase]="guest().phase">{{ guest().phase || '—' }}</span>
+      </dd>
       <dt>Guest running</dt>
       <dd>{{ guest().guestRunning ? 'yes' : 'no' }}</dd>
       <dt>Node</dt>
@@ -55,10 +64,30 @@
       <div class="muted">{{ err }}</div>
     } @else {
       <div class="charts">
-        <app-sparkline label="CPU" [values]="seriesValues('cpu_cores')" unit="cores" color="#1a73e8" />
-        <app-sparkline label="Memory" [values]="seriesValues('memory_bytes')" unit="bytes" color="#1e8e3e" />
-        <app-sparkline label="Net RX" [values]="seriesValues('net_rx_bps')" unit="bytes/sec" color="#9334e6" />
-        <app-sparkline label="Net TX" [values]="seriesValues('net_tx_bps')" unit="bytes/sec" color="#e8710a" />
+        <app-sparkline
+          label="CPU"
+          [values]="seriesValues('cpu_cores')"
+          unit="cores"
+          color="#1a73e8"
+        />
+        <app-sparkline
+          label="Memory"
+          [values]="seriesValues('memory_bytes')"
+          unit="bytes"
+          color="#1e8e3e"
+        />
+        <app-sparkline
+          label="Net RX"
+          [values]="seriesValues('net_rx_bps')"
+          unit="bytes/sec"
+          color="#9334e6"
+        />
+        <app-sparkline
+          label="Net TX"
+          [values]="seriesValues('net_tx_bps')"
+          unit="bytes/sec"
+          color="#e8710a"
+        />
       </div>
     }
   </section>
@@ -79,16 +108,26 @@
     <section>
       <h4>Conditions</h4>
       <table class="conds">
-        <thead><tr><th>Type</th><th>Status</th><th>Reason</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
         <tbody>
           @for (c of guest().conditions; track c.type) {
             <tr>
               <td>{{ c.type }}</td>
-              <td class="st" [class.t]="c.status === 'True'" [class.f]="c.status === 'False'">{{ c.status }}</td>
+              <td class="st" [class.t]="c.status === 'True'" [class.f]="c.status === 'False'">
+                {{ c.status }}
+              </td>
               <td>{{ c.reason || '—' }}</td>
             </tr>
             @if (c.message) {
-              <tr class="msg"><td colspan="3">{{ c.message }}</td></tr>
+              <tr class="msg">
+                <td colspan="3">{{ c.message }}</td>
+              </tr>
             }
           }
         </tbody>
@@ -114,4 +153,14 @@
 
 @if (showMigrate()) {
   <app-migrate-dialog [guest]="guest()" (closed)="closeMigrate()" />
+}
+
+@if (showSnapshot()) {
+  <app-snapshot-dialog
+    [cluster]="guest().ref?.cluster ?? ''"
+    [namespace]="guest().ref?.namespace ?? 'default'"
+    [fixedGuest]="guest().ref?.name ?? ''"
+    (saved)="closeSnapshot()"
+    (closed)="closeSnapshot()"
+  />
 }

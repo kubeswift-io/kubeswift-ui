@@ -1,0 +1,124 @@
+<div class="page">
+  <div class="head">
+    <h2>Snapshots</h2>
+    <select
+      class="cluster"
+      [value]="selectedCluster()"
+      (change)="selectCluster($any($event.target).value)"
+    >
+      @for (c of clusters(); track c.name) {
+        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
+      }
+    </select>
+    <span class="spacer"></span>
+    <span class="hint">Create a snapshot from a VM's drawer on the Fleet page.</span>
+  </div>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  <section class="card">
+    <h3>
+      Snapshots <span class="count">{{ snapshots().length }}</span>
+    </h3>
+    @if (snapshots().length) {
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Namespace</th>
+            <th>Guest</th>
+            <th>Backend</th>
+            <th>Phase</th>
+            <th>Age</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of snapshots(); track ns(s) + '/' + s.ref?.name) {
+            <tr>
+              <td class="strong">{{ s.ref?.name }}</td>
+              <td>{{ ns(s) }}</td>
+              <td>{{ col(s, 'guest') }}</td>
+              <td>{{ col(s, 'backend') }}</td>
+              <td>
+                <span class="phase" [class]="col(s, 'phase').toLowerCase()">{{
+                  col(s, 'phase')
+                }}</span>
+              </td>
+              <td>{{ age(s) }}</td>
+              <td class="acts">
+                <button class="rowbtn" (click)="openRestore(s)" title="Restore">
+                  <mat-icon>restore</mat-icon>
+                </button>
+                <button class="rowbtn danger" (click)="del('swiftsnapshots', s)" title="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <div class="empty">No snapshots.</div>
+    }
+  </section>
+
+  <section class="card">
+    <h3>
+      Restores <span class="count">{{ restores().length }}</span>
+    </h3>
+    @if (restores().length) {
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Namespace</th>
+            <th>Snapshot</th>
+            <th>Target</th>
+            <th>Phase</th>
+            <th>Age</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of restores(); track ns(r) + '/' + r.ref?.name) {
+            <tr>
+              <td class="strong">{{ r.ref?.name }}</td>
+              <td>{{ ns(r) }}</td>
+              <td>{{ col(r, 'snapshot') }}</td>
+              <td>{{ col(r, 'target') }}</td>
+              <td>
+                <span class="phase" [class]="col(r, 'phase').toLowerCase()">{{
+                  col(r, 'phase')
+                }}</span>
+              </td>
+              <td>{{ age(r) }}</td>
+              <td class="acts">
+                <button class="rowbtn danger" (click)="del('swiftrestores', r)" title="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <div class="empty">No restores.</div>
+    }
+  </section>
+
+  @if (restoreFrom(); as rf) {
+    <app-restore-dialog
+      [cluster]="selectedCluster()"
+      [namespace]="rf.namespace"
+      [snapshot]="rf.snapshot"
+      [sourceGuest]="rf.guest"
+      (saved)="onRestored()"
+      (closed)="restoreFrom.set(null)"
+    />
+  }
+</div>
