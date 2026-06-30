@@ -1,6 +1,6 @@
 # kubeswift-ui
 
-Web console for [KubeSwift](https://github.com/projectbeskar/kubeswift) — a
+Web console for [KubeSwift](https://github.com/kubeswift-io/kubeswift) — a
 multi-cluster fleet view of VMs, built on the `kubeswift-gateway` Connect API.
 
 - **Angular 20** (standalone) + **Material 3** + RxJS, static-asset build (no SSR).
@@ -40,7 +40,7 @@ npm run build        # → dist/kubeswift-ui/browser (static assets)
 
 A multi-stage [`Dockerfile`](Dockerfile) builds the app (`npm ci && ng build`)
 and serves `dist/kubeswift-ui/browser` from an unprivileged (non-root) nginx on
-port **8080**. CI publishes it to `ghcr.io/projectbeskar/kubeswift-ui`
+port **8080**. CI publishes it to `ghcr.io/kubeswift-io/kubeswift-ui`
 (`:sha-<short>` + `:latest` on `main`, `:vX.Y.Z` on tags — see
 [`.github/workflows/release.yml`](.github/workflows/release.yml)).
 
@@ -68,7 +68,7 @@ docker run --rm -p 8080:8080 \
 The KubeSwift Helm chart ships an opt-in `ui` block (paired with `gateway`):
 
 ```bash
-helm upgrade --install kubeswift oci://ghcr.io/projectbeskar/charts/kubeswift \
+helm upgrade --install kubeswift oci://ghcr.io/kubeswift-io/charts/kubeswift \
   -n kubeswift-system --create-namespace \
   --set gateway.enabled=true \
   --set ui.enabled=true \
