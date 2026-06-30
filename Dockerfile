@@ -24,7 +24,7 @@ FROM nginxinc/nginx-unprivileged:1.27-alpine AS serve
 ARG VERSION=dev
 ARG GIT_COMMIT=unknown
 LABEL org.opencontainers.image.title="kubeswift-ui" \
-      org.opencontainers.image.source="https://github.com/projectbeskar/kubeswift-ui" \
+      org.opencontainers.image.source="https://github.com/kubeswift-io/kubeswift-ui" \
       org.opencontainers.image.description="KubeSwift web console (Angular SPA served by nginx)" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.revision="${GIT_COMMIT}"

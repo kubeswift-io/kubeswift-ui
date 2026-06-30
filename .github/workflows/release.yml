@@ -2,8 +2,8 @@ name: Release
 
 # Build (and, off a branch/tag, push) the kubeswift-ui container image to GHCR.
 # Mirrors the kubeswift repo's release-dev / release-stable image build:
-#   - push to main  -> ghcr.io/projectbeskar/kubeswift-ui:sha-<short> + :latest
-#   - push tag vX.Y.Z -> ghcr.io/projectbeskar/kubeswift-ui:vX.Y.Z
+#   - push to main  -> ghcr.io/kubeswift-io/kubeswift-ui:sha-<short> + :latest
+#   - push tag vX.Y.Z -> ghcr.io/kubeswift-io/kubeswift-ui:vX.Y.Z
 #   - pull_request  -> build only (no push), so a broken Dockerfile fails the PR
 on:
   push:
@@ -17,7 +17,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE: ghcr.io/projectbeskar/kubeswift-ui
+  IMAGE: ghcr.io/kubeswift-io/kubeswift-ui
 
 jobs:
   build-and-push:
