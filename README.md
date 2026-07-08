@@ -97,7 +97,3 @@ PATH="$PWD/node_modules/.bin:$PATH" buf generate
 - `src/app/fleet/` — the landing page: cluster summary + fleet inventory table + the per-cluster error surface.
 - `src/app/gen/` — generated proto client (do not edit by hand).
 - `proto/`, `buf.yaml`, `buf.gen.yaml` — the contract + codegen config.
-
-## License
-
-Licensed under the [Apache License 2.0](LICENSE).
