@@ -38,6 +38,8 @@ export class AuthService {
   readonly enabled = !!(ISSUER && CLIENT_ID);
   /** The signed-in username (email/preferred_username), reactive for the shell. */
   readonly user = signal<string | null>(null);
+  /** A human-readable sign-in error for the login screen. Null = none. */
+  readonly error = signal<string | null>(null);
 
   private disc?: Discovery;
   private tokens?: StoredTokens;
@@ -45,8 +47,20 @@ export class AuthService {
   /** APP_INITIALIZER: discover the IdP + finish any pending login redirect. */
   async init(): Promise<void> {
     if (!this.enabled) return;
+    // Discovery is a background fetch(); it hard-fails when the IdP serves a TLS
+    // cert the browser doesn't trust (e.g. a private-CA Keycloak) — and a
+    // background request can't be click-through'd the way a full-page navigation
+    // can. Don't let that dead-end login: fall back to the well-known Keycloak
+    // endpoints derived from the issuer, so the login REDIRECT still fires (the
+    // user accepts the IdP cert there) instead of the Sign-in button silently
+    // doing nothing.
     try {
       this.disc = await this.discover();
+    } catch (e) {
+      console.error('OIDC discovery failed; falling back to issuer-derived endpoints', e);
+      this.disc = keycloakFallback(ISSUER);
+    }
+    try {
       this.tokens = this.load();
       const p = new URLSearchParams(location.search);
       const code = p.get('code');
@@ -89,22 +103,37 @@ export class AuthService {
 
   /** Start the Authorization-Code + PKCE redirect to the IdP. */
   async login(): Promise<void> {
-    if (!this.enabled || !this.disc) return;
-    const verifier = randomString(64);
-    const challenge = await s256(verifier);
-    const state = randomString(32);
-    sessionStorage.setItem('kubeswift.oidc.verifier', verifier);
-    sessionStorage.setItem('kubeswift.oidc.state', state);
-    const p = new URLSearchParams({
-      response_type: 'code',
-      client_id: CLIENT_ID,
-      redirect_uri: redirectUri(),
-      scope: 'openid profile email',
-      state,
-      code_challenge: challenge,
-      code_challenge_method: 'S256',
-    });
-    location.assign(`${this.disc.authorization_endpoint}?${p.toString()}`);
+    if (!this.enabled) return;
+    this.error.set(null);
+    const disc = this.disc ?? keycloakFallback(ISSUER);
+    if (!disc) {
+      // No silent failure (KubeSwift principle #6): say why nothing happened.
+      this.error.set(
+        'Cannot start sign-in: the identity provider could not be reached. Check that ' +
+          'the OIDC issuer is reachable and its TLS certificate is trusted by this browser.',
+      );
+      return;
+    }
+    try {
+      const verifier = randomString(64);
+      const challenge = await s256(verifier);
+      const state = randomString(32);
+      sessionStorage.setItem('kubeswift.oidc.verifier', verifier);
+      sessionStorage.setItem('kubeswift.oidc.state', state);
+      const p = new URLSearchParams({
+        response_type: 'code',
+        client_id: CLIENT_ID,
+        redirect_uri: redirectUri(),
+        scope: 'openid profile email',
+        state,
+        code_challenge: challenge,
+        code_challenge_method: 'S256',
+      });
+      location.assign(`${disc.authorization_endpoint}?${p.toString()}`);
+    } catch (e) {
+      this.error.set('Sign-in could not start; see the browser console for details.');
+      console.error('OIDC login failed', e);
+    }
   }
 
   logout(): void {
@@ -131,7 +160,6 @@ export class AuthService {
   }
 
   private async exchange(code: string, state: string): Promise<void> {
-    if (!this.disc) return;
     if (state !== sessionStorage.getItem('kubeswift.oidc.state'))
       throw new Error('OIDC state mismatch');
     const verifier = sessionStorage.getItem('kubeswift.oidc.verifier') ?? '';
@@ -157,9 +185,10 @@ export class AuthService {
   }
 
   private async tokenRequest(fields: Record<string, string>): Promise<Record<string, unknown>> {
-    if (!this.disc) throw new Error('no token endpoint');
+    const disc = this.disc ?? keycloakFallback(ISSUER);
+    if (!disc) throw new Error('no token endpoint');
     const body = new URLSearchParams({ client_id: CLIENT_ID, ...fields });
-    const r = await fetch(this.disc.token_endpoint, {
+    const r = await fetch(disc.token_endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: body.toString(),
@@ -219,6 +248,25 @@ export class AuthService {
 
 function redirectUri(): string {
   return location.origin + '/';
+}
+
+/**
+ * Well-known OIDC endpoints for a Keycloak realm issuer, derived from the issuer
+ * URL. Used as a fallback when the discovery document cannot be fetched from the
+ * browser — the usual cause is the IdP serving a private-CA TLS cert the browser
+ * doesn't trust, so a background fetch() to it hard-fails with no click-through
+ * (unlike a full-page navigation). Returns undefined for a non-Keycloak issuer
+ * (no trailing /realms/<realm>), where discovery is the only way to learn the
+ * endpoints.
+ */
+function keycloakFallback(issuer: string): Discovery | undefined {
+  if (!/\/realms\/[^/]+$/.test(issuer)) return undefined;
+  const base = `${issuer}/protocol/openid-connect`;
+  return {
+    authorization_endpoint: `${base}/auth`,
+    token_endpoint: `${base}/token`,
+    end_session_endpoint: `${base}/logout`,
+  };
 }
 
 function randomString(len: number): string {
