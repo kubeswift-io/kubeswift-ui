@@ -123,4 +123,11 @@
       filter: brightness(1.05);
     }
   }
+  .signin-error {
+    max-width: 420px;
+    margin: 16px 0 0;
+    color: var(--mat-sys-error);
+    font-size: 13px;
+    line-height: 1.4;
+  }
 }

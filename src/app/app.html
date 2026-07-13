@@ -4,6 +4,9 @@
     <h1>KubeSwift</h1>
     <p>Sign in to manage the fleet.</p>
     <button class="signin" (click)="auth.login()">Sign in</button>
+    @if (auth.error(); as err) {
+      <p class="signin-error" role="alert">{{ err }}</p>
+    }
   </div>
 } @else {
   <mat-toolbar class="topbar">
