@@ -153,6 +153,24 @@
           (closed)="closeDetail()"
         />
       }
+      @case ('swiftsandboxes') {
+        <app-sandbox-drawer
+          [cluster]="selectedCluster()"
+          [namespace]="d.namespace"
+          [name]="d.name"
+          (closed)="closeDetail()"
+          (changed)="onDrawerChanged()"
+        />
+      }
+      @case ('swiftsandboxpools') {
+        <app-sandboxpool-drawer
+          [cluster]="selectedCluster()"
+          [namespace]="d.namespace"
+          [name]="d.name"
+          (closed)="closeDetail()"
+          (changed)="onDrawerChanged()"
+        />
+      }
     }
   }
 

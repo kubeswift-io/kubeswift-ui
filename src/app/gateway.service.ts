@@ -8,7 +8,6 @@ import { MigrationService } from './gen/kubeswift/v1/migration_pb';
 import { TelemetryService } from './gen/kubeswift/v1/telemetry_pb';
 import { ResourceService } from './gen/kubeswift/v1/resource_pb';
 import { AccessService } from './gen/kubeswift/v1/access_pb';
-import { SandboxService } from './gen/kubeswift/v1/sandbox_pb';
 
 // The kubeswift-gateway endpoint. By default it targets the gateway on the
 // SAME host that serves the UI, port 18080 — so a dev port-forward on that host
@@ -48,7 +47,6 @@ export class GatewayService {
   readonly telemetry = createClient(TelemetryService, this.transport);
   readonly resources = createClient(ResourceService, this.transport);
   readonly access = createClient(AccessService, this.transport);
-  readonly sandboxes = createClient(SandboxService, this.transport);
 
   // The console plane is a raw WebSocket (not Connect), so build its URL by hand
   // off the gateway base (http→ws, https→wss). Browsers can't set a WS

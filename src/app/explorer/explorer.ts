@@ -9,6 +9,8 @@ import { GpuNodeDrawer } from '../gpu-node-drawer/gpu-node-drawer';
 import { SnapshotDetail } from '../snapshot-detail/snapshot-detail';
 import { PoolDrawer } from '../pool-drawer/pool-drawer';
 import { ImageDrawer } from '../image-drawer/image-drawer';
+import { SandboxDrawer } from '../sandbox-drawer/sandbox-drawer';
+import { SandboxPoolDrawer } from '../sandboxpool-drawer/sandboxpool-drawer';
 import { YamlEditor } from '../yaml-editor/yaml-editor';
 
 // Kinds that open a resource-aware detail drawer on row-click (instead of the
@@ -19,6 +21,8 @@ const DRAWER_KINDS = new Set([
   'swiftsnapshots',
   'swiftguestpools',
   'swiftimages',
+  'swiftsandboxes',
+  'swiftsandboxpools',
 ]);
 
 interface KindGroup {
@@ -42,6 +46,8 @@ interface KindGroup {
     SnapshotDetail,
     PoolDrawer,
     ImageDrawer,
+    SandboxDrawer,
+    SandboxPoolDrawer,
     YamlEditor,
   ],
   templateUrl: './explorer.html',
