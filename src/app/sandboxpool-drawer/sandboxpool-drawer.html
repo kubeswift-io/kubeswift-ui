@@ -1,0 +1,62 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <mat-icon>dynamic_feed</mat-icon>
+    <div class="title">
+      <span class="name">{{ name() }}</span>
+      <span class="sub">{{ namespace() }} · {{ cluster() }}</span>
+    </div>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  <section>
+    <h4>Warm buffer</h4>
+    <div class="scale">
+      <button (click)="dec()" [disabled]="target() === 0" aria-label="Decrease">
+        <mat-icon>remove</mat-icon>
+      </button>
+      <span class="count">{{ target() }}</span>
+      <button (click)="inc()" aria-label="Increase"><mat-icon>add</mat-icon></button>
+      <button class="apply" [disabled]="!dirty() || busy()" (click)="scale()">
+        {{ busy() ? 'Applying…' : 'Apply' }}
+      </button>
+    </div>
+    <div class="counts">
+      <span>{{ warm() }} warm</span>
+      <span>{{ claimed() }} claimed</span>
+      <span class="muted"
+        >minWarm {{ minWarm() }}{{ maxWarm() ? ' · maxWarm ' + maxWarm() : '' }}</span
+      >
+    </div>
+  </section>
+
+  <section>
+    <h4>Spec</h4>
+    <dl class="kv">
+      <dt>Phase</dt>
+      <dd>
+        <span class="phase" [attr.data-phase]="phase()">{{ phase() || '—' }}</span>
+      </dd>
+      <dt>Image</dt>
+      <dd class="mono">{{ image() }}</dd>
+      <dt>Rootfs</dt>
+      <dd>{{ rootfsMode() }}</dd>
+      <dt>Network</dt>
+      <dd>{{ network() }}</dd>
+      @if (verifyKey()) {
+        <dt>Verify key</dt>
+        <dd>{{ verifyKey() }}</dd>
+      }
+    </dl>
+  </section>
+
+  <section>
+    <button class="danger" [disabled]="busy()" (click)="del()">Delete</button>
+  </section>
+</aside>

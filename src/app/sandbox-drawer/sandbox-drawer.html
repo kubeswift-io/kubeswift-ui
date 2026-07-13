@@ -1,0 +1,74 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <mat-icon>developer_board</mat-icon>
+    <div class="title">
+      <span class="name">{{ name() }}</span>
+      <span class="sub">{{ namespace() }} · {{ cluster() }}</span>
+    </div>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  <section>
+    <h4>Status</h4>
+    <div class="status">
+      <span class="phase" [attr.data-phase]="phase()">{{ phase() || '—' }}</span>
+      @if (terminal()) {
+        <span class="exit" [class.bad]="!!exitCode()">exit {{ exitCode() ?? '—' }}</span>
+      }
+    </div>
+    @if (message()) {
+      <p class="msg">{{ message() }}</p>
+    }
+  </section>
+
+  <section>
+    <h4>Spec</h4>
+    <dl class="kv">
+      <dt>Image</dt>
+      <dd class="mono">{{ image() }}</dd>
+      <dt>Command</dt>
+      <dd class="mono">{{ command() || '(image default)' }}</dd>
+      @if (workingDir()) {
+        <dt>Working dir</dt>
+        <dd class="mono">{{ workingDir() }}</dd>
+      }
+      <dt>Rootfs</dt>
+      <dd>{{ rootfsMode() }}</dd>
+      <dt>Network</dt>
+      <dd>{{ network() }}</dd>
+      @if (poolRef()) {
+        <dt>Pool</dt>
+        <dd>{{ poolRef() }}</dd>
+      }
+      @if (verifyKey()) {
+        <dt>Verify key</dt>
+        <dd>{{ verifyKey() }}</dd>
+      }
+    </dl>
+  </section>
+
+  <section>
+    <h4>Runtime</h4>
+    <dl class="kv">
+      <dt>Node</dt>
+      <dd>{{ node() || '—' }}</dd>
+      <dt>IP</dt>
+      <dd>{{ ip() || '—' }}</dd>
+      <dt>Digest</dt>
+      <dd class="mono">{{ digest() || '—' }}</dd>
+    </dl>
+  </section>
+
+  <section>
+    <button class="danger" [disabled]="busy()" (click)="del()">
+      {{ busy() ? 'Deleting…' : 'Delete' }}
+    </button>
+  </section>
+</aside>
