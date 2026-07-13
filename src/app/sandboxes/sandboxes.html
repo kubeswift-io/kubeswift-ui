@@ -1,0 +1,119 @@
+<div class="page">
+  <div class="head">
+    <h2>Sandboxes</h2>
+    <span class="live" [class.on]="live()">
+      <span class="dot"></span>{{ live() ? 'live' : 'reconnecting…' }}
+    </span>
+    <span class="count">{{ sandboxes().length }} sandboxes · {{ pools().length }} pools</span>
+    <button class="new" (click)="showCreate.set(true)"><mat-icon>add</mat-icon> New</button>
+  </div>
+
+  @if (loadError(); as e) {
+    <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
+  }
+  @for (e of errors(); track e.cluster) {
+    <div class="banner warn">
+      <mat-icon>warning</mat-icon> <span><strong>{{ e.cluster }}</strong>: {{ e.message }}</span>
+    </div>
+  }
+
+  <h3>Sandboxes</h3>
+  @if (sandboxes().length) {
+    <table mat-table [dataSource]="sandboxes()" class="tbl">
+      <ng-container matColumnDef="cluster">
+        <th mat-header-cell *matHeaderCellDef>Cluster</th>
+        <td mat-cell *matCellDef="let s">{{ s.ref?.cluster }}</td>
+      </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let s" class="strong">{{ s.ref?.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="phase">
+        <th mat-header-cell *matHeaderCellDef>Phase</th>
+        <td mat-cell *matCellDef="let s">
+          <span class="phase" [attr.data-phase]="s.phase">{{ s.phase || '—' }}</span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="image">
+        <th mat-header-cell *matHeaderCellDef>Image</th>
+        <td mat-cell *matCellDef="let s" class="mono">{{ s.image }}</td>
+      </ng-container>
+      <ng-container matColumnDef="node">
+        <th mat-header-cell *matHeaderCellDef>Node</th>
+        <td mat-cell *matCellDef="let s">{{ s.nodeName || '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="ip">
+        <th mat-header-cell *matHeaderCellDef>IP</th>
+        <td mat-cell *matCellDef="let s">{{ s.primaryIp || '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="pool">
+        <th mat-header-cell *matHeaderCellDef>Pool</th>
+        <td mat-cell *matCellDef="let s">{{ s.poolRef || '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="exit">
+        <th mat-header-cell *matHeaderCellDef>Exit</th>
+        <td mat-cell *matCellDef="let s">{{ exitLabel(s) }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let s">
+          <button class="icon" (click)="deleteSandbox(s)" title="Delete"><mat-icon>delete</mat-icon></button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="sandboxCols"></tr>
+      <tr mat-row *matRowDef="let row; columns: sandboxCols"></tr>
+    </table>
+  } @else {
+    <div class="empty">No sandboxes.</div>
+  }
+
+  <h3>Warm pools</h3>
+  @if (pools().length) {
+    <table mat-table [dataSource]="pools()" class="tbl">
+      <ng-container matColumnDef="cluster">
+        <th mat-header-cell *matHeaderCellDef>Cluster</th>
+        <td mat-cell *matCellDef="let p">{{ p.ref?.cluster }}</td>
+      </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let p" class="strong">{{ p.ref?.name }}</td>
+      </ng-container>
+      <ng-container matColumnDef="phase">
+        <th mat-header-cell *matHeaderCellDef>Phase</th>
+        <td mat-cell *matCellDef="let p">
+          <span class="phase" [attr.data-phase]="p.phase">{{ p.phase || '—' }}</span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="image">
+        <th mat-header-cell *matHeaderCellDef>Image</th>
+        <td mat-cell *matCellDef="let p" class="mono">{{ p.image }}</td>
+      </ng-container>
+      <ng-container matColumnDef="warm">
+        <th mat-header-cell *matHeaderCellDef>Warm</th>
+        <td mat-cell *matCellDef="let p">{{ p.warmReplicas }}</td>
+      </ng-container>
+      <ng-container matColumnDef="claimed">
+        <th mat-header-cell *matHeaderCellDef>Claimed</th>
+        <td mat-cell *matCellDef="let p">{{ p.claimedReplicas }}</td>
+      </ng-container>
+      <ng-container matColumnDef="min">
+        <th mat-header-cell *matHeaderCellDef>MinWarm</th>
+        <td mat-cell *matCellDef="let p">{{ p.minWarm }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let p">
+          <button class="icon" (click)="deletePool(p)" title="Delete"><mat-icon>delete</mat-icon></button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="poolCols"></tr>
+      <tr mat-row *matRowDef="let row; columns: poolCols"></tr>
+    </table>
+  } @else {
+    <div class="empty">No warm pools.</div>
+  }
+</div>
+
+@if (showCreate()) {
+  <app-create-sandbox [clusters]="clusters()" (created)="onCreated()" (closed)="showCreate.set(false)" />
+}
