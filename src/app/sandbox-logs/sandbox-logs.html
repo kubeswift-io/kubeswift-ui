@@ -1,0 +1,14 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+
+<div class="console" role="dialog" aria-label="Sandbox logs">
+  <header>
+    <span class="title">Logs — {{ name() }}</span>
+    <span class="status" [class]="status()">{{ status() }}</span>
+    <span class="spacer"></span>
+    <button mat-icon-button (click)="closed.emit()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+  <div #term class="term"></div>
+  <footer>Read-only — following the microVM console log.</footer>
+</div>
