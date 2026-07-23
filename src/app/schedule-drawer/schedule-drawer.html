@@ -1,0 +1,68 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <mat-icon>schedule</mat-icon>
+    <div class="title">
+      <span class="name">{{ name() }}</span>
+      <span class="sub">{{ namespace() }} · {{ cluster() }}</span>
+    </div>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  <section>
+    <h4>Schedule</h4>
+    <dl class="kv">
+      <dt>Cron</dt>
+      <dd class="mono">{{ schedule() || '—' }}</dd>
+      <dt>State</dt>
+      <dd>
+        <span class="phase" [attr.data-phase]="suspend() ? 'Suspended' : 'Active'">{{
+          suspend() ? 'Suspended' : 'Active'
+        }}</span>
+      </dd>
+      <dt>Concurrency</dt>
+      <dd>{{ concurrency() }}</dd>
+      @if (keepLast() !== null) {
+        <dt>Keep last</dt>
+        <dd>{{ keepLast() }}</dd>
+      }
+    </dl>
+  </section>
+
+  <section>
+    <h4>Template</h4>
+    <dl class="kv">
+      <dt>Guest</dt>
+      <dd>{{ guest() || '—' }}</dd>
+      <dt>Backend</dt>
+      <dd>{{ backend() || '—' }}</dd>
+      <dt>Memory</dt>
+      <dd>{{ includeMemory() ? 'included' : 'disk only' }}</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h4>Status</h4>
+    <dl class="kv">
+      <dt>Last run</dt>
+      <dd>{{ fmt(lastRun()) }}</dd>
+      <dt>Last success</dt>
+      <dd>{{ fmt(lastSuccess()) }}</dd>
+      <dt>Active</dt>
+      <dd>{{ active() }}</dd>
+    </dl>
+  </section>
+
+  <section class="drawer-actions">
+    <button class="logs" [disabled]="busy()" (click)="toggleSuspend()">
+      {{ suspend() ? 'Resume' : 'Suspend' }}
+    </button>
+    <button class="danger" [disabled]="busy()" (click)="del()">Delete</button>
+  </section>
+</aside>
