@@ -79,6 +79,11 @@
   </section>
 
   <section class="drawer-actions">
+    @if (phase() === 'Running') {
+      <button class="logs" (click)="showExec.set(true)">
+        <mat-icon>terminal</mat-icon> Shell
+      </button>
+    }
     <button class="logs" (click)="showLogs.set(true)">
       <mat-icon>subject</mat-icon> Logs
     </button>
@@ -94,5 +99,14 @@
     [namespace]="namespace()"
     [name]="name()"
     (closed)="showLogs.set(false)"
+  />
+}
+
+@if (showExec()) {
+  <app-sandbox-exec
+    [cluster]="cluster()"
+    [namespace]="namespace()"
+    [name]="name()"
+    (closed)="showExec.set(false)"
   />
 }

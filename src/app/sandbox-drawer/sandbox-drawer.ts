@@ -2,6 +2,7 @@ import { Component, OnInit, inject, input, output, signal } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon';
 import { GatewayService } from '../gateway.service';
 import { SandboxLogs } from '../sandbox-logs/sandbox-logs';
+import { SandboxExec } from '../sandbox-exec/sandbox-exec';
 
 interface RawSandbox {
   spec?: {
@@ -37,7 +38,7 @@ interface RawSandbox {
  */
 @Component({
   selector: 'app-sandbox-drawer',
-  imports: [MatIconModule, SandboxLogs],
+  imports: [MatIconModule, SandboxLogs, SandboxExec],
   templateUrl: './sandbox-drawer.html',
   styleUrl: './sandbox-drawer.scss',
 })
@@ -68,6 +69,7 @@ export class SandboxDrawer implements OnInit {
   readonly error = signal<string | null>(null);
   readonly busy = signal(false);
   readonly showLogs = signal(false);
+  readonly showExec = signal(false);
 
   async ngOnInit(): Promise<void> {
     try {
