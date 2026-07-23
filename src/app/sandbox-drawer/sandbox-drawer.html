@@ -78,9 +78,21 @@
     </dl>
   </section>
 
-  <section>
+  <section class="drawer-actions">
+    <button class="logs" (click)="showLogs.set(true)">
+      <mat-icon>subject</mat-icon> Logs
+    </button>
     <button class="danger" [disabled]="busy()" (click)="del()">
       {{ busy() ? 'Deleting…' : 'Delete' }}
     </button>
   </section>
 </aside>
+
+@if (showLogs()) {
+  <app-sandbox-logs
+    [cluster]="cluster()"
+    [namespace]="namespace()"
+    [name]="name()"
+    (closed)="showLogs.set(false)"
+  />
+}

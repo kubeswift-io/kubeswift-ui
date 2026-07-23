@@ -59,4 +59,13 @@ export class GatewayService {
     if (token) q.set('token', token);
     return `${base}/console?${q.toString()}`;
   }
+
+  // Sandbox logs ride the same raw-WS plane as the console (bearer on ?token=).
+  sandboxLogsWsUrl(cluster: string, namespace: string, name: string, follow = true): string {
+    const base = GATEWAY_URL.replace(/^http/, 'ws');
+    const q = new URLSearchParams({ cluster, namespace, name, follow: String(follow) });
+    const token = this.auth.token();
+    if (token) q.set('token', token);
+    return `${base}/sandbox-logs?${q.toString()}`;
+  }
 }
