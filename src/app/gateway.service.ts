@@ -68,4 +68,14 @@ export class GatewayService {
     if (token) q.set('token', token);
     return `${base}/sandbox-logs?${q.toString()}`;
   }
+
+  // Interactive sandbox exec/attach over the same raw-WS plane.
+  sandboxExecWsUrl(cluster: string, namespace: string, name: string, cmd = ''): string {
+    const base = GATEWAY_URL.replace(/^http/, 'ws');
+    const q = new URLSearchParams({ cluster, namespace, name });
+    if (cmd) q.set('cmd', cmd);
+    const token = this.auth.token();
+    if (token) q.set('token', token);
+    return `${base}/sandbox-exec?${q.toString()}`;
+  }
 }
