@@ -184,4 +184,14 @@
       (closed)="closeEditor()"
     />
   }
+
+  @if (sandboxCreateOpen()) {
+    <app-create-sandbox
+      [clusters]="clusters()"
+      [initialCluster]="selectedCluster()"
+      [initialNamespace]="selectedNamespace()"
+      (created)="onSandboxCreated()"
+      (closed)="closeSandboxCreate()"
+    />
+  }
 </div>
