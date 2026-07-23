@@ -10,6 +10,8 @@ interface RawSandboxPool {
     rootfsMode?: string;
     network?: { mode?: string };
     verifyKeySecretRef?: { name?: string };
+    gpuProfileRef?: { name?: string };
+    model?: { imageRef?: string; mountPath?: string };
   };
   status?: {
     phase?: string;
@@ -44,6 +46,8 @@ export class SandboxPoolDrawer implements OnInit {
   readonly rootfsMode = signal('');
   readonly network = signal('');
   readonly verifyKey = signal('');
+  readonly gpu = signal('');
+  readonly model = signal('');
   readonly warm = signal(0);
   readonly claimed = signal(0);
   readonly maxWarm = signal(0);
@@ -66,6 +70,12 @@ export class SandboxPoolDrawer implements OnInit {
       this.rootfsMode.set(o.spec?.rootfsMode ?? 'block');
       this.network.set(o.spec?.network?.mode ?? 'restricted');
       this.verifyKey.set(o.spec?.verifyKeySecretRef?.name ?? '');
+      this.gpu.set(o.spec?.gpuProfileRef?.name ?? '');
+      this.model.set(
+        o.spec?.model?.imageRef
+          ? o.spec.model.imageRef + ' \u2192 ' + (o.spec.model.mountPath ?? '/model')
+          : '',
+      );
       this.warm.set(o.status?.warmReplicas ?? 0);
       this.claimed.set(o.status?.claimedReplicas ?? 0);
       this.maxWarm.set(o.spec?.maxWarm ?? 0);

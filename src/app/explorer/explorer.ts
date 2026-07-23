@@ -11,6 +11,7 @@ import { PoolDrawer } from '../pool-drawer/pool-drawer';
 import { ImageDrawer } from '../image-drawer/image-drawer';
 import { SandboxDrawer } from '../sandbox-drawer/sandbox-drawer';
 import { SandboxPoolDrawer } from '../sandboxpool-drawer/sandboxpool-drawer';
+import { CreateSandbox } from '../create-sandbox/create-sandbox';
 import { YamlEditor } from '../yaml-editor/yaml-editor';
 
 // Kinds that open a resource-aware detail drawer on row-click (instead of the
@@ -48,6 +49,7 @@ interface KindGroup {
     ImageDrawer,
     SandboxDrawer,
     SandboxPoolDrawer,
+    CreateSandbox,
     YamlEditor,
   ],
   templateUrl: './explorer.html',
@@ -69,6 +71,7 @@ export class Explorer implements OnInit {
   // Kind-aware detail drawer: row-click opens the right drawer for the kind.
   readonly detail = signal<{ kind: string; name: string; namespace: string } | null>(null);
   readonly editorOpen = signal(false); // YAML editor (create/edit)
+  readonly sandboxCreateOpen = signal(false); // guided SwiftSandbox create wizard
   readonly editorName = signal(''); // '' = create
   readonly editorNs = signal('');
   readonly actionError = signal<string | null>(null); // delete/apply denials, surfaced
@@ -219,9 +222,15 @@ export class Explorer implements OnInit {
   // --- CRUD (RBAC-gated; the gateway impersonates the user, so denials surface
   // in the action banner — never a silent no-op). ---
   openCreate(): void {
+    this.actionError.set(null);
+    // Sandboxes get a guided wizard (image + the v0.12 GPU/model/scratch shapes);
+    // every other kind uses the generic YAML editor.
+    if (this.selectedKind()?.key === 'swiftsandboxes') {
+      this.sandboxCreateOpen.set(true);
+      return;
+    }
     this.editorName.set(''); // '' -> create
     this.editorNs.set(this.selectedKind()?.namespaced ? this.selectedNamespace() : '');
-    this.actionError.set(null);
     this.editorOpen.set(true);
   }
   openEdit(r: Resource, ev: Event): void {
@@ -233,6 +242,13 @@ export class Explorer implements OnInit {
   }
   closeEditor(): void {
     this.editorOpen.set(false);
+  }
+  closeSandboxCreate(): void {
+    this.sandboxCreateOpen.set(false);
+  }
+  async onSandboxCreated(): Promise<void> {
+    this.sandboxCreateOpen.set(false);
+    await this.reload();
   }
   async onSaved(): Promise<void> {
     this.editorOpen.set(false);

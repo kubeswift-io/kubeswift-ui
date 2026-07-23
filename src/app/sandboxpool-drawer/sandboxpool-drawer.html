@@ -49,6 +49,14 @@
       <dd>{{ rootfsMode() }}</dd>
       <dt>Network</dt>
       <dd>{{ network() }}</dd>
+      @if (gpu()) {
+        <dt>GPU profile</dt>
+        <dd>{{ gpu() }}</dd>
+      }
+      @if (model()) {
+        <dt>Model</dt>
+        <dd class="mono">{{ model() }}</dd>
+      }
       @if (verifyKey()) {
         <dt>Verify key</dt>
         <dd>{{ verifyKey() }}</dd>

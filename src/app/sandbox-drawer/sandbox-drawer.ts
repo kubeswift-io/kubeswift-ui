@@ -10,6 +10,10 @@ interface RawSandbox {
     rootfsMode?: string;
     network?: { mode?: string };
     poolRef?: { name?: string };
+    gpuProfileRef?: { name?: string };
+    gpuResourceClaim?: { resourceClaimName?: string; resourceClaimTemplateName?: string };
+    model?: { imageRef?: string; mountPath?: string };
+    scratchDisk?: { blank?: { size?: string }; pvcRef?: { name?: string }; mountPath?: string };
     verifyKeySecretRef?: { name?: string };
     workingDir?: string;
   };
@@ -53,6 +57,9 @@ export class SandboxDrawer implements OnInit {
   readonly command = signal('');
   readonly workingDir = signal('');
   readonly poolRef = signal('');
+  readonly gpu = signal('');
+  readonly model = signal('');
+  readonly scratch = signal('');
   readonly verifyKey = signal('');
   readonly exitCode = signal<number | null>(null);
   readonly digest = signal('');
@@ -78,6 +85,28 @@ export class SandboxDrawer implements OnInit {
       this.command.set([...(o.spec?.command ?? []), ...(o.spec?.args ?? [])].join(' '));
       this.workingDir.set(o.spec?.workingDir ?? '');
       this.poolRef.set(o.spec?.poolRef?.name ?? '');
+    this.gpu.set(
+      o.spec?.gpuProfileRef?.name ??
+        (o.spec?.gpuResourceClaim
+          ? 'DRA: ' +
+            (o.spec.gpuResourceClaim.resourceClaimName ??
+              o.spec.gpuResourceClaim.resourceClaimTemplateName ??
+              'claim')
+          : ''),
+    );
+    this.model.set(
+      o.spec?.model?.imageRef
+        ? o.spec.model.imageRef + ' \u2192 ' + (o.spec.model.mountPath ?? '/model')
+        : '',
+    );
+    const sd = o.spec?.scratchDisk;
+    this.scratch.set(
+      sd
+        ? (sd.blank?.size ? 'blank ' + sd.blank.size : 'pvc ' + (sd.pvcRef?.name ?? '')) +
+            ' \u2192 ' +
+            (sd.mountPath ?? '/scratch')
+        : '',
+    );
       this.verifyKey.set(o.spec?.verifyKeySecretRef?.name ?? '');
       this.exitCode.set(o.status?.exitCode ?? null);
       this.digest.set(o.status?.rootfs?.digest ?? '');
