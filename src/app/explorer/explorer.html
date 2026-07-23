@@ -154,6 +154,15 @@
           (changed)="onDrawerChanged()"
         />
       }
+      @case ('swiftkernels') {
+        <app-kernel-drawer
+          [cluster]="selectedCluster()"
+          [namespace]="d.namespace"
+          [name]="d.name"
+          (closed)="closeDetail()"
+          (changed)="onDrawerChanged()"
+        />
+      }
       @case ('swiftimages') {
         <app-image-drawer
           [cluster]="selectedCluster()"

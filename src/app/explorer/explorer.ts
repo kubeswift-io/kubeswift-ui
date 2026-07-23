@@ -6,6 +6,7 @@ import type { Cluster } from '../gen/kubeswift/v1/cluster_pb';
 import type { ClusterError } from '../gen/kubeswift/v1/common_pb';
 import { NodeDrawer } from '../node-drawer/node-drawer';
 import { GpuNodeDrawer } from '../gpu-node-drawer/gpu-node-drawer';
+import { KernelDrawer } from '../kernel-drawer/kernel-drawer';
 import { SnapshotDetail } from '../snapshot-detail/snapshot-detail';
 import { ScheduleDrawer } from '../schedule-drawer/schedule-drawer';
 import { PoolDrawer } from '../pool-drawer/pool-drawer';
@@ -24,6 +25,7 @@ const DRAWER_KINDS = new Set([
   'swiftsnapshotschedules',
   'swiftguestpools',
   'swiftimages',
+  'swiftkernels',
   'swiftsandboxes',
   'swiftsandboxpools',
 ]);
@@ -46,6 +48,7 @@ interface KindGroup {
     MatIconModule,
     NodeDrawer,
     GpuNodeDrawer,
+    KernelDrawer,
     SnapshotDetail,
     ScheduleDrawer,
     PoolDrawer,

@@ -17,7 +17,10 @@ interface RawGpuNode {
     freeGPUs?: number;
     gpuModel?: string;
     vfioReady?: boolean;
-    fabricManager?: { running?: boolean };
+    fabricManager?: {
+      running?: boolean;
+      partitions?: { id?: number; gpuIndices?: number[]; active?: boolean; allocatedTo?: string }[];
+    };
     gpus?: {
       index?: number;
       pciAddress?: string;
@@ -55,6 +58,9 @@ export class GpuNodeDrawer implements OnInit {
   readonly vfioReady = signal(false);
   readonly fmRunning = signal(false);
   readonly gpus = signal<GpuDevice[]>([]);
+  readonly partitions = signal<
+    { id: number; gpus: string; active: boolean; allocatedTo: string }[]
+  >([]);
   readonly error = signal<string | null>(null);
 
   async ngOnInit(): Promise<void> {
@@ -79,6 +85,14 @@ export class GpuNodeDrawer implements OnInit {
           numaNode: g.numaNode ?? 0,
           driver: g.driver ?? '',
           allocatedTo: g.allocatedTo ?? '',
+        })),
+      );
+      this.partitions.set(
+        (st.fabricManager?.partitions ?? []).map((p) => ({
+          id: p.id ?? 0,
+          gpus: (p.gpuIndices ?? []).join(', '),
+          active: !!p.active,
+          allocatedTo: p.allocatedTo ?? '',
         })),
       );
     } catch (e) {

@@ -63,4 +63,36 @@
       <div class="muted">No GPU detail yet (discovery pending).</div>
     }
   </section>
+
+  @if (partitions().length) {
+    <section>
+      <h4>Fabric Manager partitions</h4>
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>GPUs</th>
+            <th>Active</th>
+            <th>Allocated to</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of partitions(); track p.id) {
+            <tr>
+              <td>{{ p.id }}</td>
+              <td>{{ p.gpus }}</td>
+              <td>{{ p.active ? 'yes' : 'no' }}</td>
+              <td>
+                @if (p.allocatedTo) {
+                  <span class="alloc">{{ p.allocatedTo }}</span>
+                } @else {
+                  <span class="muted">free</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  }
 </aside>

@@ -1,0 +1,71 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <mat-icon>terminal</mat-icon>
+    <div class="title">
+      <span class="name">{{ name() }}</span>
+      <span class="sub">{{ namespace() }} · {{ cluster() }}</span>
+    </div>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error">
+      <mat-icon>error</mat-icon> <span>{{ e }}</span>
+    </div>
+  }
+
+  <section>
+    <h4>Kernel</h4>
+    <dl class="kv">
+      <dt>Phase</dt>
+      <dd><span class="phase" [attr.data-phase]="phase()">{{ phase() || '—' }}</span></dd>
+      <dt>OCI ref</dt>
+      <dd class="mono">{{ image() || '—' }}</dd>
+      @if (profile()) {
+        <dt>Profile</dt>
+        <dd>{{ profile() }}</dd>
+      }
+      @if (cmdline()) {
+        <dt>Cmdline</dt>
+        <dd class="mono">{{ cmdline() }}</dd>
+      }
+      @if (kernelDigest()) {
+        <dt>Kernel digest</dt>
+        <dd class="mono">{{ kernelDigest() }}</dd>
+      }
+      @if (initramfsDigest()) {
+        <dt>Initramfs digest</dt>
+        <dd class="mono">{{ initramfsDigest() }}</dd>
+      }
+    </dl>
+  </section>
+
+  <section>
+    <h4>Per-node pull status</h4>
+    @if (nodes().length) {
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Node</th>
+            <th>Phase</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (n of nodes(); track n.node) {
+            <tr>
+              <td>{{ n.node }}</td>
+              <td><span class="phase" [attr.data-phase]="n.phase">{{ n.phase }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <div class="muted">No per-node status yet.</div>
+    }
+  </section>
+
+  <section class="drawer-actions">
+    <button class="danger" [disabled]="busy()" (click)="del()">Delete</button>
+  </section>
+</aside>
