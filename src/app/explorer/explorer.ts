@@ -7,6 +7,7 @@ import type { ClusterError } from '../gen/kubeswift/v1/common_pb';
 import { NodeDrawer } from '../node-drawer/node-drawer';
 import { GpuNodeDrawer } from '../gpu-node-drawer/gpu-node-drawer';
 import { SnapshotDetail } from '../snapshot-detail/snapshot-detail';
+import { ScheduleDrawer } from '../schedule-drawer/schedule-drawer';
 import { PoolDrawer } from '../pool-drawer/pool-drawer';
 import { ImageDrawer } from '../image-drawer/image-drawer';
 import { SandboxDrawer } from '../sandbox-drawer/sandbox-drawer';
@@ -20,6 +21,7 @@ const DRAWER_KINDS = new Set([
   'nodes',
   'swiftgpunodes',
   'swiftsnapshots',
+  'swiftsnapshotschedules',
   'swiftguestpools',
   'swiftimages',
   'swiftsandboxes',
@@ -45,6 +47,7 @@ interface KindGroup {
     NodeDrawer,
     GpuNodeDrawer,
     SnapshotDetail,
+    ScheduleDrawer,
     PoolDrawer,
     ImageDrawer,
     SandboxDrawer,

@@ -136,6 +136,15 @@
           (changed)="onDrawerChanged()"
         />
       }
+      @case ('swiftsnapshotschedules') {
+        <app-schedule-drawer
+          [cluster]="selectedCluster()"
+          [namespace]="d.namespace"
+          [name]="d.name"
+          (closed)="closeDetail()"
+          (changed)="onDrawerChanged()"
+        />
+      }
       @case ('swiftguestpools') {
         <app-pool-drawer
           [cluster]="selectedCluster()"
