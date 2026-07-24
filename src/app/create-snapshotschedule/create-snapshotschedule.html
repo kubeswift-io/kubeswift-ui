@@ -1,103 +1,132 @@
-<div class="backdrop" (click)="closed.emit()"></div>
-<aside class="drawer">
-  <header>
-    <div class="title">
-      <span class="name">New snapshot schedule</span>
-      <span class="sub">cron snapshots + keep-N</span>
-    </div>
-    <select class="cluster" [value]="cluster()" (change)="selectCluster($any($event.target).value)" title="Target cluster">
-      @for (c of clusters(); track c.name) {
-        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
-      }
-    </select>
-    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
-  </header>
-
-  @if (error(); as e) {
-    <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
-  }
-
-  <div class="body">
-    <div class="row2">
-      <label class="field">
-        <span>Namespace</span>
+<app-form-shell
+  [title]="isEdit() ? 'Edit snapshot schedule' : 'New snapshot schedule'"
+  sub="cron snapshots + keep-N"
+  [clusters]="clusters()"
+  [cluster]="cluster()"
+  [edit]="isEdit()"
+  [view]="view()"
+  [yaml]="yamlText()"
+  [error]="error()"
+  [canWrite]="canWrite()"
+  [busy]="busy()"
+  [canSave]="canSave()"
+  [saveLabel]="isEdit() ? 'Apply' : 'Create schedule'"
+  (clusterChange)="selectCluster($event)"
+  (viewChange)="setView($event)"
+  (yamlChange)="yamlText.set($event)"
+  (save)="save()"
+  (close)="closed.emit()"
+>
+  <div class="row2">
+    <label class="field">
+      <span>Namespace</span>
+      @if (isEdit()) {
+        <input [value]="namespace()" disabled />
+      } @else {
         <select [value]="namespace()" (change)="selectNamespace($any($event.target).value)">
           @for (ns of namespaces(); track ns) {
             <option [value]="ns">{{ ns }}</option>
           }
         </select>
-      </label>
-      <label class="field">
-        <span>Name *</span>
-        <input placeholder="nightly-web" [value]="name()" (input)="name.set($any($event.target).value)" />
-      </label>
-    </div>
-
+      }
+    </label>
     <label class="field">
-      <span>Guest *</span>
-      <select [value]="guestRef()" (change)="guestRef.set($any($event.target).value)">
-        <option value="">— select a guest —</option>
-        @for (g of guests(); track g) {
-          <option [value]="g">{{ g }}</option>
-        }
+      <span>Name *</span>
+      <input
+        placeholder="nightly-web"
+        [value]="name()"
+        (input)="name.set($any($event.target).value)"
+        [disabled]="isEdit()"
+      />
+    </label>
+  </div>
+
+  <label class="field">
+    <span>Guest *</span>
+    <select [value]="guestRef()" (change)="guestRef.set($any($event.target).value)">
+      <option value="">— select a guest —</option>
+      @for (g of guests(); track g) {
+        <option [value]="g">{{ g }}</option>
+      }
+    </select>
+  </label>
+
+  <label class="field">
+    <span>Schedule (cron) *</span>
+    <input
+      placeholder="0 2 * * *"
+      [value]="schedule()"
+      (input)="schedule.set($any($event.target).value)"
+    />
+  </label>
+  <p class="hint">Standard 5-field cron. Example: <code>0 2 * * *</code> = daily at 02:00.</p>
+
+  <h4>Backend</h4>
+  <div class="seg">
+    <button [class.on]="backend() === 'local'" (click)="backend.set('local')">local</button>
+    <button
+      [class.on]="backend() === 'csi-volume-snapshot'"
+      (click)="backend.set('csi-volume-snapshot')"
+    >
+      CSI
+    </button>
+  </div>
+  @if (backend() === 'local') {
+    <label class="check">
+      <input
+        type="checkbox"
+        [checked]="includeMemory()"
+        (change)="includeMemory.set($any($event.target).checked)"
+      />
+      <span>Include memory (Tier B live snapshot)</span>
+    </label>
+    <label class="field">
+      <span>Host path (optional — auto-derived if blank)</span>
+      <input
+        placeholder="/var/lib/kubeswift/snapshots/&lt;ns&gt;-&lt;name&gt;"
+        [value]="localHostPath()"
+        (input)="localHostPath.set($any($event.target).value)"
+      />
+    </label>
+    <p class="hint">Node-local; must be under <code>/var/lib/kubeswift/snapshots/</code>.</p>
+  } @else {
+    <label class="field">
+      <span>VolumeSnapshotClass (optional)</span>
+      <input
+        placeholder="(cluster default)"
+        [value]="csiClass()"
+        (input)="csiClass.set($any($event.target).value)"
+      />
+    </label>
+    <p class="hint">CSI is disk-only; memory is not captured.</p>
+  }
+  <p class="hint">S3 / OCI object backends: toggle to YAML.</p>
+
+  <h4>Retention &amp; policy</h4>
+  <div class="row2">
+    <label class="field">
+      <span>Keep last</span>
+      <input
+        type="number"
+        min="0"
+        [value]="keepLast()"
+        (input)="keepLast.set(+$any($event.target).value || 0)"
+      />
+    </label>
+    <label class="field">
+      <span>Concurrency</span>
+      <select [value]="concurrency()" (change)="concurrency.set($any($event.target).value)">
+        <option value="Forbid">Forbid (default)</option>
+        <option value="Allow">Allow</option>
       </select>
     </label>
-
-    <label class="field">
-      <span>Schedule (cron) *</span>
-      <input placeholder="0 2 * * *" [value]="schedule()" (input)="schedule.set($any($event.target).value)" />
-    </label>
-    <p class="hint">Standard 5-field cron. Example: <code>0 2 * * *</code> = daily at 02:00.</p>
-
-    <h4>Backend</h4>
-    <div class="seg">
-      <button [class.on]="backend() === 'local'" (click)="backend.set('local')">local</button>
-      <button [class.on]="backend() === 'csi-volume-snapshot'" (click)="backend.set('csi-volume-snapshot')">CSI</button>
-    </div>
-    @if (backend() === 'local') {
-      <label class="check">
-        <input type="checkbox" [checked]="includeMemory()" (change)="includeMemory.set($any($event.target).checked)" />
-        <span>Include memory (Tier B live snapshot)</span>
-      </label>
-      <label class="field">
-        <span>Host path (optional — auto-derived if blank)</span>
-        <input placeholder="/var/lib/kubeswift/snapshots/&lt;ns&gt;-&lt;name&gt;" [value]="localHostPath()" (input)="localHostPath.set($any($event.target).value)" />
-      </label>
-      <p class="hint">Node-local; must be under <code>/var/lib/kubeswift/snapshots/</code>.</p>
-    } @else {
-      <label class="field">
-        <span>VolumeSnapshotClass (optional)</span>
-        <input placeholder="(cluster default)" [value]="csiClass()" (input)="csiClass.set($any($event.target).value)" />
-      </label>
-      <p class="hint">CSI is disk-only; memory is not captured.</p>
-    }
-    <p class="hint">S3 / OCI object backends: use “Edit as YAML”.</p>
-
-    <h4>Retention &amp; policy</h4>
-    <div class="row2">
-      <label class="field">
-        <span>Keep last</span>
-        <input type="number" min="0" [value]="keepLast()" (input)="keepLast.set(+$any($event.target).value || 0)" />
-      </label>
-      <label class="field">
-        <span>Concurrency</span>
-        <select [value]="concurrency()" (change)="concurrency.set($any($event.target).value)">
-          <option value="Forbid">Forbid (default)</option>
-          <option value="Allow">Allow</option>
-        </select>
-      </label>
-    </div>
-    <label class="check">
-      <input type="checkbox" [checked]="suspend()" (change)="suspend.set($any($event.target).checked)" />
-      <span>Create suspended</span>
-    </label>
   </div>
-
-  <div class="actions">
-    <button class="primary" [disabled]="!canCreate() || busy()" (click)="create()">
-      {{ busy() ? 'Creating…' : 'Create schedule' }}
-    </button>
-    <button class="ghost" (click)="closed.emit()">Cancel</button>
-    <button class="link" (click)="advanced.emit()" title="Switch to the raw YAML editor">Edit as YAML</button>
-  </div>
-</aside>
+  <label class="check">
+    <input
+      type="checkbox"
+      [checked]="suspend()"
+      (change)="suspend.set($any($event.target).checked)"
+    />
+    <span>Create suspended</span>
+  </label>
+</app-form-shell>

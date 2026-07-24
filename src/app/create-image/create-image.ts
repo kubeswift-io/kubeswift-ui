@@ -1,71 +1,38 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { GatewayService } from '../gateway.service';
+import { FormShell } from '../form-shell/form-shell';
+import { ResourceForm } from '../resource-form';
 import { listNames } from '../wizard-util';
-import type { Cluster } from '../gen/kubeswift/v1/cluster_pb';
 
+type Obj = Record<string, unknown>;
 type Src = 'http' | 'oci' | 'pvcClone';
 
-/**
- * CreateImage is the guided Create wizard for a SwiftImage — a VM disk artifact
- * imported from HTTP, an OCI golden image, or a PVC clone, converted to a raw
- * runtime disk. Submits via ResourceService.ApplyResource as the signed-in user.
- */
+/** CreateImage — a SwiftImage VM disk (HTTP / OCI golden / PVC clone → raw runtime disk). */
 @Component({
   selector: 'app-create-image',
-  imports: [MatIconModule],
+  imports: [MatIconModule, FormShell],
   templateUrl: './create-image.html',
   styleUrl: '../wizard.scss',
 })
-export class CreateImage {
-  private readonly gw = inject(GatewayService);
-  readonly clusters = input.required<Cluster[]>();
-  readonly initialCluster = input<string>('');
-  readonly initialNamespace = input<string>('');
-  readonly created = output<void>();
-  readonly closed = output<void>();
-  readonly advanced = output<void>();
+export class CreateImage extends ResourceForm {
+  readonly kindKey = 'swiftimages';
+  readonly apiVersion = 'image.kubeswift.io/v1alpha1';
+  readonly kindName = 'SwiftImage';
+  readonly namespaced = true;
 
-  readonly cluster = signal('');
-  readonly namespace = signal('default');
-  readonly name = signal('');
   readonly src = signal<Src>('http');
-  // http
   readonly url = signal('');
-  // oci
   readonly ociRepo = signal('');
   readonly ociTag = signal('');
   readonly ociInsecure = signal(false);
-  // pvcClone
   readonly pvcName = signal('');
   readonly pvcNamespace = signal('');
-  // common
   readonly format = signal('qcow2');
   readonly osType = signal('linux');
   readonly diskSize = signal('');
-
   readonly namespaces = signal<string[]>([]);
-  readonly busy = signal(false);
-  readonly error = signal<string | null>(null);
 
-  constructor() {
-    effect(() => {
-      const cs = this.clusters();
-      if (this.cluster() || cs.length === 0) return;
-      const first = this.initialCluster() || cs.find((c) => c.ready)?.name || cs[0]?.name || '';
-      if (first) {
-        this.cluster.set(first);
-        if (this.initialNamespace()) this.namespace.set(this.initialNamespace());
-        void this.loadNamespaces(first);
-      }
-    });
-  }
-
-  async selectCluster(c: string): Promise<void> {
-    this.cluster.set(c);
-    await this.loadNamespaces(c);
-  }
-  private async loadNamespaces(cluster: string): Promise<void> {
+  protected override async onCluster(cluster: string): Promise<void> {
     this.namespaces.set(await listNames(this.gw, cluster, 'namespaces'));
   }
 
@@ -76,56 +43,57 @@ export class CreateImage {
     this.format.set(s === 'oci' ? 'raw' : 'qcow2');
   }
 
-  canCreate(): boolean {
-    if (!this.cluster() || !this.namespace() || !this.name().trim()) return false;
-    if (this.src() === 'http') return !!this.url().trim();
-    if (this.src() === 'oci') return !!this.ociRepo().trim();
-    if (this.src() === 'pvcClone') return !!this.pvcName().trim();
-    return false;
+  hydrate(obj: Obj): void {
+    const spec = (obj['spec'] ?? {}) as Obj;
+    const source = (spec['source'] ?? {}) as Obj;
+    if (source['oci']) {
+      this.src.set('oci');
+      const oci = source['oci'] as Obj;
+      this.ociRepo.set(String(oci['repository'] ?? ''));
+      this.ociTag.set(String(oci['tag'] ?? ''));
+      this.ociInsecure.set(!!oci['insecure']);
+    } else if (source['pvcClone']) {
+      this.src.set('pvcClone');
+      const pvc = source['pvcClone'] as Obj;
+      this.pvcName.set(String(pvc['name'] ?? ''));
+      this.pvcNamespace.set(String(pvc['namespace'] ?? ''));
+    } else {
+      this.src.set('http');
+      this.url.set(String(((source['http'] ?? {}) as Obj)['url'] ?? ''));
+    }
+    this.format.set(String(spec['format'] ?? 'qcow2'));
+    this.osType.set(String(spec['osType'] ?? 'linux'));
+    this.diskSize.set(String(((spec['rootDisk'] ?? {}) as Obj)['size'] ?? ''));
   }
 
-  async create(): Promise<void> {
-    if (!this.canCreate() || this.busy()) return;
-    this.busy.set(true);
-    this.error.set(null);
-
-    let source: Record<string, unknown>;
+  build(base: Obj): Obj {
+    const spec = (base['spec'] = (base['spec'] ?? {}) as Obj) as Obj;
+    let source: Obj;
     if (this.src() === 'http') {
       source = { http: { url: this.url().trim() } };
     } else if (this.src() === 'oci') {
-      const oci: Record<string, unknown> = { repository: this.ociRepo().trim() };
+      const oci: Obj = { repository: this.ociRepo().trim() };
       if (this.ociTag().trim()) oci['tag'] = this.ociTag().trim();
       if (this.ociInsecure()) oci['insecure'] = true;
       source = { oci };
     } else {
-      const pvc: Record<string, unknown> = { name: this.pvcName().trim() };
+      const pvc: Obj = { name: this.pvcName().trim() };
       if (this.pvcNamespace().trim()) pvc['namespace'] = this.pvcNamespace().trim();
       source = { pvcClone: pvc };
     }
-
-    const spec: Record<string, unknown> = { source, format: this.format() };
+    spec['source'] = source;
+    spec['format'] = this.format();
     if (this.osType() && this.osType() !== 'linux') spec['osType'] = this.osType();
+    else delete spec['osType'];
     if (this.diskSize().trim()) spec['rootDisk'] = { size: this.diskSize().trim() };
+    else delete spec['rootDisk'];
+    return base;
+  }
 
-    const obj = {
-      apiVersion: 'image.kubeswift.io/v1alpha1',
-      kind: 'SwiftImage',
-      metadata: { name: this.name().trim(), namespace: this.namespace() },
-      spec,
-    };
-
-    try {
-      await this.gw.resources.applyResource({
-        cluster: this.cluster(),
-        kind: 'swiftimages',
-        namespace: this.namespace(),
-        yaml: JSON.stringify(obj),
-      });
-      this.created.emit();
-    } catch (e) {
-      this.error.set(e instanceof Error ? e.message : String(e));
-    } finally {
-      this.busy.set(false);
-    }
+  canSave(): boolean {
+    if (!this.cluster() || !this.namespace() || !this.name().trim()) return false;
+    if (this.src() === 'http') return !!this.url().trim();
+    if (this.src() === 'oci') return !!this.ociRepo().trim();
+    return !!this.pvcName().trim();
   }
 }

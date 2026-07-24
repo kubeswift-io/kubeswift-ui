@@ -216,9 +216,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('swiftguestclasses') {
@@ -226,9 +227,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('swiftimages') {
@@ -236,9 +238,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('swiftseedprofiles') {
@@ -246,9 +249,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('swiftkernels') {
@@ -256,9 +260,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('swiftgpuprofiles') {
@@ -266,9 +271,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('swiftsnapshotschedules') {
@@ -276,9 +282,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('swiftsandboxpools') {
@@ -286,9 +293,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('swiftguestpools') {
@@ -296,9 +304,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('secrets') {
@@ -306,9 +315,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('configmaps') {
@@ -316,9 +326,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('services') {
@@ -326,9 +337,142 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('serviceaccounts') {
+      <app-create-serviceaccount
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('ingresses') {
+      <app-create-ingress
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('roles') {
+      <app-create-role
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('clusterroles') {
+      <app-create-clusterrole
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('rolebindings') {
+      <app-create-rolebinding
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('clusterrolebindings') {
+      <app-create-clusterrolebinding
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('deployments') {
+      <app-create-deployment
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('statefulsets') {
+      <app-create-statefulset
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('daemonsets') {
+      <app-create-daemonset
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('replicasets') {
+      <app-create-replicaset
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('jobs') {
+      <app-create-job
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('cronjobs') {
+      <app-create-cronjob
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
       />
     }
   }

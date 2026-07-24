@@ -1,0 +1,21 @@
+<app-form-shell
+  [title]="isEdit() ? 'Edit daemon set' : 'New daemon set'" sub="an apps/v1 DaemonSet"
+  [clusters]="clusters()" [cluster]="cluster()" [edit]="isEdit()"
+  [view]="view()" [yaml]="yamlText()" [error]="error()" [canWrite]="canWrite()"
+  [busy]="busy()" [canSave]="canSave()" [saveLabel]="isEdit() ? 'Apply' : 'Create daemon set'"
+  (clusterChange)="selectCluster($event)" (viewChange)="setView($event)" (yamlChange)="yamlText.set($event)"
+  (save)="save()" (close)="closed.emit()"
+>
+  <div class="row2">
+    <label class="field"><span>Namespace</span>
+      @if (isEdit()) { <input [value]="namespace()" disabled /> } @else {
+        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">@for (ns of namespaces(); track ns) { <option [value]="ns">{{ ns }}</option> }</select>
+      }
+    </label>
+    <label class="field"><span>Name *</span><input placeholder="my-ds" [value]="name()" (input)="name.set($any($event.target).value)" [disabled]="isEdit()" /></label>
+  </div>
+  <label class="field"><span>Update strategy</span>
+    <select [value]="updateStrategy()" (change)="updateStrategy.set($any($event.target).value)"><option value="RollingUpdate">RollingUpdate</option><option value="OnDelete">OnDelete</option></select>
+  </label>
+  <app-pod-template [value]="podSpecInput()" />
+</app-form-shell>

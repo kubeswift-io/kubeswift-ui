@@ -1,9 +1,10 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { GatewayService } from '../gateway.service';
+import { FormShell } from '../form-shell/form-shell';
+import { ResourceForm } from '../resource-form';
 import { listNames } from '../wizard-util';
-import type { Cluster } from '../gen/kubeswift/v1/cluster_pb';
 
+type Obj = Record<string, unknown>;
 interface KV {
   key: string;
   value: string;
@@ -16,60 +17,81 @@ interface Port {
 }
 
 /**
- * CreateService is the guided create form for a core Service — type, a label
- * selector, and a ports table (or an ExternalName alias). Submits via
- * ResourceService.ApplyResource as the signed-in user.
+ * CreateService is the guided create/edit form for a core Service — type, a
+ * label selector, and a ports table (or an ExternalName alias). Extends
+ * ResourceForm; merge-on-edit preserves other spec fields (clusterIP, etc.).
  */
 @Component({
   selector: 'app-create-service',
-  imports: [MatIconModule],
+  imports: [MatIconModule, FormShell],
   templateUrl: './create-service.html',
   styleUrl: '../wizard.scss',
 })
-export class CreateService {
-  private readonly gw = inject(GatewayService);
-  readonly clusters = input.required<Cluster[]>();
-  readonly initialCluster = input<string>('');
-  readonly initialNamespace = input<string>('');
-  readonly created = output<void>();
-  readonly closed = output<void>();
-  readonly advanced = output<void>();
+export class CreateService extends ResourceForm {
+  readonly kindKey = 'services';
+  readonly apiVersion = 'v1';
+  readonly kindName = 'Service';
+  readonly namespaced = true;
 
-  readonly cluster = signal('');
-  readonly namespace = signal('default');
-  readonly name = signal('');
   readonly svcType = signal('ClusterIP');
   readonly externalName = signal('');
   readonly selector = signal<KV[]>([{ key: 'app', value: '' }]);
   readonly ports = signal<Port[]>([{ name: 'http', port: 80, targetPort: 0, protocol: 'TCP' }]);
-
   readonly namespaces = signal<string[]>([]);
-  readonly busy = signal(false);
-  readonly error = signal<string | null>(null);
 
-  constructor() {
-    effect(() => {
-      const cs = this.clusters();
-      if (this.cluster() || cs.length === 0) return;
-      const first = this.initialCluster() || cs.find((c) => c.ready)?.name || cs[0]?.name || '';
-      if (first) {
-        this.cluster.set(first);
-        if (this.initialNamespace()) this.namespace.set(this.initialNamespace());
-        void this.loadNamespaces(first);
-      }
-    });
-  }
-
-  async selectCluster(c: string): Promise<void> {
-    this.cluster.set(c);
-    await this.loadNamespaces(c);
-  }
-  private async loadNamespaces(cluster: string): Promise<void> {
+  protected override async onCluster(cluster: string): Promise<void> {
     this.namespaces.set(await listNames(this.gw, cluster, 'namespaces'));
   }
 
   isExternalName(): boolean {
     return this.svcType() === 'ExternalName';
+  }
+
+  hydrate(obj: Obj): void {
+    const spec = (obj['spec'] ?? {}) as Obj;
+    this.svcType.set(String(spec['type'] ?? 'ClusterIP'));
+    this.externalName.set(String(spec['externalName'] ?? ''));
+    const sel = (spec['selector'] ?? {}) as Record<string, unknown>;
+    const kv = Object.entries(sel).map(([key, value]) => ({ key, value: String(value) }));
+    this.selector.set(kv.length ? kv : [{ key: 'app', value: '' }]);
+    const ports = (spec['ports'] ?? []) as Obj[];
+    const ps = ports.map((p) => ({
+      name: String(p['name'] ?? ''),
+      port: Number(p['port'] ?? 0),
+      targetPort: Number(p['targetPort'] ?? 0) || 0,
+      protocol: String(p['protocol'] ?? 'TCP'),
+    }));
+    this.ports.set(ps.length ? ps : [{ name: 'http', port: 80, targetPort: 0, protocol: 'TCP' }]);
+  }
+
+  build(base: Obj): Obj {
+    const spec = (base['spec'] = (base['spec'] ?? {}) as Obj) as Obj;
+    spec['type'] = this.svcType();
+    if (this.isExternalName()) {
+      spec['externalName'] = this.externalName().trim();
+      delete spec['selector'];
+      delete spec['ports'];
+    } else {
+      delete spec['externalName'];
+      const sel: Record<string, string> = {};
+      for (const s of this.selector()) if (s.key.trim()) sel[s.key.trim()] = s.value;
+      spec['selector'] = sel;
+      spec['ports'] = this.ports()
+        .filter((p) => p.port > 0)
+        .map((p) => {
+          const o: Obj = { port: p.port, protocol: p.protocol || 'TCP' };
+          if (p.name.trim()) o['name'] = p.name.trim();
+          if (p.targetPort > 0) o['targetPort'] = p.targetPort;
+          return o;
+        });
+    }
+    return base;
+  }
+
+  canSave(): boolean {
+    if (!this.cluster() || !this.namespace() || !this.name().trim()) return false;
+    if (this.isExternalName()) return !!this.externalName().trim();
+    return this.ports().some((p) => p.port > 0);
   }
 
   addSel(): void {
@@ -93,55 +115,5 @@ export class CreateService {
         j === i ? { ...pt, [field]: field === 'name' || field === 'protocol' ? val : +val || 0 } : pt,
       ),
     );
-  }
-
-  canCreate(): boolean {
-    if (!this.cluster() || !this.namespace() || !this.name().trim()) return false;
-    if (this.isExternalName()) return !!this.externalName().trim();
-    return this.ports().some((p) => p.port > 0);
-  }
-
-  async create(): Promise<void> {
-    if (!this.canCreate() || this.busy()) return;
-    this.busy.set(true);
-    this.error.set(null);
-
-    const spec: Record<string, unknown> = { type: this.svcType() };
-    if (this.isExternalName()) {
-      spec['externalName'] = this.externalName().trim();
-    } else {
-      const sel: Record<string, string> = {};
-      for (const s of this.selector()) if (s.key.trim()) sel[s.key.trim()] = s.value;
-      if (Object.keys(sel).length) spec['selector'] = sel;
-      spec['ports'] = this.ports()
-        .filter((p) => p.port > 0)
-        .map((p) => {
-          const o: Record<string, unknown> = { port: p.port, protocol: p.protocol || 'TCP' };
-          if (p.name.trim()) o['name'] = p.name.trim();
-          if (p.targetPort > 0) o['targetPort'] = p.targetPort;
-          return o;
-        });
-    }
-
-    const obj = {
-      apiVersion: 'v1',
-      kind: 'Service',
-      metadata: { name: this.name().trim(), namespace: this.namespace() },
-      spec,
-    };
-
-    try {
-      await this.gw.resources.applyResource({
-        cluster: this.cluster(),
-        kind: 'services',
-        namespace: this.namespace(),
-        yaml: JSON.stringify(obj),
-      });
-      this.created.emit();
-    } catch (e) {
-      this.error.set(e instanceof Error ? e.message : String(e));
-    } finally {
-      this.busy.set(false);
-    }
   }
 }

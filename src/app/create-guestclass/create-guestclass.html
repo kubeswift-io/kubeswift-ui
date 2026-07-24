@@ -1,94 +1,91 @@
-<div class="backdrop" (click)="closed.emit()"></div>
-<aside class="drawer">
-  <header>
-    <div class="title">
-      <span class="name">New guest class</span>
-      <span class="sub">a SwiftGuestClass resource/storage template</span>
-    </div>
-    <select class="cluster" [value]="cluster()" (change)="cluster.set($any($event.target).value)" title="Target cluster">
-      @for (c of clusters(); track c.name) {
-        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
-      }
-    </select>
-    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
-  </header>
-
-  @if (error(); as e) {
-    <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
-  }
-
-  <div class="body">
-    <label class="field">
-      <span>Name *</span>
-      <input placeholder="standard-2c-2g" [value]="name()" (input)="name.set($any($event.target).value)" />
-    </label>
-
-    <div class="row2">
-      <label class="field">
-        <span>vCPUs *</span>
-        <input type="number" min="1" [value]="cpu() || ''" (input)="cpu.set(+$any($event.target).value || 0)" />
-      </label>
-      <label class="field">
-        <span>Memory *</span>
-        <input placeholder="2Gi" [value]="memory()" (input)="memory.set($any($event.target).value)" />
-      </label>
-    </div>
-
-    <h4>Root disk</h4>
-    <div class="row2">
-      <label class="field">
-        <span>Size *</span>
-        <input placeholder="20Gi" [value]="diskSize()" (input)="diskSize.set($any($event.target).value)" />
-      </label>
-      <label class="field">
-        <span>Format</span>
-        <select [value]="diskFormat()" (change)="diskFormat.set($any($event.target).value)">
-          <option value="raw">raw (default)</option>
-          <option value="qcow2">qcow2</option>
-        </select>
-      </label>
-    </div>
-
-    <h4>Storage defaults (optional)</h4>
-    <div class="row2">
-      <label class="field">
-        <span>Access mode</span>
-        <select [value]="accessMode()" (change)="accessMode.set($any($event.target).value)">
-          <option value="">— controller default —</option>
-          <option value="ReadWriteOnce">ReadWriteOnce</option>
-          <option value="ReadWriteMany">ReadWriteMany (live-migration)</option>
-        </select>
-      </label>
-      <label class="field">
-        <span>Volume mode</span>
-        <select [value]="volumeMode()" (change)="volumeMode.set($any($event.target).value)">
-          <option value="">— controller default —</option>
-          <option value="Filesystem">Filesystem</option>
-          <option value="Block">Block (RWX live-migration)</option>
-        </select>
-      </label>
-    </div>
-    <label class="field">
-      <span>StorageClass</span>
-      <input placeholder="(cluster default)" [value]="storageClass()" (input)="storageClass.set($any($event.target).value)" />
-    </label>
-
-    <h4>Advanced</h4>
-    <label class="field">
-      <span>Core scheduling (SMT isolation)</span>
-      <select [value]="coreScheduling()" (change)="coreScheduling.set($any($event.target).value)">
-        <option value="off">off (default)</option>
-        <option value="vm">vm — one core group per guest</option>
-        <option value="vcpu">vcpu — one core group per vCPU</option>
+<app-form-shell
+  [title]="isEdit() ? 'Edit guest class' : 'New guest class'"
+  sub="a SwiftGuestClass"
+  [clusters]="clusters()"
+  [cluster]="cluster()"
+  [edit]="isEdit()"
+  [view]="view()"
+  [yaml]="yamlText()"
+  [error]="error()"
+  [canWrite]="canWrite()"
+  [busy]="busy()"
+  [canSave]="canSave()"
+  [saveLabel]="isEdit() ? 'Apply' : 'Create guest class'"
+  (clusterChange)="selectCluster($event)"
+  (viewChange)="setView($event)"
+  (yamlChange)="yamlText.set($event)"
+  (save)="save()"
+  (close)="closed.emit()"
+>
+  <label class="field">
+    <span>Name *</span>
+    <input
+      placeholder="standard-2c-2g"
+      [value]="name()"
+      (input)="name.set($any($event.target).value)"
+      [disabled]="isEdit()"
+    />
+  </label>
+  <div class="row2">
+    <label class="field"
+      ><span>vCPUs *</span
+      ><input placeholder="2" [value]="cpu()" (input)="cpu.set($any($event.target).value)"
+    /></label>
+    <label class="field"
+      ><span>Memory *</span
+      ><input placeholder="2Gi" [value]="memory()" (input)="memory.set($any($event.target).value)"
+    /></label>
+  </div>
+  <h4>Root disk</h4>
+  <div class="row2">
+    <label class="field"
+      ><span>Size *</span
+      ><input
+        placeholder="20Gi"
+        [value]="diskSize()"
+        (input)="diskSize.set($any($event.target).value)"
+    /></label>
+    <label class="field"
+      ><span>Format</span>
+      <select [value]="diskFormat()" (change)="diskFormat.set($any($event.target).value)">
+        <option value="raw">raw (default)</option>
+        <option value="qcow2">qcow2</option>
       </select>
     </label>
   </div>
-
-  <div class="actions">
-    <button class="primary" [disabled]="!canCreate() || busy()" (click)="create()">
-      {{ busy() ? 'Creating…' : 'Create guest class' }}
-    </button>
-    <button class="ghost" (click)="closed.emit()">Cancel</button>
-    <button class="link" (click)="advanced.emit()" title="Switch to the raw YAML editor">Edit as YAML</button>
+  <h4>Storage defaults (optional)</h4>
+  <div class="row2">
+    <label class="field"
+      ><span>Access mode</span>
+      <select [value]="accessMode()" (change)="accessMode.set($any($event.target).value)">
+        <option value="">— controller default —</option>
+        <option value="ReadWriteOnce">ReadWriteOnce</option>
+        <option value="ReadWriteMany">ReadWriteMany (live-migration)</option>
+      </select>
+    </label>
+    <label class="field"
+      ><span>Volume mode</span>
+      <select [value]="volumeMode()" (change)="volumeMode.set($any($event.target).value)">
+        <option value="">— controller default —</option>
+        <option value="Filesystem">Filesystem</option>
+        <option value="Block">Block (RWX live-migration)</option>
+      </select>
+    </label>
   </div>
-</aside>
+  <label class="field"
+    ><span>StorageClass</span
+    ><input
+      placeholder="(cluster default)"
+      [value]="storageClass()"
+      (input)="storageClass.set($any($event.target).value)"
+  /></label>
+  <h4>Advanced</h4>
+  <label class="field"
+    ><span>Core scheduling (SMT isolation)</span>
+    <select [value]="coreScheduling()" (change)="coreScheduling.set($any($event.target).value)">
+      <option value="off">off (default)</option>
+      <option value="vm">vm — one core group per guest</option>
+      <option value="vcpu">vcpu — one core group per vCPU</option>
+    </select>
+  </label>
+</app-form-shell>

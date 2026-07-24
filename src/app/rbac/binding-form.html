@@ -1,0 +1,64 @@
+<app-form-shell
+  [title]="isEdit() ? 'Edit ' + label : 'New ' + label"
+  [sub]="'a ' + kindName"
+  [clusters]="clusters()" [cluster]="cluster()" [edit]="isEdit()"
+  [view]="view()" [yaml]="yamlText()" [error]="error()" [canWrite]="canWrite()"
+  [busy]="busy()" [canSave]="canSave()" [saveLabel]="isEdit() ? 'Apply' : 'Create ' + label"
+  (clusterChange)="selectCluster($event)" (viewChange)="setView($event)" (yamlChange)="yamlText.set($event)"
+  (save)="save()" (close)="closed.emit()"
+>
+  <div class="row2">
+    @if (namespaced) {
+      <label class="field">
+        <span>Namespace</span>
+        @if (isEdit()) { <input [value]="namespace()" disabled /> } @else {
+          <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
+            @for (ns of namespaces(); track ns) { <option [value]="ns">{{ ns }}</option> }
+          </select>
+        }
+      </label>
+    }
+    <label class="field">
+      <span>Name *</span>
+      <input placeholder="my-binding" [value]="name()" (input)="name.set($any($event.target).value)" [disabled]="isEdit()" />
+    </label>
+  </div>
+
+  <h4>Role reference</h4>
+  <div class="row2">
+    @if (allowRoleKind) {
+      <label class="field">
+        <span>Kind</span>
+        <select [value]="roleRefKind()" (change)="roleRefKind.set($any($event.target).value)">
+          <option value="Role">Role</option>
+          <option value="ClusterRole">ClusterRole</option>
+        </select>
+      </label>
+    } @else {
+      <label class="field"><span>Kind</span><input value="ClusterRole" disabled /></label>
+    }
+    <label class="field">
+      <span>Name *</span>
+      <input placeholder="my-role" [value]="roleRefName()" (input)="roleRefName.set($any($event.target).value)" />
+    </label>
+  </div>
+
+  <h4>Subjects</h4>
+  @for (s of subjects(); track $index) {
+    <div class="ports">
+      <div class="prow" style="grid-template-columns: 1fr 1.2fr 1fr 28px">
+        <select [value]="s.kind" (change)="setSubject($index, 'kind', $any($event.target).value)">
+          <option value="ServiceAccount">ServiceAccount</option>
+          <option value="User">User</option>
+          <option value="Group">Group</option>
+        </select>
+        <input placeholder="name" [value]="s.name" (input)="setSubject($index, 'name', $any($event.target).value)" />
+        @if (s.kind === 'ServiceAccount') {
+          <input placeholder="namespace" [value]="s.namespace" (input)="setSubject($index, 'namespace', $any($event.target).value)" />
+        } @else { <span></span> }
+        <button class="rowx" (click)="removeSubject($index)" title="Remove"><mat-icon>close</mat-icon></button>
+      </div>
+    </div>
+  }
+  <button class="link" style="margin: 0" (click)="addSubject()">+ Add subject</button>
+</app-form-shell>

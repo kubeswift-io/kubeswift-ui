@@ -1,0 +1,55 @@
+<div class="backdrop" (click)="close.emit()"></div>
+<aside class="drawer">
+  <header>
+    <div class="title">
+      <span class="name">{{ title() }}</span>
+      <span class="sub">{{ sub() }}</span>
+    </div>
+    @if (!edit()) {
+      <select
+        class="cluster"
+        [value]="cluster()"
+        (change)="clusterChange.emit($any($event.target).value)"
+        title="Target cluster"
+      >
+        @for (c of clusters(); track c.name) {
+          <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
+        }
+      </select>
+    }
+    <button class="icon" (click)="close.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
+  }
+
+  <div class="seg viewtoggle">
+    <button [class.on]="view() === 'form'" (click)="viewChange.emit('form')">Form</button>
+    <button [class.on]="view() === 'yaml'" (click)="viewChange.emit('yaml')">YAML</button>
+  </div>
+
+  @if (view() === 'form') {
+    <div class="body"><ng-content></ng-content></div>
+  } @else {
+    <div class="body">
+      <textarea
+        class="yamlbox"
+        [value]="yaml()"
+        (input)="yamlChange.emit($any($event.target).value)"
+        spellcheck="false"
+      ></textarea>
+    </div>
+  }
+
+  <div class="actions">
+    @if (canWrite()) {
+      <button class="primary" [disabled]="!canSave() || busy()" (click)="save.emit()">
+        {{ busy() ? 'Saving…' : saveLabel() }}
+      </button>
+    } @else {
+      <span class="ro">Read-only — you don't have permission to modify this resource.</span>
+    }
+    <button class="ghost" (click)="close.emit()">{{ canWrite() ? 'Cancel' : 'Close' }}</button>
+  </div>
+</aside>

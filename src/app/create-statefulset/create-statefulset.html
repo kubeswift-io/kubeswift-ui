@@ -1,0 +1,26 @@
+<app-form-shell
+  [title]="isEdit() ? 'Edit stateful set' : 'New stateful set'" sub="an apps/v1 StatefulSet"
+  [clusters]="clusters()" [cluster]="cluster()" [edit]="isEdit()"
+  [view]="view()" [yaml]="yamlText()" [error]="error()" [canWrite]="canWrite()"
+  [busy]="busy()" [canSave]="canSave()" [saveLabel]="isEdit() ? 'Apply' : 'Create stateful set'"
+  (clusterChange)="selectCluster($event)" (viewChange)="setView($event)" (yamlChange)="yamlText.set($event)"
+  (save)="save()" (close)="closed.emit()"
+>
+  <div class="row2">
+    <label class="field"><span>Namespace</span>
+      @if (isEdit()) { <input [value]="namespace()" disabled /> } @else {
+        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">@for (ns of namespaces(); track ns) { <option [value]="ns">{{ ns }}</option> }</select>
+      }
+    </label>
+    <label class="field"><span>Name *</span><input placeholder="my-sts" [value]="name()" (input)="name.set($any($event.target).value)" [disabled]="isEdit()" /></label>
+  </div>
+  <div class="row2">
+    <label class="field"><span>Replicas</span><input type="number" min="0" [value]="replicas()" (input)="replicas.set(+$any($event.target).value || 0)" /></label>
+    <label class="field"><span>Service name (headless)</span><input [placeholder]="name() || 'svc'" [value]="serviceName()" (input)="serviceName.set($any($event.target).value)" /></label>
+  </div>
+  <label class="field"><span>Update strategy</span>
+    <select [value]="updateStrategy()" (change)="updateStrategy.set($any($event.target).value)"><option value="RollingUpdate">RollingUpdate</option><option value="OnDelete">OnDelete</option></select>
+  </label>
+  <p class="hint">Volume claim templates: use “YAML”.</p>
+  <app-pod-template [value]="podSpecInput()" />
+</app-form-shell>

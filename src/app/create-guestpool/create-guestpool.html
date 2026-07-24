@@ -1,178 +1,210 @@
-<div class="backdrop" (click)="closed.emit()"></div>
-<aside class="drawer">
-  <header>
-    <div class="title">
-      <span class="name">New guest pool</span>
-      <span class="sub">N replicas of a guest template</span>
-    </div>
-    <select class="cluster" [value]="cluster()" (change)="selectCluster($any($event.target).value)" title="Target cluster">
-      @for (c of clusters(); track c.name) {
-        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
-      }
-    </select>
-    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
-  </header>
-
-  @if (error(); as e) {
-    <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
-  }
-
-  <div class="body">
-    <div class="row2">
-      <label class="field">
-        <span>Namespace</span>
+<app-form-shell
+  [title]="isEdit() ? 'Edit guest pool' : 'New guest pool'"
+  sub="N replicas of a guest template"
+  [clusters]="clusters()"
+  [cluster]="cluster()"
+  [edit]="isEdit()"
+  [view]="view()"
+  [yaml]="yamlText()"
+  [error]="error()"
+  [canWrite]="canWrite()"
+  [busy]="busy()"
+  [canSave]="canSave()"
+  [saveLabel]="isEdit() ? 'Apply' : 'Create guest pool'"
+  (clusterChange)="selectCluster($event)"
+  (viewChange)="setView($event)"
+  (yamlChange)="yamlText.set($event)"
+  (save)="save()"
+  (close)="closed.emit()"
+>
+  <div class="row2">
+    <label class="field">
+      <span>Namespace</span>
+      @if (isEdit()) {
+        <input [value]="namespace()" disabled />
+      } @else {
         <select [value]="namespace()" (change)="selectNamespace($any($event.target).value)">
           @for (ns of namespaces(); track ns) {
             <option [value]="ns">{{ ns }}</option>
           }
         </select>
-      </label>
-      <label class="field">
-        <span>Name *</span>
-        <input placeholder="web-pool" [value]="name()" (input)="name.set($any($event.target).value)" />
-      </label>
-    </div>
-
-    <div class="row2">
-      <label class="field">
-        <span>Replicas</span>
-        <input type="number" min="0" [value]="replicas()" (input)="replicas.set(+$any($event.target).value || 0)" />
-      </label>
-      <label class="field">
-        <span>Spread policy</span>
-        <select [value]="spreadPolicy()" (change)="spreadPolicy.set($any($event.target).value)">
-          <option value="Pack">Pack (default)</option>
-          <option value="Spread">Spread across nodes</option>
-        </select>
-      </label>
-    </div>
-
-    <h4>Guest template — boot source</h4>
-    <div class="seg">
-      <button [class.on]="boot() === 'image'" (click)="boot.set('image')">Disk image</button>
-      <button [class.on]="boot() === 'kernel'" (click)="boot.set('kernel')">Kernel</button>
-    </div>
-    @if (boot() === 'image') {
-      <label class="field">
-        <span>Image *</span>
-        <select [value]="imageRef()" (change)="imageRef.set($any($event.target).value)">
-          <option value="">— select an image —</option>
-          @for (i of images(); track i) {
-            <option [value]="i">{{ i }}</option>
-          }
-        </select>
-      </label>
-    } @else {
-      <label class="field">
-        <span>Kernel *</span>
-        <select [value]="kernelRef()" (change)="kernelRef.set($any($event.target).value)">
-          <option value="">— select a kernel —</option>
-          @for (k of kernels(); track k) {
-            <option [value]="k">{{ k }}</option>
-          }
-        </select>
-      </label>
-    }
-
+      }
+    </label>
     <label class="field">
-      <span>Guest class *</span>
-      <select [value]="guestClass()" (change)="guestClass.set($any($event.target).value)">
-        <option value="">— select a class —</option>
-        @for (gc of guestClasses(); track gc) {
-          <option [value]="gc">{{ gc }}</option>
+      <span>Name *</span>
+      <input
+        placeholder="web-pool"
+        [value]="name()"
+        (input)="name.set($any($event.target).value)"
+        [disabled]="isEdit()"
+      />
+    </label>
+  </div>
+
+  <div class="row2">
+    <label class="field">
+      <span>Replicas</span>
+      <input
+        type="number"
+        min="0"
+        [value]="replicas()"
+        (input)="replicas.set(+$any($event.target).value || 0)"
+      />
+    </label>
+    <label class="field">
+      <span>Spread policy</span>
+      <select [value]="spreadPolicy()" (change)="spreadPolicy.set($any($event.target).value)">
+        <option value="Pack">Pack (default)</option>
+        <option value="Spread">Spread across nodes</option>
+      </select>
+    </label>
+  </div>
+
+  <h4>Guest template — boot source</h4>
+  <div class="seg">
+    <button [class.on]="boot() === 'image'" (click)="boot.set('image')">Disk image</button>
+    <button [class.on]="boot() === 'kernel'" (click)="boot.set('kernel')">Kernel</button>
+  </div>
+  @if (boot() === 'image') {
+    <label class="field">
+      <span>Image *</span>
+      <select [value]="imageRef()" (change)="imageRef.set($any($event.target).value)">
+        <option value="">— select an image —</option>
+        @for (i of images(); track i) {
+          <option [value]="i">{{ i }}</option>
         }
       </select>
     </label>
+  } @else {
+    <label class="field">
+      <span>Kernel *</span>
+      <select [value]="kernelRef()" (change)="kernelRef.set($any($event.target).value)">
+        <option value="">— select a kernel —</option>
+        @for (k of kernels(); track k) {
+          <option [value]="k">{{ k }}</option>
+        }
+      </select>
+    </label>
+  }
 
+  <label class="field">
+    <span>Guest class *</span>
+    <select [value]="guestClass()" (change)="guestClass.set($any($event.target).value)">
+      <option value="">— select a class —</option>
+      @for (gc of guestClasses(); track gc) {
+        <option [value]="gc">{{ gc }}</option>
+      }
+    </select>
+  </label>
+
+  <div class="row2">
+    <label class="field">
+      <span>Seed profile (optional)</span>
+      <select [value]="seedRef()" (change)="seedRef.set($any($event.target).value)">
+        <option value="">— none —</option>
+        @for (s of seeds(); track s) {
+          <option [value]="s">{{ s }}</option>
+        }
+      </select>
+    </label>
+    <label class="field">
+      <span>Run policy</span>
+      <select [value]="runPolicy()" (change)="runPolicy.set($any($event.target).value)">
+        <option value="Running">Running</option>
+        <option value="Stopped">Stopped</option>
+        <option value="RestartOnFailure">RestartOnFailure</option>
+        <option value="Always">Always</option>
+      </select>
+    </label>
+  </div>
+
+  @if (boot() === 'image') {
     <div class="row2">
       <label class="field">
-        <span>Seed profile (optional)</span>
-        <select [value]="seedRef()" (change)="seedRef.set($any($event.target).value)">
+        <span>GPU profile (optional)</span>
+        <select [value]="gpuRef()" (change)="gpuRef.set($any($event.target).value)">
           <option value="">— none —</option>
-          @for (s of seeds(); track s) {
-            <option [value]="s">{{ s }}</option>
+          @for (g of gpuProfiles(); track g) {
+            <option [value]="g">{{ g }}</option>
           }
         </select>
       </label>
       <label class="field">
-        <span>Run policy</span>
-        <select [value]="runPolicy()" (change)="runPolicy.set($any($event.target).value)">
-          <option value="Running">Running</option>
-          <option value="Stopped">Stopped</option>
-          <option value="RestartOnFailure">RestartOnFailure</option>
-          <option value="Always">Always</option>
+        <span>OS type</span>
+        <select [value]="osType()" (change)="osType.set($any($event.target).value)">
+          <option value="linux">linux</option>
+          <option value="windows">windows</option>
         </select>
       </label>
     </div>
+  }
 
-    @if (boot() === 'image') {
-      <div class="row2">
-        <label class="field">
-          <span>GPU profile (optional)</span>
-          <select [value]="gpuRef()" (change)="gpuRef.set($any($event.target).value)">
-            <option value="">— none —</option>
-            @for (g of gpuProfiles(); track g) {
-              <option [value]="g">{{ g }}</option>
-            }
-          </select>
-        </label>
-        <label class="field">
-          <span>OS type</span>
-          <select [value]="osType()" (change)="osType.set($any($event.target).value)">
-            <option value="linux">linux</option>
-            <option value="windows">windows</option>
-          </select>
-        </label>
+  <h4>Service (optional)</h4>
+  <label class="check">
+    <input
+      type="checkbox"
+      [checked]="serviceEnabled()"
+      (change)="serviceEnabled.set($any($event.target).checked)"
+    />
+    <span>Expose a selector Service across the replicas</span>
+  </label>
+  @if (serviceEnabled()) {
+    <div class="row2">
+      <label class="field">
+        <span>Service type</span>
+        <select [value]="serviceType()" (change)="serviceType.set($any($event.target).value)">
+          <option value="ClusterIP">ClusterIP</option>
+          <option value="NodePort">NodePort</option>
+          <option value="LoadBalancer">LoadBalancer</option>
+        </select>
+      </label>
+      <label class="check" style="margin-top: 22px">
+        <input
+          type="checkbox"
+          [checked]="headless()"
+          (change)="headless.set($any($event.target).checked)"
+        />
+        <span>Headless</span>
+      </label>
+    </div>
+    <div class="ports">
+      <div class="phead">
+        <span>Name</span><span>Port</span><span>Target</span><span>Proto</span><span></span>
       </div>
-    }
-
-    <h4>Service (optional)</h4>
-    <label class="check">
-      <input type="checkbox" [checked]="serviceEnabled()" (change)="serviceEnabled.set($any($event.target).checked)" />
-      <span>Expose a selector Service across the replicas</span>
-    </label>
-    @if (serviceEnabled()) {
-      <div class="row2">
-        <label class="field">
-          <span>Service type</span>
-          <select [value]="serviceType()" (change)="serviceType.set($any($event.target).value)">
-            <option value="ClusterIP">ClusterIP</option>
-            <option value="NodePort">NodePort</option>
-            <option value="LoadBalancer">LoadBalancer</option>
+      @for (p of ports(); track $index) {
+        <div class="prow">
+          <input
+            placeholder="http"
+            [value]="p.name"
+            (input)="setPort($index, 'name', $any($event.target).value)"
+          />
+          <input
+            type="number"
+            min="1"
+            [value]="p.port || ''"
+            (input)="setPort($index, 'port', $any($event.target).value)"
+          />
+          <input
+            type="number"
+            min="1"
+            placeholder="=port"
+            [value]="p.targetPort || ''"
+            (input)="setPort($index, 'targetPort', $any($event.target).value)"
+          />
+          <select
+            [value]="p.protocol"
+            (change)="setPort($index, 'protocol', $any($event.target).value)"
+          >
+            <option value="TCP">TCP</option>
+            <option value="UDP">UDP</option>
+            <option value="SCTP">SCTP</option>
           </select>
-        </label>
-        <label class="check" style="margin-top: 22px">
-          <input type="checkbox" [checked]="headless()" (change)="headless.set($any($event.target).checked)" />
-          <span>Headless</span>
-        </label>
-      </div>
-      <div class="ports">
-        <div class="phead">
-          <span>Name</span><span>Port</span><span>Target</span><span>Proto</span><span></span>
+          <button class="rowx" (click)="removePort($index)" title="Remove">
+            <mat-icon>close</mat-icon>
+          </button>
         </div>
-        @for (p of ports(); track $index) {
-          <div class="prow">
-            <input placeholder="http" [value]="p.name" (input)="setPort($index, 'name', $any($event.target).value)" />
-            <input type="number" min="1" [value]="p.port || ''" (input)="setPort($index, 'port', $any($event.target).value)" />
-            <input type="number" min="1" placeholder="=port" [value]="p.targetPort || ''" (input)="setPort($index, 'targetPort', $any($event.target).value)" />
-            <select [value]="p.protocol" (change)="setPort($index, 'protocol', $any($event.target).value)">
-              <option value="TCP">TCP</option>
-              <option value="UDP">UDP</option>
-              <option value="SCTP">SCTP</option>
-            </select>
-            <button class="rowx" (click)="removePort($index)" title="Remove"><mat-icon>close</mat-icon></button>
-          </div>
-        }
-        <button class="link" style="margin: 0" (click)="addPort()">+ Add port</button>
-      </div>
-    }
-  </div>
-
-  <div class="actions">
-    <button class="primary" [disabled]="!canCreate() || busy()" (click)="create()">
-      {{ busy() ? 'Creating…' : 'Create guest pool' }}
-    </button>
-    <button class="ghost" (click)="closed.emit()">Cancel</button>
-    <button class="link" (click)="advanced.emit()" title="Switch to the raw YAML editor">Edit as YAML</button>
-  </div>
-</aside>
+      }
+      <button class="link" style="margin: 0" (click)="addPort()">+ Add port</button>
+    </div>
+  }
+</app-form-shell>

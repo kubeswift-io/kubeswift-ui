@@ -1,34 +1,25 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { GatewayService } from '../gateway.service';
+import { FormShell } from '../form-shell/form-shell';
+import { ResourceForm } from '../resource-form';
 import { listNames } from '../wizard-util';
-import type { Cluster } from '../gen/kubeswift/v1/cluster_pb';
 
-/**
- * CreateSnapshotSchedule is the guided Create wizard for a SwiftSnapshotSchedule
- * — cron snapshots of a guest with keep-N retention. It covers the two
- * cluster-local backends (local memory+disk, CSI disk-only); S3/OCI object
- * backends need endpoint config, so they route through "Edit as YAML". Submits
- * via ResourceService.ApplyResource as the signed-in user.
- */
+type Obj = Record<string, unknown>;
+
+/** CreateSnapshotSchedule — a SwiftSnapshotSchedule (cron snapshots + keep-N).
+ *  local + CSI backends here; S3/OCI object backends route through the YAML toggle. */
 @Component({
   selector: 'app-create-snapshotschedule',
-  imports: [MatIconModule],
+  imports: [MatIconModule, FormShell],
   templateUrl: './create-snapshotschedule.html',
   styleUrl: '../wizard.scss',
 })
-export class CreateSnapshotSchedule {
-  private readonly gw = inject(GatewayService);
-  readonly clusters = input.required<Cluster[]>();
-  readonly initialCluster = input<string>('');
-  readonly initialNamespace = input<string>('');
-  readonly created = output<void>();
-  readonly closed = output<void>();
-  readonly advanced = output<void>();
+export class CreateSnapshotSchedule extends ResourceForm {
+  readonly kindKey = 'swiftsnapshotschedules';
+  readonly apiVersion = 'snapshot.kubeswift.io/v1alpha1';
+  readonly kindName = 'SwiftSnapshotSchedule';
+  readonly namespaced = true;
 
-  readonly cluster = signal('');
-  readonly namespace = signal('default');
-  readonly name = signal('');
   readonly guestRef = signal('');
   readonly schedule = signal('0 2 * * *');
   readonly backend = signal('local');
@@ -38,35 +29,10 @@ export class CreateSnapshotSchedule {
   readonly keepLast = signal<number>(7);
   readonly concurrency = signal('Forbid');
   readonly suspend = signal(false);
-
   readonly namespaces = signal<string[]>([]);
   readonly guests = signal<string[]>([]);
-  readonly busy = signal(false);
-  readonly error = signal<string | null>(null);
 
-  constructor() {
-    effect(() => {
-      const cs = this.clusters();
-      if (this.cluster() || cs.length === 0) return;
-      const first = this.initialCluster() || cs.find((c) => c.ready)?.name || cs[0]?.name || '';
-      if (first) {
-        this.cluster.set(first);
-        if (this.initialNamespace()) this.namespace.set(this.initialNamespace());
-        void this.loadPickers(first);
-      }
-    });
-  }
-
-  async selectCluster(c: string): Promise<void> {
-    this.cluster.set(c);
-    await this.loadPickers(c);
-  }
-  async selectNamespace(ns: string): Promise<void> {
-    this.namespace.set(ns);
-    this.guestRef.set('');
-    this.guests.set(await listNames(this.gw, this.cluster(), 'swiftguests', ns));
-  }
-  private async loadPickers(cluster: string): Promise<void> {
+  protected override async onCluster(cluster: string): Promise<void> {
     const [ns, g] = await Promise.all([
       listNames(this.gw, cluster, 'namespaces'),
       listNames(this.gw, cluster, 'swiftguests', this.namespace()),
@@ -75,25 +41,39 @@ export class CreateSnapshotSchedule {
     this.guests.set(g);
   }
 
-  canCreate(): boolean {
-    return !!(
-      this.cluster() &&
-      this.namespace() &&
-      this.name().trim() &&
-      this.guestRef() &&
-      this.schedule().trim()
-    );
+  async selectNamespace(ns: string): Promise<void> {
+    this.namespace.set(ns);
+    this.guestRef.set('');
+    this.guests.set(await listNames(this.gw, this.cluster(), 'swiftguests', ns));
   }
 
-  async create(): Promise<void> {
-    if (!this.canCreate() || this.busy()) return;
-    this.busy.set(true);
-    this.error.set(null);
+  hydrate(obj: Obj): void {
+    const spec = (obj['spec'] ?? {}) as Obj;
+    this.schedule.set(String(spec['schedule'] ?? '0 2 * * *'));
+    this.concurrency.set(String(spec['concurrencyPolicy'] ?? 'Forbid'));
+    this.suspend.set(!!spec['suspend']);
+    this.keepLast.set(Number(((spec['retention'] ?? {}) as Obj)['keepLast'] ?? 0));
+    const tspec = (((spec['template'] ?? {}) as Obj)['spec'] ?? {}) as Obj;
+    this.guestRef.set(String(((tspec['guestRef'] ?? {}) as Obj)['name'] ?? ''));
+    this.includeMemory.set(!!tspec['includeMemory']);
+    const be = (tspec['backend'] ?? {}) as Obj;
+    if (be['type'] === 'csi-volume-snapshot') {
+      this.backend.set('csi-volume-snapshot');
+      this.csiClass.set(
+        String(((be['csiVolumeSnapshot'] ?? {}) as Obj)['volumeSnapshotClassName'] ?? ''),
+      );
+    } else {
+      this.backend.set('local');
+      this.localHostPath.set(String(((be['local'] ?? {}) as Obj)['hostPath'] ?? ''));
+    }
+  }
 
-    let backendObj: Record<string, unknown>;
+  build(base: Obj): Obj {
+    const spec = (base['spec'] = (base['spec'] ?? {}) as Obj) as Obj;
+    let backendObj: Obj;
     let includeMemory: boolean;
     if (this.backend() === 'csi-volume-snapshot') {
-      const csi: Record<string, unknown> = {};
+      const csi: Obj = {};
       if (this.csiClass().trim()) csi['volumeSnapshotClassName'] = this.csiClass().trim();
       backendObj = { type: 'csi-volume-snapshot', csiVolumeSnapshot: csi };
       includeMemory = false; // CSI is disk-only by definition
@@ -106,39 +86,25 @@ export class CreateSnapshotSchedule {
       backendObj = { type: 'local', local: { hostPath: hp } };
       includeMemory = this.includeMemory();
     }
-
-    const templateSpec: Record<string, unknown> = {
-      guestRef: { name: this.guestRef() },
-      backend: backendObj,
-      includeMemory,
-    };
-    const spec: Record<string, unknown> = {
-      schedule: this.schedule().trim(),
-      concurrencyPolicy: this.concurrency(),
-      template: { spec: templateSpec },
+    spec['schedule'] = this.schedule().trim();
+    spec['concurrencyPolicy'] = this.concurrency();
+    spec['template'] = {
+      spec: { guestRef: { name: this.guestRef() }, backend: backendObj, includeMemory },
     };
     if (this.suspend()) spec['suspend'] = true;
+    else delete spec['suspend'];
     if (this.keepLast() > 0) spec['retention'] = { keepLast: Math.floor(this.keepLast()) };
+    else delete spec['retention'];
+    return base;
+  }
 
-    const obj = {
-      apiVersion: 'snapshot.kubeswift.io/v1alpha1',
-      kind: 'SwiftSnapshotSchedule',
-      metadata: { name: this.name().trim(), namespace: this.namespace() },
-      spec,
-    };
-
-    try {
-      await this.gw.resources.applyResource({
-        cluster: this.cluster(),
-        kind: 'swiftsnapshotschedules',
-        namespace: this.namespace(),
-        yaml: JSON.stringify(obj),
-      });
-      this.created.emit();
-    } catch (e) {
-      this.error.set(e instanceof Error ? e.message : String(e));
-    } finally {
-      this.busy.set(false);
-    }
+  canSave(): boolean {
+    return !!(
+      this.cluster() &&
+      this.namespace() &&
+      this.name().trim() &&
+      this.guestRef() &&
+      this.schedule().trim()
+    );
   }
 }

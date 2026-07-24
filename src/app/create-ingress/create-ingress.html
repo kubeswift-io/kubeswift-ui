@@ -1,0 +1,63 @@
+<app-form-shell
+  [title]="isEdit() ? 'Edit ingress' : 'New ingress'"
+  sub="an Ingress"
+  [clusters]="clusters()" [cluster]="cluster()" [edit]="isEdit()"
+  [view]="view()" [yaml]="yamlText()" [error]="error()" [canWrite]="canWrite()"
+  [busy]="busy()" [canSave]="canSave()" [saveLabel]="isEdit() ? 'Apply' : 'Create ingress'"
+  (clusterChange)="selectCluster($event)" (viewChange)="setView($event)" (yamlChange)="yamlText.set($event)"
+  (save)="save()" (close)="closed.emit()"
+>
+  <div class="row2">
+    <label class="field">
+      <span>Namespace</span>
+      @if (isEdit()) { <input [value]="namespace()" disabled /> } @else {
+        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
+          @for (ns of namespaces(); track ns) { <option [value]="ns">{{ ns }}</option> }
+        </select>
+      }
+    </label>
+    <label class="field">
+      <span>Name *</span>
+      <input placeholder="my-ingress" [value]="name()" (input)="name.set($any($event.target).value)" [disabled]="isEdit()" />
+    </label>
+  </div>
+
+  <label class="field">
+    <span>Ingress class</span>
+    <input placeholder="nginx" [value]="className()" (input)="className.set($any($event.target).value)" />
+  </label>
+
+  <h4>Rules</h4>
+  @for (r of rules(); track ri; let ri = $index) {
+    <div class="kvblock">
+      <div class="kvhead">
+        <input class="kvkey" placeholder="host (blank = any)" [value]="r.host" (input)="setHost(ri, $any($event.target).value)" />
+        <button class="rowx" (click)="removeRule(ri)" title="Remove rule"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="ports">
+        <div class="phead" style="grid-template-columns: 1fr 0.9fr 1fr 0.7fr 28px"><span>Path</span><span>Type</span><span>Service</span><span>Port</span><span></span></div>
+        @for (p of r.paths; track pi; let pi = $index) {
+          <div class="prow" style="grid-template-columns: 1fr 0.9fr 1fr 0.7fr 28px">
+            <input placeholder="/" [value]="p.path" (input)="setPath(ri, pi, 'path', $any($event.target).value)" />
+            <select [value]="p.pathType" (change)="setPath(ri, pi, 'pathType', $any($event.target).value)">
+              <option value="Prefix">Prefix</option>
+              <option value="Exact">Exact</option>
+              <option value="ImplementationSpecific">ImplSpecific</option>
+            </select>
+            <input placeholder="svc" [value]="p.service" (input)="setPath(ri, pi, 'service', $any($event.target).value)" />
+            <input placeholder="80" [value]="p.port" (input)="setPath(ri, pi, 'port', $any($event.target).value)" />
+            <button class="rowx" (click)="removePath(ri, pi)" title="Remove path"><mat-icon>close</mat-icon></button>
+          </div>
+        }
+        <button class="link" style="margin: 0" (click)="addPath(ri)">+ Add path</button>
+      </div>
+    </div>
+  }
+  <button class="link" style="margin: 0" (click)="addRule()">+ Add rule</button>
+
+  <h4>TLS (optional)</h4>
+  <div class="row2">
+    <label class="field"><span>Secret name</span><input placeholder="tls-secret" [value]="tlsSecret()" (input)="tlsSecret.set($any($event.target).value)" /></label>
+    <label class="field"><span>Hosts (comma-sep)</span><input placeholder="example.com" [value]="tlsHosts()" (input)="tlsHosts.set($any($event.target).value)" /></label>
+  </div>
+</app-form-shell>

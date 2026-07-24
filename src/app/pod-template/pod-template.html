@@ -1,0 +1,174 @@
+<h4>Containers</h4>
+@for (c of containers(); track ci; let ci = $index) {
+  <div class="cblock">
+    <div class="chead">
+      <span class="cnum">Container {{ ci + 1 }}</span>
+      <button class="rowx" (click)="removeContainer(ci)" title="Remove container"><mat-icon>close</mat-icon></button>
+    </div>
+    <div class="row2">
+      <label class="field"><span>Name</span><input placeholder="main" [value]="c.name" (input)="setC(ci, 'name', $any($event.target).value)" /></label>
+      <label class="field"><span>Image *</span><input placeholder="nginx:1.27" [value]="c.image" (input)="setC(ci, 'image', $any($event.target).value)" /></label>
+    </div>
+    <div class="row2">
+      <label class="field"><span>Command (override entrypoint)</span><input placeholder="/bin/sh -c" [value]="c.command" (input)="setC(ci, 'command', $any($event.target).value)" /></label>
+      <label class="field"><span>Args</span><input placeholder="-c 'echo hi'" [value]="c.args" (input)="setC(ci, 'args', $any($event.target).value)" /></label>
+    </div>
+
+    <h5>Environment</h5>
+    <div class="ports">
+      @for (e of c.env; track ei; let ei = $index) {
+        <div class="prow" style="grid-template-columns: 1fr 1.4fr 28px">
+          <input placeholder="NAME" [value]="e.name" (input)="setEnv(ci, ei, 'name', $any($event.target).value)" />
+          <input placeholder="value" [value]="e.value" (input)="setEnv(ci, ei, 'value', $any($event.target).value)" />
+          <button class="rowx" (click)="removeEnv(ci, ei)" title="Remove"><mat-icon>close</mat-icon></button>
+        </div>
+      }
+      <button class="link" style="margin: 0" (click)="addEnv(ci)">+ Add env</button>
+    </div>
+
+    <h5>Ports</h5>
+    <div class="ports">
+      @for (p of c.ports; track pi; let pi = $index) {
+        <div class="prow" style="grid-template-columns: 1fr 0.8fr 0.9fr 28px">
+          <input placeholder="name" [value]="p.name" (input)="setPort(ci, pi, 'name', $any($event.target).value)" />
+          <input type="number" placeholder="port" [value]="p.containerPort" (input)="setPort(ci, pi, 'containerPort', $any($event.target).value)" />
+          <select [value]="p.protocol" (change)="setPort(ci, pi, 'protocol', $any($event.target).value)">
+            <option value="TCP">TCP</option><option value="UDP">UDP</option><option value="SCTP">SCTP</option>
+          </select>
+          <button class="rowx" (click)="removePort(ci, pi)" title="Remove"><mat-icon>close</mat-icon></button>
+        </div>
+      }
+      <button class="link" style="margin: 0" (click)="addPort(ci)">+ Add port</button>
+    </div>
+
+    <h5>Resources</h5>
+    <div class="row2">
+      <label class="field"><span>CPU request</span><input placeholder="100m" [value]="c.cpuReq" (input)="setC(ci, 'cpuReq', $any($event.target).value)" /></label>
+      <label class="field"><span>Memory request</span><input placeholder="128Mi" [value]="c.memReq" (input)="setC(ci, 'memReq', $any($event.target).value)" /></label>
+    </div>
+    <div class="row2">
+      <label class="field"><span>CPU limit</span><input placeholder="500m" [value]="c.cpuLim" (input)="setC(ci, 'cpuLim', $any($event.target).value)" /></label>
+      <label class="field"><span>Memory limit</span><input placeholder="256Mi" [value]="c.memLim" (input)="setC(ci, 'memLim', $any($event.target).value)" /></label>
+    </div>
+
+    <h5>Volume mounts</h5>
+    <div class="ports">
+      @for (m of c.mounts; track mi; let mi = $index) {
+        <div class="prow" style="grid-template-columns: 1fr 1.3fr 0.6fr 28px">
+          <input placeholder="volume" [value]="m.name" (input)="setMount(ci, mi, 'name', $any($event.target).value)" />
+          <input placeholder="/path" [value]="m.mountPath" (input)="setMount(ci, mi, 'mountPath', $any($event.target).value)" />
+          <label class="check" style="margin: 0"><input type="checkbox" [checked]="m.readOnly" (change)="setMount(ci, mi, 'readOnly', $any($event.target).checked)" /><span>ro</span></label>
+          <button class="rowx" (click)="removeMount(ci, mi)" title="Remove"><mat-icon>close</mat-icon></button>
+        </div>
+      }
+      <button class="link" style="margin: 0" (click)="addMount(ci)">+ Add mount</button>
+    </div>
+
+    <h5>Probes</h5>
+    @for (pr of [{ k: 'liveness', v: c.liveness }, { k: 'readiness', v: c.readiness }, { k: 'startup', v: c.startup }]; track pr.k) {
+      <div class="ports">
+        <div class="prow" style="grid-template-columns: 0.7fr 0.8fr 1fr 1fr">
+          <span style="font-size: 12px; color: var(--mat-sys-on-surface-variant); align-self: center">{{ pr.k }}</span>
+          <select [value]="pr.v.type" (change)="setProbe(ci, $any(pr.k), 'type', $any($event.target).value)">
+            <option value="none">none</option><option value="httpGet">httpGet</option><option value="tcpSocket">tcp</option><option value="exec">exec</option>
+          </select>
+          @if (pr.v.type === 'httpGet') {
+            <input placeholder="/healthz" [value]="pr.v.path" (input)="setProbe(ci, $any(pr.k), 'path', $any($event.target).value)" />
+            <input placeholder="port" [value]="pr.v.port" (input)="setProbe(ci, $any(pr.k), 'port', $any($event.target).value)" />
+          } @else if (pr.v.type === 'tcpSocket') {
+            <span></span>
+            <input placeholder="port" [value]="pr.v.port" (input)="setProbe(ci, $any(pr.k), 'port', $any($event.target).value)" />
+          } @else if (pr.v.type === 'exec') {
+            <input placeholder="cat /tmp/ready" [value]="pr.v.command" (input)="setProbe(ci, $any(pr.k), 'command', $any($event.target).value)" style="grid-column: span 2" />
+          } @else { <span></span><span></span> }
+        </div>
+      </div>
+    }
+
+    <h5>Security context</h5>
+    <div class="row2">
+      <label class="field"><span>runAsUser</span><input type="number" placeholder="(default)" [value]="c.runAsUser" (input)="setC(ci, 'runAsUser', $any($event.target).value)" /></label>
+      <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 18px">
+        <label class="check" style="margin: 0"><input type="checkbox" [checked]="c.runAsNonRoot" (change)="setC(ci, 'runAsNonRoot', $any($event.target).checked)" /><span>runAsNonRoot</span></label>
+        <label class="check" style="margin: 0"><input type="checkbox" [checked]="c.readOnlyRootFs" (change)="setC(ci, 'readOnlyRootFs', $any($event.target).checked)" /><span>readOnlyRootFs</span></label>
+      </div>
+    </div>
+    <label class="check"><input type="checkbox" [checked]="c.allowPrivEsc" (change)="setC(ci, 'allowPrivEsc', $any($event.target).checked)" /><span>allowPrivilegeEscalation</span></label>
+    <label class="check"><input type="checkbox" [checked]="c.privileged" (change)="setC(ci, 'privileged', $any($event.target).checked)" /><span>privileged</span></label>
+  </div>
+}
+<button class="link" style="margin: 0 0 8px" (click)="addContainer()">+ Add container</button>
+
+<h4>Volumes</h4>
+<div class="ports">
+  @for (v of volumes(); track vi; let vi = $index) {
+    <div class="prow" style="grid-template-columns: 1fr 1fr 1.2fr 28px">
+      <input placeholder="name" [value]="v.name" (input)="setVol(vi, 'name', $any($event.target).value)" />
+      <select [value]="v.type" (change)="setVol(vi, 'type', $any($event.target).value)">
+        <option value="emptyDir">emptyDir</option><option value="configMap">configMap</option><option value="secret">secret</option>
+        <option value="persistentVolumeClaim">pvc</option><option value="hostPath">hostPath</option>
+      </select>
+      @if (v.type !== 'emptyDir') {
+        <input placeholder="source" [value]="v.source" (input)="setVol(vi, 'source', $any($event.target).value)" />
+      } @else { <span></span> }
+      <button class="rowx" (click)="removeVolume(vi)" title="Remove"><mat-icon>close</mat-icon></button>
+    </div>
+  }
+  <button class="link" style="margin: 0" (click)="addVolume()">+ Add volume</button>
+</div>
+
+<h4>Scheduling &amp; identity</h4>
+<div class="row2">
+  <label class="field"><span>Service account</span><input placeholder="(default)" [value]="serviceAccountName()" (input)="serviceAccountName.set($any($event.target).value)" /></label>
+  <label class="field"><span>Restart policy</span>
+    <select [value]="restartPolicy()" (change)="restartPolicy.set($any($event.target).value)">
+      <option value="">(default)</option><option value="Always">Always</option><option value="OnFailure">OnFailure</option><option value="Never">Never</option>
+    </select>
+  </label>
+</div>
+
+<h5 style="margin: 8px 0 6px; font-size: 12px; color: var(--mat-sys-on-surface-variant)">Node selector</h5>
+<div class="ports">
+  @for (n of nodeSelector(); track ni; let ni = $index) {
+    <div class="prow" style="grid-template-columns: 1fr 1fr 28px">
+      <input placeholder="key" [value]="n.key" (input)="setNsel(ni, 'key', $any($event.target).value)" />
+      <input placeholder="value" [value]="n.value" (input)="setNsel(ni, 'value', $any($event.target).value)" />
+      <button class="rowx" (click)="removeNsel(ni)" title="Remove"><mat-icon>close</mat-icon></button>
+    </div>
+  }
+  <button class="link" style="margin: 0" (click)="addNsel()">+ Add node selector</button>
+</div>
+
+<h5 style="margin: 8px 0 6px; font-size: 12px; color: var(--mat-sys-on-surface-variant)">Tolerations</h5>
+<div class="ports">
+  @for (t of tolerations(); track ti; let ti = $index) {
+    <div class="prow" style="grid-template-columns: 1fr 0.8fr 1fr 0.9fr 28px">
+      <input placeholder="key" [value]="t.key" (input)="setTol(ti, 'key', $any($event.target).value)" />
+      <select [value]="t.operator" (change)="setTol(ti, 'operator', $any($event.target).value)"><option value="Equal">Equal</option><option value="Exists">Exists</option></select>
+      <input placeholder="value" [value]="t.value" (input)="setTol(ti, 'value', $any($event.target).value)" />
+      <select [value]="t.effect" (change)="setTol(ti, 'effect', $any($event.target).value)">
+        <option value="">(any)</option><option value="NoSchedule">NoSchedule</option><option value="PreferNoSchedule">PreferNoSchedule</option><option value="NoExecute">NoExecute</option>
+      </select>
+      <button class="rowx" (click)="removeTol(ti)" title="Remove"><mat-icon>close</mat-icon></button>
+    </div>
+  }
+  <button class="link" style="margin: 0" (click)="addTol()">+ Add toleration</button>
+</div>
+
+<h5 style="margin: 8px 0 6px; font-size: 12px; color: var(--mat-sys-on-surface-variant)">Image pull secrets</h5>
+<div class="ports">
+  @for (s of imagePullSecrets(); track si; let si = $index) {
+    <div class="prow" style="grid-template-columns: 1fr 28px">
+      <input placeholder="regcreds" [value]="s" (input)="setIps(si, $any($event.target).value)" />
+      <button class="rowx" (click)="removeIps(si)" title="Remove"><mat-icon>close</mat-icon></button>
+    </div>
+  }
+  <button class="link" style="margin: 0" (click)="addIps()">+ Add pull secret</button>
+</div>
+
+<h5 style="margin: 8px 0 6px; font-size: 12px; color: var(--mat-sys-on-surface-variant)">Pod security context</h5>
+<div class="row2">
+  <label class="field"><span>runAsUser</span><input type="number" placeholder="(default)" [value]="podRunAsUser()" (input)="podRunAsUser.set($any($event.target).value)" /></label>
+  <label class="field"><span>fsGroup</span><input type="number" placeholder="(default)" [value]="fsGroup()" (input)="fsGroup.set($any($event.target).value)" /></label>
+</div>
+<label class="check"><input type="checkbox" [checked]="podRunAsNonRoot()" (change)="podRunAsNonRoot.set($any($event.target).checked)" /><span>runAsNonRoot</span></label>

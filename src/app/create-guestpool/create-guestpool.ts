@@ -1,9 +1,10 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { GatewayService } from '../gateway.service';
+import { FormShell } from '../form-shell/form-shell';
+import { ResourceForm } from '../resource-form';
 import { listNames } from '../wizard-util';
-import type { Cluster } from '../gen/kubeswift/v1/cluster_pb';
 
+type Obj = Record<string, unknown>;
 type Boot = 'image' | 'kernel';
 interface Port {
   name: string;
@@ -12,34 +13,22 @@ interface Port {
   protocol: string;
 }
 
-/**
- * CreateGuestPool is the guided Create wizard for a SwiftGuestPool — N replicas
- * of a guest template with rolling updates, node spread, and an optional selector
- * Service. The template is a SwiftGuest spec (boot source, guest class, seed,
- * GPU); pool-level service ports are injected into each replica by the pool
- * controller. Submits via ResourceService.ApplyResource as the signed-in user.
- */
+/** CreateGuestPool — a SwiftGuestPool (N replicas of a guest template + rolling
+ *  updates, node spread, optional selector Service). */
 @Component({
   selector: 'app-create-guestpool',
-  imports: [MatIconModule],
+  imports: [MatIconModule, FormShell],
   templateUrl: './create-guestpool.html',
   styleUrl: '../wizard.scss',
 })
-export class CreateGuestPool {
-  private readonly gw = inject(GatewayService);
-  readonly clusters = input.required<Cluster[]>();
-  readonly initialCluster = input<string>('');
-  readonly initialNamespace = input<string>('');
-  readonly created = output<void>();
-  readonly closed = output<void>();
-  readonly advanced = output<void>();
+export class CreateGuestPool extends ResourceForm {
+  readonly kindKey = 'swiftguestpools';
+  readonly apiVersion = 'swift.kubeswift.io/v1alpha1';
+  readonly kindName = 'SwiftGuestPool';
+  readonly namespaced = true;
 
-  readonly cluster = signal('');
-  readonly namespace = signal('default');
-  readonly name = signal('');
   readonly replicas = signal<number>(2);
   readonly spreadPolicy = signal('Pack');
-  // Guest template.
   readonly boot = signal<Boot>('image');
   readonly imageRef = signal('');
   readonly kernelRef = signal('');
@@ -48,13 +37,11 @@ export class CreateGuestPool {
   readonly gpuRef = signal('');
   readonly runPolicy = signal('Running');
   readonly osType = signal('linux');
-  // Optional selector Service.
   readonly serviceEnabled = signal(false);
   readonly serviceType = signal('ClusterIP');
   readonly headless = signal(false);
   readonly ports = signal<Port[]>([{ name: 'http', port: 80, targetPort: 0, protocol: 'TCP' }]);
 
-  // Pickers.
   readonly namespaces = signal<string[]>([]);
   readonly images = signal<string[]>([]);
   readonly kernels = signal<string[]>([]);
@@ -62,36 +49,20 @@ export class CreateGuestPool {
   readonly seeds = signal<string[]>([]);
   readonly gpuProfiles = signal<string[]>([]);
 
-  readonly busy = signal(false);
-  readonly error = signal<string | null>(null);
-
-  constructor() {
-    effect(() => {
-      const cs = this.clusters();
-      if (this.cluster() || cs.length === 0) return;
-      const first = this.initialCluster() || cs.find((c) => c.ready)?.name || cs[0]?.name || '';
-      if (first) {
-        this.cluster.set(first);
-        if (this.initialNamespace()) this.namespace.set(this.initialNamespace());
-        void this.loadPickers(first);
-      }
-    });
+  protected override async onCluster(cluster: string): Promise<void> {
+    // guestclasses are cluster-scoped; the rest are namespace-scoped.
+    const [gc, ns] = await Promise.all([
+      listNames(this.gw, cluster, 'swiftguestclasses'),
+      listNames(this.gw, cluster, 'namespaces'),
+    ]);
+    this.guestClasses.set(gc);
+    this.namespaces.set(ns);
+    await this.loadNamespaced(cluster, this.namespace());
   }
 
-  async selectCluster(c: string): Promise<void> {
-    this.cluster.set(c);
-    await this.loadPickers(c);
-  }
   async selectNamespace(ns: string): Promise<void> {
     this.namespace.set(ns);
     await this.loadNamespaced(this.cluster(), ns);
-  }
-  private async loadPickers(cluster: string): Promise<void> {
-    // guestclasses are cluster-scoped; the rest are namespace-scoped.
-    const gc = listNames(this.gw, cluster, 'swiftguestclasses');
-    const ns = listNames(this.gw, cluster, 'namespaces');
-    await Promise.all([gc.then((v) => this.guestClasses.set(v)), ns.then((v) => this.namespaces.set(v))]);
-    await this.loadNamespaced(cluster, this.namespace());
   }
   private async loadNamespaced(cluster: string, ns: string): Promise<void> {
     const [img, krn, seed, gpu] = await Promise.all([
@@ -106,6 +77,84 @@ export class CreateGuestPool {
     this.gpuProfiles.set(gpu);
   }
 
+  hydrate(obj: Obj): void {
+    const spec = (obj['spec'] ?? {}) as Obj;
+    this.replicas.set(Number(spec['replicas'] ?? 2));
+    this.spreadPolicy.set(String(spec['spreadPolicy'] ?? 'Pack'));
+    const g = (((spec['template'] ?? {}) as Obj)['spec'] ?? {}) as Obj;
+    this.guestClass.set(String(((g['guestClassRef'] ?? {}) as Obj)['name'] ?? ''));
+    this.runPolicy.set(String(g['runPolicy'] ?? 'Running'));
+    this.osType.set(String(g['osType'] ?? 'linux'));
+    if (g['kernelRef']) {
+      this.boot.set('kernel');
+      this.kernelRef.set(String((g['kernelRef'] as Obj)['name'] ?? ''));
+    } else {
+      this.boot.set('image');
+      this.imageRef.set(String(((g['imageRef'] ?? {}) as Obj)['name'] ?? ''));
+      this.gpuRef.set(String(((g['gpuProfileRef'] ?? {}) as Obj)['name'] ?? ''));
+    }
+    this.seedRef.set(String(((g['seedProfileRef'] ?? {}) as Obj)['name'] ?? ''));
+    const svc = spec['service'] as Obj | undefined;
+    if (svc) {
+      this.serviceEnabled.set(true);
+      this.serviceType.set(String(svc['type'] ?? 'ClusterIP'));
+      this.headless.set(!!svc['headless']);
+      const ports = ((svc['ports'] ?? []) as Obj[]).map((p) => ({
+        name: String(p['name'] ?? ''),
+        port: Number(p['port'] ?? 0),
+        targetPort: Number(p['targetPort'] ?? 0),
+        protocol: String(p['protocol'] ?? 'TCP'),
+      }));
+      if (ports.length) this.ports.set(ports);
+    } else {
+      this.serviceEnabled.set(false);
+    }
+  }
+
+  build(base: Obj): Obj {
+    const spec = (base['spec'] = (base['spec'] ?? {}) as Obj) as Obj;
+    const g: Obj = { guestClassRef: { name: this.guestClass() }, runPolicy: this.runPolicy() };
+    if (this.boot() === 'image') {
+      g['imageRef'] = { name: this.imageRef() };
+      if (this.gpuRef()) g['gpuProfileRef'] = { name: this.gpuRef() };
+      if (this.osType() !== 'linux') g['osType'] = this.osType();
+    } else {
+      g['kernelRef'] = { name: this.kernelRef() };
+    }
+    if (this.seedRef()) g['seedProfileRef'] = { name: this.seedRef() };
+
+    spec['replicas'] = Math.floor(this.replicas());
+    spec['spreadPolicy'] = this.spreadPolicy();
+    spec['template'] = { spec: g };
+    if (this.serviceEnabled()) {
+      const ports = this.ports()
+        .filter((p) => p.port > 0)
+        .map((p) => {
+          const o: Obj = { port: p.port };
+          if (p.name.trim()) o['name'] = p.name.trim();
+          if (p.targetPort > 0) o['targetPort'] = p.targetPort;
+          if (p.protocol && p.protocol !== 'TCP') o['protocol'] = p.protocol;
+          return o;
+        });
+      const svc: Obj = { type: this.serviceType(), ports };
+      if (this.headless()) svc['headless'] = true;
+      spec['service'] = svc;
+    } else {
+      delete spec['service'];
+    }
+    return base;
+  }
+
+  canSave(): boolean {
+    if (!this.cluster() || !this.namespace() || !this.name().trim() || !this.guestClass())
+      return false;
+    if (this.replicas() < 0) return false;
+    if (this.boot() === 'image' && !this.imageRef()) return false;
+    if (this.boot() === 'kernel' && !this.kernelRef()) return false;
+    if (this.serviceEnabled() && !this.ports().some((p) => p.port > 0)) return false;
+    return true;
+  }
+
   addPort(): void {
     this.ports.update((ps) => [...ps, { name: '', port: 0, targetPort: 0, protocol: 'TCP' }]);
   }
@@ -118,76 +167,5 @@ export class CreateGuestPool {
         j === i ? { ...p, [key]: key === 'name' || key === 'protocol' ? val : +val || 0 } : p,
       ),
     );
-  }
-
-  canCreate(): boolean {
-    if (!this.cluster() || !this.namespace() || !this.name().trim() || !this.guestClass()) {
-      return false;
-    }
-    if (this.replicas() < 0) return false;
-    if (this.boot() === 'image' && !this.imageRef()) return false;
-    if (this.boot() === 'kernel' && !this.kernelRef()) return false;
-    if (this.serviceEnabled() && !this.ports().some((p) => p.port > 0)) return false;
-    return true;
-  }
-
-  async create(): Promise<void> {
-    if (!this.canCreate() || this.busy()) return;
-    this.busy.set(true);
-    this.error.set(null);
-
-    const gspec: Record<string, unknown> = {
-      guestClassRef: { name: this.guestClass() },
-      runPolicy: this.runPolicy(),
-    };
-    if (this.boot() === 'image') {
-      gspec['imageRef'] = { name: this.imageRef() };
-      if (this.gpuRef()) gspec['gpuProfileRef'] = { name: this.gpuRef() };
-    } else {
-      gspec['kernelRef'] = { name: this.kernelRef() };
-    }
-    if (this.seedRef()) gspec['seedProfileRef'] = { name: this.seedRef() };
-    if (this.osType() !== 'linux') gspec['osType'] = this.osType();
-
-    const spec: Record<string, unknown> = {
-      replicas: Math.floor(this.replicas()),
-      spreadPolicy: this.spreadPolicy(),
-      template: { spec: gspec },
-    };
-    if (this.serviceEnabled()) {
-      const ports = this.ports()
-        .filter((p) => p.port > 0)
-        .map((p) => {
-          const o: Record<string, unknown> = { port: p.port };
-          if (p.name.trim()) o['name'] = p.name.trim();
-          if (p.targetPort > 0) o['targetPort'] = p.targetPort;
-          if (p.protocol && p.protocol !== 'TCP') o['protocol'] = p.protocol;
-          return o;
-        });
-      const svc: Record<string, unknown> = { type: this.serviceType(), ports };
-      if (this.headless()) svc['headless'] = true;
-      spec['service'] = svc;
-    }
-
-    const obj = {
-      apiVersion: 'swift.kubeswift.io/v1alpha1',
-      kind: 'SwiftGuestPool',
-      metadata: { name: this.name().trim(), namespace: this.namespace() },
-      spec,
-    };
-
-    try {
-      await this.gw.resources.applyResource({
-        cluster: this.cluster(),
-        kind: 'swiftguestpools',
-        namespace: this.namespace(),
-        yaml: JSON.stringify(obj),
-      });
-      this.created.emit();
-    } catch (e) {
-      this.error.set(e instanceof Error ? e.message : String(e));
-    } finally {
-      this.busy.set(false);
-    }
   }
 }
