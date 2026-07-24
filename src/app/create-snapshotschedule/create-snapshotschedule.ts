@@ -33,6 +33,7 @@ export class CreateSnapshotSchedule {
   readonly schedule = signal('0 2 * * *');
   readonly backend = signal('local');
   readonly includeMemory = signal(true);
+  readonly localHostPath = signal(''); // '' -> auto-derived under the required prefix
   readonly csiClass = signal('');
   readonly keepLast = signal<number>(7);
   readonly concurrency = signal('Forbid');
@@ -97,7 +98,12 @@ export class CreateSnapshotSchedule {
       backendObj = { type: 'csi-volume-snapshot', csiVolumeSnapshot: csi };
       includeMemory = false; // CSI is disk-only by definition
     } else {
-      backendObj = { type: 'local' };
+      // The webhook requires backend.local.hostPath under a fixed prefix; derive
+      // a per-schedule default when the operator leaves the field blank.
+      const hp =
+        this.localHostPath().trim() ||
+        `/var/lib/kubeswift/snapshots/${this.namespace()}-${this.name().trim()}`;
+      backendObj = { type: 'local', local: { hostPath: hp } };
       includeMemory = this.includeMemory();
     }
 

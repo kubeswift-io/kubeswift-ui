@@ -59,6 +59,11 @@
         <input type="checkbox" [checked]="includeMemory()" (change)="includeMemory.set($any($event.target).checked)" />
         <span>Include memory (Tier B live snapshot)</span>
       </label>
+      <label class="field">
+        <span>Host path (optional — auto-derived if blank)</span>
+        <input placeholder="/var/lib/kubeswift/snapshots/&lt;ns&gt;-&lt;name&gt;" [value]="localHostPath()" (input)="localHostPath.set($any($event.target).value)" />
+      </label>
+      <p class="hint">Node-local; must be under <code>/var/lib/kubeswift/snapshots/</code>.</p>
     } @else {
       <label class="field">
         <span>VolumeSnapshotClass (optional)</span>
