@@ -50,7 +50,7 @@
           </select>
         </label>
       }
-      @if (selectedKind()) {
+      @if (selectedKind() && !isReadOnlyKind()) {
         <button class="newbtn" (click)="openCreate()" title="Create a new resource">
           <mat-icon>add</mat-icon> New
         </button>

@@ -40,6 +40,10 @@ const DRAWER_KINDS = new Set([
 
 // Kinds with a bespoke guided Create wizard (an @switch in the template maps
 // each key to its form). Everything else falls back to the generic YAML editor.
+// Kinds the console browses read-only: discovery/controller-owned or
+// status-only (SwiftGPUNode has no spec). No "New" button for these.
+const READONLY_KINDS = new Set(['nodes', 'namespaces', 'swiftgpunodes']);
+
 const GUIDED_KINDS = new Set([
   'swiftsandboxes',
   'swiftguestclasses',
@@ -257,7 +261,12 @@ export class Explorer implements OnInit {
 
   // --- CRUD (RBAC-gated; the gateway impersonates the user, so denials surface
   // in the action banner — never a silent no-op). ---
+  // The "New" button is hidden for read-only kinds (nothing to author).
+  isReadOnlyKind(): boolean {
+    return READONLY_KINDS.has(this.selectedKind()?.key ?? '');
+  }
   openCreate(): void {
+    if (this.isReadOnlyKind()) return;
     this.actionError.set(null);
     // Authorable KubeSwift kinds get a guided wizard; everything else (and a
     // wizard's "Edit as YAML" escape hatch) uses the generic YAML editor.
