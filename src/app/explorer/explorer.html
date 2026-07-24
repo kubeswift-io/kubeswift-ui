@@ -254,5 +254,35 @@
         (advanced)="openAdvancedCreate()"
       />
     }
+    @case ('swiftgpuprofiles') {
+      <app-create-gpuprofile
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('swiftsnapshotschedules') {
+      <app-create-snapshotschedule
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('swiftsandboxpools') {
+      <app-create-sandboxpool
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
   }
 </div>

@@ -18,6 +18,9 @@ import { CreateGuestClass } from '../create-guestclass/create-guestclass';
 import { CreateImage } from '../create-image/create-image';
 import { CreateSeedProfile } from '../create-seedprofile/create-seedprofile';
 import { CreateKernel } from '../create-kernel/create-kernel';
+import { CreateGPUProfile } from '../create-gpuprofile/create-gpuprofile';
+import { CreateSnapshotSchedule } from '../create-snapshotschedule/create-snapshotschedule';
+import { CreateSandboxPool } from '../create-sandboxpool/create-sandboxpool';
 import { YamlEditor } from '../yaml-editor/yaml-editor';
 
 // Kinds that open a resource-aware detail drawer on row-click (instead of the
@@ -42,6 +45,9 @@ const GUIDED_KINDS = new Set([
   'swiftimages',
   'swiftseedprofiles',
   'swiftkernels',
+  'swiftgpuprofiles',
+  'swiftsnapshotschedules',
+  'swiftsandboxpools',
 ]);
 
 interface KindGroup {
@@ -74,6 +80,9 @@ interface KindGroup {
     CreateImage,
     CreateSeedProfile,
     CreateKernel,
+    CreateGPUProfile,
+    CreateSnapshotSchedule,
+    CreateSandboxPool,
     YamlEditor,
   ],
   templateUrl: './explorer.html',

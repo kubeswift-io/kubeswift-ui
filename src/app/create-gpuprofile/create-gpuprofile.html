@@ -1,0 +1,108 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <div class="title">
+      <span class="name">New GPU profile</span>
+      <span class="sub">a SwiftGPUProfile passthrough request</span>
+    </div>
+    <select class="cluster" [value]="cluster()" (change)="selectCluster($any($event.target).value)" title="Target cluster">
+      @for (c of clusters(); track c.name) {
+        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
+      }
+    </select>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
+  }
+
+  <div class="body">
+    <div class="row2">
+      <label class="field">
+        <span>Namespace</span>
+        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
+          @for (ns of namespaces(); track ns) {
+            <option [value]="ns">{{ ns }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>Name *</span>
+        <input placeholder="gtx1080-1" [value]="name()" (input)="name.set($any($event.target).value)" />
+      </label>
+    </div>
+
+    <div class="row2">
+      <label class="field">
+        <span>Count</span>
+        <select [value]="count()" (change)="count.set(+$any($event.target).value)">
+          <option [value]="1">1</option>
+          <option [value]="2">2</option>
+          <option [value]="4">4</option>
+          <option [value]="8">8</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Model filter (optional)</span>
+        <input placeholder="GTX 1080 / H200-SXM" [value]="model()" (input)="model.set($any($event.target).value)" />
+      </label>
+    </div>
+
+    <h4>Tier</h4>
+    <div class="seg">
+      <button [class.on]="tier() === 'pcie'" (click)="selectTier('pcie')">pcie</button>
+      <button [class.on]="tier() === 'hgx-shared'" (click)="selectTier('hgx-shared')">hgx-shared</button>
+      <button [class.on]="tier() === 'hgx-full'" (click)="selectTier('hgx-full')">hgx-full</button>
+    </div>
+    @if (tier() === 'pcie') {
+      <p class="hint">Cloud Hypervisor, flat PCI topology. Tier-1 discrete GPUs (validated: GTX 1080).</p>
+    } @else if (tier() === 'hgx-shared') {
+      <p class="hint">QEMU, pcie-root-port per GPU, host Fabric Manager. HGX SXM — hardware-gated.</p>
+    } @else {
+      <p class="hint">Full NVSwitch passthrough. Not yet wired — rejected at guest allocation (UnsupportedTier).</p>
+    }
+
+    <label class="field">
+      <span>Partition mode</span>
+      <select [value]="partitionMode()" (change)="partitionMode.set($any($event.target).value)">
+        <option value="isolated">isolated (no NVLink)</option>
+        <option value="shared">shared (host FM partition)</option>
+        <option value="full">full (FM in guest)</option>
+      </select>
+    </label>
+
+    <h4>Advanced</h4>
+    <div class="row2">
+      <label class="field">
+        <span>Hugepages</span>
+        <select [value]="hugepages()" (change)="hugepages.set($any($event.target).value)">
+          <option value="">none</option>
+          <option value="1Gi">1Gi (recommended)</option>
+          <option value="2Mi">2Mi</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>GPUDirect clique (P2P, CH)</span>
+        <input type="number" min="0" [value]="gpuDirectClique()" (input)="gpuDirectClique.set(+$any($event.target).value || 0)" />
+      </label>
+    </div>
+    <label class="check">
+      <input type="checkbox" [checked]="vcpuPinning()" (change)="vcpuPinning.set($any($event.target).checked)" />
+      <span>1:1 vCPU pinning</span>
+    </label>
+    <label class="check">
+      <input type="checkbox" [checked]="noMmap()" (change)="noMmap.set($any($event.target).checked)" />
+      <span>Disable BAR mmap (large-BAR GPUs, e.g. B200)</span>
+    </label>
+    <p class="hint">NUMA topology and Fabric Manager version pinning: use “Edit as YAML”.</p>
+  </div>
+
+  <div class="actions">
+    <button class="primary" [disabled]="!canCreate() || busy()" (click)="create()">
+      {{ busy() ? 'Creating…' : 'Create GPU profile' }}
+    </button>
+    <button class="ghost" (click)="closed.emit()">Cancel</button>
+    <button class="link" (click)="advanced.emit()" title="Switch to the raw YAML editor">Edit as YAML</button>
+  </div>
+</aside>

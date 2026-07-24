@@ -9,10 +9,11 @@ export async function listNames(
   gw: GatewayService,
   cluster: string,
   kind: string,
+  namespace = '',
 ): Promise<string[]> {
   if (!cluster) return [];
   try {
-    const r = await gw.resources.listResources({ cluster, kind });
+    const r = await gw.resources.listResources({ cluster, kind, namespace });
     return r.resources
       .map((x) => x.ref?.name ?? '')
       .filter(Boolean)
