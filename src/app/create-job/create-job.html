@@ -1,0 +1,24 @@
+<app-form-shell
+  [title]="isEdit() ? 'Edit job' : 'New job'" sub="a batch/v1 Job"
+  [clusters]="clusters()" [cluster]="cluster()" [edit]="isEdit()"
+  [view]="view()" [yaml]="yamlText()" [error]="error()" [canWrite]="canWrite()"
+  [busy]="busy()" [canSave]="canSave()" [saveLabel]="isEdit() ? 'Apply' : 'Create job'"
+  (clusterChange)="selectCluster($event)" (viewChange)="setView($event)" (yamlChange)="yamlText.set($event)"
+  (save)="save()" (close)="closed.emit()"
+>
+  <div class="row2">
+    <label class="field"><span>Namespace</span>
+      @if (isEdit()) { <input [value]="namespace()" disabled /> } @else {
+        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">@for (ns of namespaces(); track ns) { <option [value]="ns">{{ ns }}</option> }</select>
+      }
+    </label>
+    <label class="field"><span>Name *</span><input placeholder="my-job" [value]="name()" (input)="name.set($any($event.target).value)" [disabled]="isEdit()" /></label>
+  </div>
+  <div class="row2">
+    <label class="field"><span>Completions</span><input type="number" placeholder="(1)" [value]="completions()" (input)="completions.set($any($event.target).value)" /></label>
+    <label class="field"><span>Parallelism</span><input type="number" placeholder="(1)" [value]="parallelism()" (input)="parallelism.set($any($event.target).value)" /></label>
+  </div>
+  <label class="field"><span>Backoff limit</span><input type="number" placeholder="(6)" [value]="backoffLimit()" (input)="backoffLimit.set($any($event.target).value)" /></label>
+  <p class="hint">Pod restart policy defaults to Never (set it in the template for OnFailure).</p>
+  <app-pod-template [value]="podSpecInput()" />
+</app-form-shell>

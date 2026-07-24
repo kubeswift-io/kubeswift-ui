@@ -400,5 +400,71 @@
         (closed)="closeGuidedCreate()"
       />
     }
+    @case ('deployments') {
+      <app-create-deployment
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('statefulsets') {
+      <app-create-statefulset
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('daemonsets') {
+      <app-create-daemonset
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('replicasets') {
+      <app-create-replicaset
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('jobs') {
+      <app-create-job
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('cronjobs') {
+      <app-create-cronjob
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
   }
 </div>

@@ -31,6 +31,12 @@ import { CreateRole } from '../create-role/create-role';
 import { CreateClusterRole } from '../create-clusterrole/create-clusterrole';
 import { CreateRoleBinding } from '../create-rolebinding/create-rolebinding';
 import { CreateClusterRoleBinding } from '../create-clusterrolebinding/create-clusterrolebinding';
+import { CreateDeployment } from '../create-deployment/create-deployment';
+import { CreateStatefulSet } from '../create-statefulset/create-statefulset';
+import { CreateDaemonSet } from '../create-daemonset/create-daemonset';
+import { CreateReplicaSet } from '../create-replicaset/create-replicaset';
+import { CreateJob } from '../create-job/create-job';
+import { CreateCronJob } from '../create-cronjob/create-cronjob';
 import { YamlEditor } from '../yaml-editor/yaml-editor';
 
 // Kinds that open a resource-aware detail drawer on row-click (instead of the
@@ -65,6 +71,12 @@ const EDITABLE_FORM_KINDS = new Set([
   'clusterroles',
   'rolebindings',
   'clusterrolebindings',
+  'deployments',
+  'statefulsets',
+  'daemonsets',
+  'replicasets',
+  'jobs',
+  'cronjobs',
 ]);
 
 const GUIDED_KINDS = new Set([
@@ -86,6 +98,12 @@ const GUIDED_KINDS = new Set([
   'clusterroles',
   'rolebindings',
   'clusterrolebindings',
+  'deployments',
+  'statefulsets',
+  'daemonsets',
+  'replicasets',
+  'jobs',
+  'cronjobs',
 ]);
 
 interface KindGroup {
@@ -131,6 +149,12 @@ interface KindGroup {
     CreateClusterRole,
     CreateRoleBinding,
     CreateClusterRoleBinding,
+    CreateDeployment,
+    CreateStatefulSet,
+    CreateDaemonSet,
+    CreateReplicaSet,
+    CreateJob,
+    CreateCronJob,
     YamlEditor,
   ],
   templateUrl: './explorer.html',

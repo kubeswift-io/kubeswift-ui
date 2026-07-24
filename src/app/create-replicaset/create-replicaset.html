@@ -1,0 +1,19 @@
+<app-form-shell
+  [title]="isEdit() ? 'Edit replica set' : 'New replica set'" sub="an apps/v1 ReplicaSet"
+  [clusters]="clusters()" [cluster]="cluster()" [edit]="isEdit()"
+  [view]="view()" [yaml]="yamlText()" [error]="error()" [canWrite]="canWrite()"
+  [busy]="busy()" [canSave]="canSave()" [saveLabel]="isEdit() ? 'Apply' : 'Create replica set'"
+  (clusterChange)="selectCluster($event)" (viewChange)="setView($event)" (yamlChange)="yamlText.set($event)"
+  (save)="save()" (close)="closed.emit()"
+>
+  <div class="row2">
+    <label class="field"><span>Namespace</span>
+      @if (isEdit()) { <input [value]="namespace()" disabled /> } @else {
+        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">@for (ns of namespaces(); track ns) { <option [value]="ns">{{ ns }}</option> }</select>
+      }
+    </label>
+    <label class="field"><span>Name *</span><input placeholder="my-rs" [value]="name()" (input)="name.set($any($event.target).value)" [disabled]="isEdit()" /></label>
+  </div>
+  <label class="field"><span>Replicas</span><input type="number" min="0" [value]="replicas()" (input)="replicas.set(+$any($event.target).value || 0)" /></label>
+  <app-pod-template [value]="podSpecInput()" />
+</app-form-shell>
