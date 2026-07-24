@@ -1,0 +1,56 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <div class="title">
+      <span class="name">New config map</span>
+      <span class="sub">create a ConfigMap</span>
+    </div>
+    <select class="cluster" [value]="cluster()" (change)="selectCluster($any($event.target).value)" title="Target cluster">
+      @for (c of clusters(); track c.name) {
+        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
+      }
+    </select>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
+  }
+
+  <div class="body">
+    <div class="row2">
+      <label class="field">
+        <span>Namespace</span>
+        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
+          @for (ns of namespaces(); track ns) {
+            <option [value]="ns">{{ ns }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>Name *</span>
+        <input placeholder="my-config" [value]="name()" (input)="name.set($any($event.target).value)" />
+      </label>
+    </div>
+
+    <h4>Data</h4>
+    @for (e of entries(); track $index) {
+      <div class="kvblock">
+        <div class="kvhead">
+          <input class="kvkey" placeholder="key (e.g. app.conf)" [value]="e.key" (input)="setEntry($index, 'key', $any($event.target).value)" />
+          <button class="rowx" (click)="removeEntry($index)" title="Remove"><mat-icon>close</mat-icon></button>
+        </div>
+        <textarea rows="3" placeholder="value" [value]="e.value" (input)="setEntry($index, 'value', $any($event.target).value)"></textarea>
+      </div>
+    }
+    <button class="link" style="margin: 0" (click)="addEntry()">+ Add entry</button>
+  </div>
+
+  <div class="actions">
+    <button class="primary" [disabled]="!canCreate() || busy()" (click)="create()">
+      {{ busy() ? 'Creating…' : 'Create config map' }}
+    </button>
+    <button class="ghost" (click)="closed.emit()">Cancel</button>
+    <button class="link" (click)="advanced.emit()" title="Switch to the raw YAML editor">Edit as YAML</button>
+  </div>
+</aside>

@@ -281,3 +281,19 @@ textarea {
 .actions .link {
   margin-left: auto;
 }
+
+.kvblock {
+  margin-bottom: 12px;
+  .kvhead {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .kvkey {
+    flex: 1;
+  }
+  textarea {
+    width: 100%;
+  }
+}

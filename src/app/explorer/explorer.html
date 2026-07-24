@@ -301,5 +301,35 @@
         (advanced)="openAdvancedCreate()"
       />
     }
+    @case ('secrets') {
+      <app-create-secret
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('configmaps') {
+      <app-create-configmap
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('services') {
+      <app-create-service
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
   }
 </div>

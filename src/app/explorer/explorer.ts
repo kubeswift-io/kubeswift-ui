@@ -22,6 +22,9 @@ import { CreateGPUProfile } from '../create-gpuprofile/create-gpuprofile';
 import { CreateSnapshotSchedule } from '../create-snapshotschedule/create-snapshotschedule';
 import { CreateSandboxPool } from '../create-sandboxpool/create-sandboxpool';
 import { CreateGuestPool } from '../create-guestpool/create-guestpool';
+import { CreateSecret } from '../create-secret/create-secret';
+import { CreateConfigMap } from '../create-configmap/create-configmap';
+import { CreateService } from '../create-service/create-service';
 import { YamlEditor } from '../yaml-editor/yaml-editor';
 
 // Kinds that open a resource-aware detail drawer on row-click (instead of the
@@ -54,6 +57,9 @@ const GUIDED_KINDS = new Set([
   'swiftsnapshotschedules',
   'swiftsandboxpools',
   'swiftguestpools',
+  'secrets',
+  'configmaps',
+  'services',
 ]);
 
 interface KindGroup {
@@ -90,6 +96,9 @@ interface KindGroup {
     CreateSnapshotSchedule,
     CreateSandboxPool,
     CreateGuestPool,
+    CreateSecret,
+    CreateConfigMap,
+    CreateService,
     YamlEditor,
   ],
   templateUrl: './explorer.html',
@@ -129,6 +138,7 @@ export class Explorer implements OnInit {
     'Networking',
     'Storage',
     'Config',
+    'Access',
     'KubeSwift',
   ];
 
