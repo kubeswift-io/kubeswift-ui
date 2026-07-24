@@ -1,9 +1,10 @@
 name: Release
 
-# Build (and, off a branch/tag, push) the kubeswift-ui container image to GHCR.
+# Build (and, off a branch/tag, push) the kubeswift-ui container image to GHCR,
+# and on a tag also publish the GitHub Release.
 # Mirrors the kubeswift repo's release-dev / release-stable image build:
 #   - push to main  -> ghcr.io/kubeswift-io/kubeswift-ui:sha-<short> + :latest
-#   - push tag vX.Y.Z -> ghcr.io/kubeswift-io/kubeswift-ui:vX.Y.Z
+#   - push tag vX.Y.Z -> ghcr.io/kubeswift-io/kubeswift-ui:vX.Y.Z + a GitHub Release
 #   - pull_request  -> build only (no push), so a broken Dockerfile fails the PR
 on:
   push:
@@ -23,6 +24,8 @@ jobs:
   build-and-push:
     name: Build and push image
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
     steps:
       - uses: actions/checkout@v6
 
@@ -74,3 +77,46 @@ jobs:
             GIT_COMMIT=${{ steps.meta.outputs.git_commit }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # Tag pushes also publish the GitHub Release. The image is built first so a
+  # release never points at a tag that failed to publish. "What's Changed" is
+  # generated from the merged PRs since the previous tag; the body below adds
+  # the pull ref and the gateway compatibility floor.
+  github-release:
+    name: Create GitHub Release
+    needs: build-and-push
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: kubeswift-ui ${{ github.ref_name }}
+          generate_release_notes: true
+          make_latest: true
+          body: |
+            ## Image
+
+            ```
+            ${{ env.IMAGE }}:${{ needs.build-and-push.outputs.version }}
+            ```
+
+            Deploy with the kubeswift chart, preserving your existing values:
+
+            ```bash
+            helm upgrade kubeswift oci://ghcr.io/kubeswift-io/charts/kubeswift \
+              -n kubeswift-system \
+              -f <(helm get values kubeswift -n kubeswift-system -o yaml) \
+              --set ui.image.tag=${{ needs.build-and-push.outputs.version }}
+            ```
+
+            ## Compatibility
+
+            kubeswift-ui is released independently of the kubeswift chart and
+            gateway. Check the notes below for the minimum gateway version this
+            release needs — the UI talks only to `kubeswift-gateway`.
+
+            Operator docs: [`docs/ui/`](https://github.com/kubeswift-io/kubeswift/tree/main/docs/ui)
