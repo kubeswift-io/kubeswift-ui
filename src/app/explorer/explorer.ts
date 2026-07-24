@@ -14,6 +14,14 @@ import { ImageDrawer } from '../image-drawer/image-drawer';
 import { SandboxDrawer } from '../sandbox-drawer/sandbox-drawer';
 import { SandboxPoolDrawer } from '../sandboxpool-drawer/sandboxpool-drawer';
 import { CreateSandbox } from '../create-sandbox/create-sandbox';
+import { CreateGuestClass } from '../create-guestclass/create-guestclass';
+import { CreateImage } from '../create-image/create-image';
+import { CreateSeedProfile } from '../create-seedprofile/create-seedprofile';
+import { CreateKernel } from '../create-kernel/create-kernel';
+import { CreateGPUProfile } from '../create-gpuprofile/create-gpuprofile';
+import { CreateSnapshotSchedule } from '../create-snapshotschedule/create-snapshotschedule';
+import { CreateSandboxPool } from '../create-sandboxpool/create-sandboxpool';
+import { CreateGuestPool } from '../create-guestpool/create-guestpool';
 import { YamlEditor } from '../yaml-editor/yaml-editor';
 
 // Kinds that open a resource-aware detail drawer on row-click (instead of the
@@ -28,6 +36,20 @@ const DRAWER_KINDS = new Set([
   'swiftkernels',
   'swiftsandboxes',
   'swiftsandboxpools',
+]);
+
+// Kinds with a bespoke guided Create wizard (an @switch in the template maps
+// each key to its form). Everything else falls back to the generic YAML editor.
+const GUIDED_KINDS = new Set([
+  'swiftsandboxes',
+  'swiftguestclasses',
+  'swiftimages',
+  'swiftseedprofiles',
+  'swiftkernels',
+  'swiftgpuprofiles',
+  'swiftsnapshotschedules',
+  'swiftsandboxpools',
+  'swiftguestpools',
 ]);
 
 interface KindGroup {
@@ -56,6 +78,14 @@ interface KindGroup {
     SandboxDrawer,
     SandboxPoolDrawer,
     CreateSandbox,
+    CreateGuestClass,
+    CreateImage,
+    CreateSeedProfile,
+    CreateKernel,
+    CreateGPUProfile,
+    CreateSnapshotSchedule,
+    CreateSandboxPool,
+    CreateGuestPool,
     YamlEditor,
   ],
   templateUrl: './explorer.html',
@@ -77,7 +107,7 @@ export class Explorer implements OnInit {
   // Kind-aware detail drawer: row-click opens the right drawer for the kind.
   readonly detail = signal<{ kind: string; name: string; namespace: string } | null>(null);
   readonly editorOpen = signal(false); // YAML editor (create/edit)
-  readonly sandboxCreateOpen = signal(false); // guided SwiftSandbox create wizard
+  readonly guidedCreateKind = signal(''); // key of the open guided-create wizard ('' = none)
   readonly editorName = signal(''); // '' = create
   readonly editorNs = signal('');
   readonly actionError = signal<string | null>(null); // delete/apply denials, surfaced
@@ -229,12 +259,16 @@ export class Explorer implements OnInit {
   // in the action banner — never a silent no-op). ---
   openCreate(): void {
     this.actionError.set(null);
-    // Sandboxes get a guided wizard (image + the v0.12 GPU/model/scratch shapes);
-    // every other kind uses the generic YAML editor.
-    if (this.selectedKind()?.key === 'swiftsandboxes') {
-      this.sandboxCreateOpen.set(true);
+    // Authorable KubeSwift kinds get a guided wizard; everything else (and a
+    // wizard's "Edit as YAML" escape hatch) uses the generic YAML editor.
+    const key = this.selectedKind()?.key ?? '';
+    if (GUIDED_KINDS.has(key)) {
+      this.guidedCreateKind.set(key);
       return;
     }
+    this.openYamlCreate();
+  }
+  private openYamlCreate(): void {
     this.editorName.set(''); // '' -> create
     this.editorNs.set(this.selectedKind()?.namespaced ? this.selectedNamespace() : '');
     this.editorOpen.set(true);
@@ -249,12 +283,17 @@ export class Explorer implements OnInit {
   closeEditor(): void {
     this.editorOpen.set(false);
   }
-  closeSandboxCreate(): void {
-    this.sandboxCreateOpen.set(false);
+  closeGuidedCreate(): void {
+    this.guidedCreateKind.set('');
   }
-  async onSandboxCreated(): Promise<void> {
-    this.sandboxCreateOpen.set(false);
+  async onGuidedCreated(): Promise<void> {
+    this.guidedCreateKind.set('');
     await this.reload();
+  }
+  // A wizard's "Edit as YAML" link: drop the guided form, open the raw editor.
+  openAdvancedCreate(): void {
+    this.guidedCreateKind.set('');
+    this.openYamlCreate();
   }
   async onSaved(): Promise<void> {
     this.editorOpen.set(false);

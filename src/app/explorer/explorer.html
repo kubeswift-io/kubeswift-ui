@@ -203,13 +203,96 @@
     />
   }
 
-  @if (sandboxCreateOpen()) {
-    <app-create-sandbox
-      [clusters]="clusters()"
-      [initialCluster]="selectedCluster()"
-      [initialNamespace]="selectedNamespace()"
-      (created)="onSandboxCreated()"
-      (closed)="closeSandboxCreate()"
-    />
+  @switch (guidedCreateKind()) {
+    @case ('swiftsandboxes') {
+      <app-create-sandbox
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('swiftguestclasses') {
+      <app-create-guestclass
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('swiftimages') {
+      <app-create-image
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('swiftseedprofiles') {
+      <app-create-seedprofile
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('swiftkernels') {
+      <app-create-kernel
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('swiftgpuprofiles') {
+      <app-create-gpuprofile
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('swiftsnapshotschedules') {
+      <app-create-snapshotschedule
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('swiftsandboxpools') {
+      <app-create-sandboxpool
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('swiftguestpools') {
+      <app-create-guestpool
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
   }
 </div>

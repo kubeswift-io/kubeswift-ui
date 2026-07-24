@@ -34,6 +34,7 @@ export class CreateSandbox {
   readonly initialNamespace = input<string>('');
   readonly created = output<void>();
   readonly closed = output<void>();
+  readonly advanced = output<void>();
 
   // Form.
   readonly cluster = signal('');

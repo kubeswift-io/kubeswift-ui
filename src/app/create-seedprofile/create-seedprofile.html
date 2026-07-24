@@ -1,0 +1,59 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <div class="title">
+      <span class="name">New seed profile</span>
+      <span class="sub">a SwiftSeedProfile cloud-init seed</span>
+    </div>
+    <select class="cluster" [value]="cluster()" (change)="selectCluster($any($event.target).value)" title="Target cluster">
+      @for (c of clusters(); track c.name) {
+        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
+      }
+    </select>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
+  }
+
+  <div class="body">
+    <div class="row2">
+      <label class="field">
+        <span>Namespace</span>
+        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
+          @for (ns of namespaces(); track ns) {
+            <option [value]="ns">{{ ns }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>Name *</span>
+        <input placeholder="web-seed" [value]="name()" (input)="name.set($any($event.target).value)" />
+      </label>
+    </div>
+
+    <p class="hint">Datasource: NoCloud. Inline data below; use “Edit as YAML” for secret/configMap references.</p>
+
+    <label class="field">
+      <span>user-data * (cloud-config)</span>
+      <textarea rows="8" [value]="userData()" (input)="userData.set($any($event.target).value)"></textarea>
+    </label>
+    <label class="field">
+      <span>meta-data (optional)</span>
+      <textarea rows="3" placeholder="instance-id: web-01&#10;local-hostname: web-01" [value]="metaData()" (input)="metaData.set($any($event.target).value)"></textarea>
+    </label>
+    <label class="field">
+      <span>network-config (optional)</span>
+      <textarea rows="3" placeholder="version: 2&#10;ethernets: …" [value]="networkData()" (input)="networkData.set($any($event.target).value)"></textarea>
+    </label>
+  </div>
+
+  <div class="actions">
+    <button class="primary" [disabled]="!canCreate() || busy()" (click)="create()">
+      {{ busy() ? 'Creating…' : 'Create seed profile' }}
+    </button>
+    <button class="ghost" (click)="closed.emit()">Cancel</button>
+    <button class="link" (click)="advanced.emit()" title="Switch to the raw YAML editor">Edit as YAML</button>
+  </div>
+</aside>

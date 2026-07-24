@@ -207,5 +207,6 @@
       {{ busy() ? 'Creating…' : 'Create sandbox' }}
     </button>
     <button class="ghost" (click)="closed.emit()">Cancel</button>
+    <button class="link" (click)="advanced.emit()" title="Switch to the raw YAML editor">Edit as YAML</button>
   </div>
 </aside>
