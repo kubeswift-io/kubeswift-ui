@@ -7,9 +7,6 @@ multi-cluster fleet view of VMs, built on the `kubeswift-gateway` Connect API.
 - Talks to the gateway over **Connect / gRPC-Web** (`@connectrpc/connect-web`),
   with the TypeScript client generated from the `kubeswift.v1` proto.
 
-> Status: **P0** — the cluster selector + a live, fleet-merged VM inventory.
-> Backend design: `kubeswift/docs/design/ui-backend-enablement.md`.
-
 ## Run against a live gateway
 
 1. **Deploy the gateway** on a hub cluster (the KubeSwift chart,
