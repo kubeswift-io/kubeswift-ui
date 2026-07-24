@@ -284,5 +284,15 @@
         (advanced)="openAdvancedCreate()"
       />
     }
+    @case ('swiftguestpools') {
+      <app-create-guestpool
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
   }
 </div>

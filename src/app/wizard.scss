@@ -267,13 +267,17 @@ textarea {
     width: auto;
   }
 }
-.actions .link {
-  margin-left: auto;
+.link {
+  border: none;
   background: transparent;
   color: var(--mat-sys-primary);
   padding: 9px 6px;
   font-size: 13px;
+  cursor: pointer;
   &:hover {
     text-decoration: underline;
   }
+}
+.actions .link {
+  margin-left: auto;
 }

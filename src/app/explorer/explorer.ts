@@ -21,6 +21,7 @@ import { CreateKernel } from '../create-kernel/create-kernel';
 import { CreateGPUProfile } from '../create-gpuprofile/create-gpuprofile';
 import { CreateSnapshotSchedule } from '../create-snapshotschedule/create-snapshotschedule';
 import { CreateSandboxPool } from '../create-sandboxpool/create-sandboxpool';
+import { CreateGuestPool } from '../create-guestpool/create-guestpool';
 import { YamlEditor } from '../yaml-editor/yaml-editor';
 
 // Kinds that open a resource-aware detail drawer on row-click (instead of the
@@ -48,6 +49,7 @@ const GUIDED_KINDS = new Set([
   'swiftgpuprofiles',
   'swiftsnapshotschedules',
   'swiftsandboxpools',
+  'swiftguestpools',
 ]);
 
 interface KindGroup {
@@ -83,6 +85,7 @@ interface KindGroup {
     CreateGPUProfile,
     CreateSnapshotSchedule,
     CreateSandboxPool,
+    CreateGuestPool,
     YamlEditor,
   ],
   templateUrl: './explorer.html',
