@@ -297,3 +297,20 @@ textarea {
     width: 100%;
   }
 }
+
+.viewtoggle {
+  margin: 12px 20px 0;
+}
+.yamlbox {
+  width: 100%;
+  min-height: 58vh;
+  font-family: var(--mat-sys-typeface-mono, monospace);
+  font-size: 12.5px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.actions .ro {
+  font-size: 13px;
+  color: var(--mat-sys-on-surface-variant);
+  margin-right: auto;
+}

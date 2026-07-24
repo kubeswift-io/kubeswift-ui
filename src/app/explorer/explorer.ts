@@ -47,6 +47,10 @@ const DRAWER_KINDS = new Set([
 // an admin; every other kind is gated by the live CanI (SelfSubjectAccessReview).
 const NEVER_CREATABLE = new Set(['nodes', 'swiftgpunodes']);
 
+// Forms retrofitted to the ResourceForm base — they support edit + the
+// Form/YAML toggle, so row-Edit opens the form (not the raw YAML editor).
+const EDITABLE_FORM_KINDS = new Set(['configmaps', 'services', 'secrets']);
+
 const GUIDED_KINDS = new Set([
   'swiftsandboxes',
   'swiftguestclasses',
@@ -121,6 +125,7 @@ export class Explorer implements OnInit {
   readonly detail = signal<{ kind: string; name: string; namespace: string } | null>(null);
   readonly editorOpen = signal(false); // YAML editor (create/edit)
   readonly guidedCreateKind = signal(''); // key of the open guided-create wizard ('' = none)
+  readonly guidedExisting = signal(''); // JSON of the object being edited ('' = create)
   readonly editorName = signal(''); // '' = create
   readonly editorNs = signal('');
   readonly actionError = signal<string | null>(null); // delete/apply denials, surfaced
@@ -317,6 +322,7 @@ export class Explorer implements OnInit {
     // wizard's "Edit as YAML" escape hatch) uses the generic YAML editor.
     const key = this.selectedKind()?.key ?? '';
     if (GUIDED_KINDS.has(key)) {
+      this.guidedExisting.set(''); // create
       this.guidedCreateKind.set(key);
       return;
     }
@@ -327,11 +333,31 @@ export class Explorer implements OnInit {
     this.editorNs.set(this.selectedKind()?.namespaced ? this.selectedNamespace() : '');
     this.editorOpen.set(true);
   }
-  openEdit(r: Resource, ev: Event): void {
+  async openEdit(r: Resource, ev: Event): Promise<void> {
     ev.stopPropagation(); // don't also trigger a node-row click
-    this.editorName.set(r.ref?.name ?? '');
-    this.editorNs.set(r.ref?.namespace ?? '');
     this.actionError.set(null);
+    const kind = this.selectedKind()?.key ?? '';
+    const name = r.ref?.name ?? '';
+    const ns = r.ref?.namespace ?? '';
+    // Kinds with an edit-capable form open in the form (with a Form/YAML toggle);
+    // the rest use the generic YAML editor.
+    if (EDITABLE_FORM_KINDS.has(kind)) {
+      try {
+        const res = await this.gw.resources.getResource({
+          cluster: this.selectedCluster(),
+          kind,
+          namespace: ns,
+          name,
+        });
+        this.guidedExisting.set(res.json);
+        this.guidedCreateKind.set(kind);
+      } catch (e) {
+        this.actionError.set(e instanceof Error ? e.message : String(e));
+      }
+      return;
+    }
+    this.editorName.set(name);
+    this.editorNs.set(ns);
     this.editorOpen.set(true);
   }
   closeEditor(): void {
@@ -339,9 +365,11 @@ export class Explorer implements OnInit {
   }
   closeGuidedCreate(): void {
     this.guidedCreateKind.set('');
+    this.guidedExisting.set('');
   }
   async onGuidedCreated(): Promise<void> {
     this.guidedCreateKind.set('');
+    this.guidedExisting.set('');
     await this.reload();
   }
   // A wizard's "Edit as YAML" link: drop the guided form, open the raw editor.

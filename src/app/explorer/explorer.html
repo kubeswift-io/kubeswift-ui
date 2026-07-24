@@ -306,9 +306,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('configmaps') {
@@ -316,9 +317,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
     @case ('services') {
@@ -326,9 +328,10 @@
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"
-        (created)="onGuidedCreated()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
         (closed)="closeGuidedCreate()"
-        (advanced)="openAdvancedCreate()"
       />
     }
   }
