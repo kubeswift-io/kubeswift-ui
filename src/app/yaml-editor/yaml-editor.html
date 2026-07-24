@@ -30,9 +30,13 @@
   }
 
   <div class="actions">
-    <button class="primary" [disabled]="saving() || loading() || !text().trim()" (click)="save()">
-      {{ saving() ? 'Applying…' : isCreate() ? 'Create' : 'Apply' }}
-    </button>
-    <button class="ghost" (click)="closed.emit()">Cancel</button>
+    @if (canWrite()) {
+      <button class="primary" [disabled]="saving() || loading() || !text().trim()" (click)="save()">
+        {{ saving() ? 'Applying…' : isCreate() ? 'Create' : 'Apply' }}
+      </button>
+    } @else {
+      <span class="ro">Read-only — you don't have permission to modify this resource.</span>
+    }
+    <button class="ghost" (click)="closed.emit()">{{ canWrite() ? 'Cancel' : 'Close' }}</button>
   </div>
 </aside>

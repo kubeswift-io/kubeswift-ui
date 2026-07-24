@@ -38,11 +38,11 @@ const DRAWER_KINDS = new Set([
   'swiftsandboxpools',
 ]);
 
-// Kinds with a bespoke guided Create wizard (an @switch in the template maps
-// each key to its form). Everything else falls back to the generic YAML editor.
-// Kinds the console browses read-only: discovery/controller-owned or
-// status-only (SwiftGPUNode has no spec). No "New" button for these.
-const READONLY_KINDS = new Set(['nodes', 'namespaces', 'swiftgpunodes']);
+// Kinds that are never hand-authored regardless of RBAC: status-only /
+// system-owned objects with no meaningful spec (a Node is kubelet-owned; a
+// SwiftGPUNode is discovery-owned). The New button is hidden for these even for
+// an admin; every other kind is gated by the live CanI (SelfSubjectAccessReview).
+const NEVER_CREATABLE = new Set(['nodes', 'swiftgpunodes']);
 
 const GUIDED_KINDS = new Set([
   'swiftsandboxes',
@@ -115,6 +115,13 @@ export class Explorer implements OnInit {
   readonly editorName = signal(''); // '' = create
   readonly editorNs = signal('');
   readonly actionError = signal<string | null>(null); // delete/apply denials, surfaced
+  // Live per-kind+namespace permissions (CanI). Fail-closed until resolved so
+  // the UI never offers an action the user can't perform.
+  readonly perms = signal<{ create: boolean; update: boolean; del: boolean }>({
+    create: false,
+    update: false,
+    del: false,
+  });
 
   private readonly categoryOrder = [
     'Cluster',
@@ -210,8 +217,10 @@ export class Explorer implements OnInit {
     if (!cluster || !kind) return;
     this.loading.set(true);
     this.error.set(null);
+    this.perms.set({ create: false, update: false, del: false }); // fail-closed until CanI resolves
     try {
       const namespace = kind.namespaced ? this.selectedNamespace() : '';
+      void this.refreshPerms(cluster, kind.key, namespace);
       const r = await this.gw.resources.listResources({ cluster, kind: kind.key, namespace });
       this.resources.set(r.resources);
       this.error.set(r.error ?? null);
@@ -223,6 +232,30 @@ export class Explorer implements OnInit {
       } as ClusterError);
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  // refreshPerms asks the gateway (SelfSubjectAccessReview, as the user) whether
+  // the user may create/update/delete this kind in this namespace, so the UI can
+  // hide actions it can't perform instead of firing them and surfacing a denial.
+  private async refreshPerms(cluster: string, kindKey: string, namespace: string): Promise<void> {
+    try {
+      const r = await this.gw.resources.canI({
+        cluster,
+        checks: [
+          { kind: kindKey, verb: 'create', namespace },
+          { kind: kindKey, verb: 'update', namespace },
+          { kind: kindKey, verb: 'delete', namespace },
+        ],
+      });
+      const d = r.decisions;
+      this.perms.set({
+        create: d[0]?.allowed ?? false,
+        update: d[1]?.allowed ?? false,
+        del: d[2]?.allowed ?? false,
+      });
+    } catch {
+      this.perms.set({ create: false, update: false, del: false });
     }
   }
 
@@ -261,12 +294,14 @@ export class Explorer implements OnInit {
 
   // --- CRUD (RBAC-gated; the gateway impersonates the user, so denials surface
   // in the action banner — never a silent no-op). ---
-  // The "New" button is hidden for read-only kinds (nothing to author).
-  isReadOnlyKind(): boolean {
-    return READONLY_KINDS.has(this.selectedKind()?.key ?? '');
+  // The New button shows only when the user can create this kind (live CanI)
+  // and the kind is hand-authorable at all.
+  canCreate(): boolean {
+    const k = this.selectedKind()?.key ?? '';
+    return !!k && this.perms().create && !NEVER_CREATABLE.has(k);
   }
   openCreate(): void {
-    if (this.isReadOnlyKind()) return;
+    if (!this.canCreate()) return;
     this.actionError.set(null);
     // Authorable KubeSwift kinds get a guided wizard; everything else (and a
     // wizard's "Edit as YAML" escape hatch) uses the generic YAML editor.
