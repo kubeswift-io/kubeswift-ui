@@ -1,0 +1,93 @@
+<div class="backdrop" (click)="closed.emit()"></div>
+<aside class="drawer">
+  <header>
+    <div class="title">
+      <span class="name">New service</span>
+      <span class="sub">create a Service</span>
+    </div>
+    <select class="cluster" [value]="cluster()" (change)="selectCluster($any($event.target).value)" title="Target cluster">
+      @for (c of clusters(); track c.name) {
+        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
+      }
+    </select>
+    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
+  </header>
+
+  @if (error(); as e) {
+    <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
+  }
+
+  <div class="body">
+    <div class="row2">
+      <label class="field">
+        <span>Namespace</span>
+        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
+          @for (ns of namespaces(); track ns) {
+            <option [value]="ns">{{ ns }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span>Name *</span>
+        <input placeholder="my-svc" [value]="name()" (input)="name.set($any($event.target).value)" />
+      </label>
+    </div>
+
+    <label class="field">
+      <span>Type</span>
+      <select [value]="svcType()" (change)="svcType.set($any($event.target).value)">
+        <option value="ClusterIP">ClusterIP</option>
+        <option value="NodePort">NodePort</option>
+        <option value="LoadBalancer">LoadBalancer</option>
+        <option value="ExternalName">ExternalName</option>
+      </select>
+    </label>
+
+    @if (isExternalName()) {
+      <label class="field">
+        <span>External name *</span>
+        <input placeholder="db.example.com" [value]="externalName()" (input)="externalName.set($any($event.target).value)" />
+      </label>
+    } @else {
+      <h4>Selector</h4>
+      <div class="ports">
+        <div class="phead" style="grid-template-columns: 1fr 1fr 28px"><span>Key</span><span>Value</span><span></span></div>
+        @for (s of selector(); track $index) {
+          <div class="prow" style="grid-template-columns: 1fr 1fr 28px">
+            <input placeholder="app" [value]="s.key" (input)="setSel($index, 'key', $any($event.target).value)" />
+            <input placeholder="my-app" [value]="s.value" (input)="setSel($index, 'value', $any($event.target).value)" />
+            <button class="rowx" (click)="removeSel($index)" title="Remove"><mat-icon>close</mat-icon></button>
+          </div>
+        }
+        <button class="link" style="margin: 0" (click)="addSel()">+ Add selector</button>
+      </div>
+
+      <h4>Ports</h4>
+      <div class="ports">
+        <div class="phead"><span>Name</span><span>Port</span><span>Target</span><span>Proto</span><span></span></div>
+        @for (p of ports(); track $index) {
+          <div class="prow">
+            <input placeholder="http" [value]="p.name" (input)="setPort($index, 'name', $any($event.target).value)" />
+            <input type="number" min="1" [value]="p.port || ''" (input)="setPort($index, 'port', $any($event.target).value)" />
+            <input type="number" min="1" placeholder="=port" [value]="p.targetPort || ''" (input)="setPort($index, 'targetPort', $any($event.target).value)" />
+            <select [value]="p.protocol" (change)="setPort($index, 'protocol', $any($event.target).value)">
+              <option value="TCP">TCP</option>
+              <option value="UDP">UDP</option>
+              <option value="SCTP">SCTP</option>
+            </select>
+            <button class="rowx" (click)="removePort($index)" title="Remove"><mat-icon>close</mat-icon></button>
+          </div>
+        }
+        <button class="link" style="margin: 0" (click)="addPort()">+ Add port</button>
+      </div>
+    }
+  </div>
+
+  <div class="actions">
+    <button class="primary" [disabled]="!canCreate() || busy()" (click)="create()">
+      {{ busy() ? 'Creating…' : 'Create service' }}
+    </button>
+    <button class="ghost" (click)="closed.emit()">Cancel</button>
+    <button class="link" (click)="advanced.emit()" title="Switch to the raw YAML editor">Edit as YAML</button>
+  </div>
+</aside>

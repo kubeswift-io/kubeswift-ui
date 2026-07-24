@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file kubeswift/v1/resource.proto.
  */
 export const file_kubeswift_v1_resource: GenFile = /*@__PURE__*/
-  fileDesc("ChtrdWJlc3dpZnQvdjEvcmVzb3VyY2UucHJvdG8SDGt1YmVzd2lmdC52MSKaAQoMUmVzb3VyY2VLaW5kEgsKA2tleRgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkSDQoFZ3JvdXAYAyABKAkSDwoHdmVyc2lvbhgEIAEoCRIQCghyZXNvdXJjZRgFIAEoCRISCgpuYW1lc3BhY2VkGAYgASgIEhAKCGNhdGVnb3J5GAcgASgJEg8KB2NvbHVtbnMYCCADKAkiGgoYTGlzdFJlc291cmNlS2luZHNSZXF1ZXN0IkYKGUxpc3RSZXNvdXJjZUtpbmRzUmVzcG9uc2USKQoFa2luZHMYASADKAsyGi5rdWJlc3dpZnQudjEuUmVzb3VyY2VLaW5kItQBCghSZXNvdXJjZRIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEgwKBGtpbmQYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASNAoHY29sdW1ucxgEIAMoCzIjLmt1YmVzd2lmdC52MS5SZXNvdXJjZS5Db2x1bW5zRW50cnkaLgoMQ29sdW1uc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiSAoUTGlzdFJlc291cmNlc1JlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIMCgRraW5kGAIgASgJEhEKCW5hbWVzcGFjZRgDIAEoCSJtChVMaXN0UmVzb3VyY2VzUmVzcG9uc2USKQoJcmVzb3VyY2VzGAEgAygLMhYua3ViZXN3aWZ0LnYxLlJlc291cmNlEikKBWVycm9yGAIgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvciJUChJHZXRSZXNvdXJjZVJlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIMCgRraW5kGAIgASgJEhEKCW5hbWVzcGFjZRgDIAEoCRIMCgRuYW1lGAQgASgJIjEKE0dldFJlc291cmNlUmVzcG9uc2USDAoEeWFtbBgBIAEoCRIMCgRqc29uGAIgASgJIlYKFEFwcGx5UmVzb3VyY2VSZXF1ZXN0Eg8KB2NsdXN0ZXIYASABKAkSDAoEa2luZBgCIAEoCRIRCgluYW1lc3BhY2UYAyABKAkSDAoEeWFtbBgEIAEoCSIzChVBcHBseVJlc291cmNlUmVzcG9uc2USDAoEeWFtbBgBIAEoCRIMCgRqc29uGAIgASgJIlcKFURlbGV0ZVJlc291cmNlUmVxdWVzdBIPCgdjbHVzdGVyGAEgASgJEgwKBGtpbmQYAiABKAkSEQoJbmFtZXNwYWNlGAMgASgJEgwKBG5hbWUYBCABKAkiGAoWRGVsZXRlUmVzb3VyY2VSZXNwb25zZTLcAwoPUmVzb3VyY2VTZXJ2aWNlEmQKEUxpc3RSZXNvdXJjZUtpbmRzEiYua3ViZXN3aWZ0LnYxLkxpc3RSZXNvdXJjZUtpbmRzUmVxdWVzdBonLmt1YmVzd2lmdC52MS5MaXN0UmVzb3VyY2VLaW5kc1Jlc3BvbnNlElgKDUxpc3RSZXNvdXJjZXMSIi5rdWJlc3dpZnQudjEuTGlzdFJlc291cmNlc1JlcXVlc3QaIy5rdWJlc3dpZnQudjEuTGlzdFJlc291cmNlc1Jlc3BvbnNlElIKC0dldFJlc291cmNlEiAua3ViZXN3aWZ0LnYxLkdldFJlc291cmNlUmVxdWVzdBohLmt1YmVzd2lmdC52MS5HZXRSZXNvdXJjZVJlc3BvbnNlElgKDUFwcGx5UmVzb3VyY2USIi5rdWJlc3dpZnQudjEuQXBwbHlSZXNvdXJjZVJlcXVlc3QaIy5rdWJlc3dpZnQudjEuQXBwbHlSZXNvdXJjZVJlc3BvbnNlElsKDkRlbGV0ZVJlc291cmNlEiMua3ViZXN3aWZ0LnYxLkRlbGV0ZVJlc291cmNlUmVxdWVzdBokLmt1YmVzd2lmdC52MS5EZWxldGVSZXNvdXJjZVJlc3BvbnNlQkBaPmdpdGh1Yi5jb20va3ViZXN3aWZ0LWlvL2t1YmVzd2lmdC9nZW4va3ViZXN3aWZ0L3YxO2t1YmVzd2lmdHYxYgZwcm90bzM", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
+  fileDesc("ChtrdWJlc3dpZnQvdjEvcmVzb3VyY2UucHJvdG8SDGt1YmVzd2lmdC52MSKaAQoMUmVzb3VyY2VLaW5kEgsKA2tleRgBIAEoCRIUCgxkaXNwbGF5X25hbWUYAiABKAkSDQoFZ3JvdXAYAyABKAkSDwoHdmVyc2lvbhgEIAEoCRIQCghyZXNvdXJjZRgFIAEoCRISCgpuYW1lc3BhY2VkGAYgASgIEhAKCGNhdGVnb3J5GAcgASgJEg8KB2NvbHVtbnMYCCADKAkiGgoYTGlzdFJlc291cmNlS2luZHNSZXF1ZXN0IkYKGUxpc3RSZXNvdXJjZUtpbmRzUmVzcG9uc2USKQoFa2luZHMYASADKAsyGi5rdWJlc3dpZnQudjEuUmVzb3VyY2VLaW5kItQBCghSZXNvdXJjZRIkCgNyZWYYASABKAsyFy5rdWJlc3dpZnQudjEuT2JqZWN0UmVmEgwKBGtpbmQYAiABKAkSLgoKY3JlYXRlZF9hdBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASNAoHY29sdW1ucxgEIAMoCzIjLmt1YmVzd2lmdC52MS5SZXNvdXJjZS5Db2x1bW5zRW50cnkaLgoMQ29sdW1uc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiSAoUTGlzdFJlc291cmNlc1JlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIMCgRraW5kGAIgASgJEhEKCW5hbWVzcGFjZRgDIAEoCSJtChVMaXN0UmVzb3VyY2VzUmVzcG9uc2USKQoJcmVzb3VyY2VzGAEgAygLMhYua3ViZXN3aWZ0LnYxLlJlc291cmNlEikKBWVycm9yGAIgASgLMhoua3ViZXN3aWZ0LnYxLkNsdXN0ZXJFcnJvciJUChJHZXRSZXNvdXJjZVJlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIMCgRraW5kGAIgASgJEhEKCW5hbWVzcGFjZRgDIAEoCRIMCgRuYW1lGAQgASgJIjEKE0dldFJlc291cmNlUmVzcG9uc2USDAoEeWFtbBgBIAEoCRIMCgRqc29uGAIgASgJIlYKFEFwcGx5UmVzb3VyY2VSZXF1ZXN0Eg8KB2NsdXN0ZXIYASABKAkSDAoEa2luZBgCIAEoCRIRCgluYW1lc3BhY2UYAyABKAkSDAoEeWFtbBgEIAEoCSIzChVBcHBseVJlc291cmNlUmVzcG9uc2USDAoEeWFtbBgBIAEoCRIMCgRqc29uGAIgASgJIlcKFURlbGV0ZVJlc291cmNlUmVxdWVzdBIPCgdjbHVzdGVyGAEgASgJEgwKBGtpbmQYAiABKAkSEQoJbmFtZXNwYWNlGAMgASgJEgwKBG5hbWUYBCABKAkiGAoWRGVsZXRlUmVzb3VyY2VSZXNwb25zZSJEChNSZXNvdXJjZUFjY2Vzc0NoZWNrEgwKBGtpbmQYASABKAkSDAoEdmVyYhgCIAEoCRIRCgluYW1lc3BhY2UYAyABKAkiUQoLQ2FuSVJlcXVlc3QSDwoHY2x1c3RlchgBIAEoCRIxCgZjaGVja3MYAiADKAsyIS5rdWJlc3dpZnQudjEuUmVzb3VyY2VBY2Nlc3NDaGVjayIxCg5BY2Nlc3NEZWNpc2lvbhIPCgdhbGxvd2VkGAEgASgIEg4KBnJlYXNvbhgCIAEoCSI/CgxDYW5JUmVzcG9uc2USLwoJZGVjaXNpb25zGAEgAygLMhwua3ViZXN3aWZ0LnYxLkFjY2Vzc0RlY2lzaW9uMpsECg9SZXNvdXJjZVNlcnZpY2USZAoRTGlzdFJlc291cmNlS2luZHMSJi5rdWJlc3dpZnQudjEuTGlzdFJlc291cmNlS2luZHNSZXF1ZXN0Gicua3ViZXN3aWZ0LnYxLkxpc3RSZXNvdXJjZUtpbmRzUmVzcG9uc2USWAoNTGlzdFJlc291cmNlcxIiLmt1YmVzd2lmdC52MS5MaXN0UmVzb3VyY2VzUmVxdWVzdBojLmt1YmVzd2lmdC52MS5MaXN0UmVzb3VyY2VzUmVzcG9uc2USUgoLR2V0UmVzb3VyY2USIC5rdWJlc3dpZnQudjEuR2V0UmVzb3VyY2VSZXF1ZXN0GiEua3ViZXN3aWZ0LnYxLkdldFJlc291cmNlUmVzcG9uc2USWAoNQXBwbHlSZXNvdXJjZRIiLmt1YmVzd2lmdC52MS5BcHBseVJlc291cmNlUmVxdWVzdBojLmt1YmVzd2lmdC52MS5BcHBseVJlc291cmNlUmVzcG9uc2USWwoORGVsZXRlUmVzb3VyY2USIy5rdWJlc3dpZnQudjEuRGVsZXRlUmVzb3VyY2VSZXF1ZXN0GiQua3ViZXN3aWZ0LnYxLkRlbGV0ZVJlc291cmNlUmVzcG9uc2USPQoEQ2FuSRIZLmt1YmVzd2lmdC52MS5DYW5JUmVxdWVzdBoaLmt1YmVzd2lmdC52MS5DYW5JUmVzcG9uc2VCQFo+Z2l0aHViLmNvbS9rdWJlc3dpZnQtaW8va3ViZXN3aWZ0L2dlbi9rdWJlc3dpZnQvdjE7a3ViZXN3aWZ0djFiBnByb3RvMw", [file_google_protobuf_timestamp, file_kubeswift_v1_common]);
 
 /**
  * ResourceKind is one browsable resource type in the explorer catalog. The
@@ -391,11 +391,116 @@ export const DeleteResourceResponseSchema: GenMessage<DeleteResourceResponse> = 
   messageDesc(file_kubeswift_v1_resource, 11);
 
 /**
+ * ResourceAccessCheck asks whether the impersonated user may perform one verb on
+ * one catalog kind (the gateway maps kind -> group/resource). namespace is ""
+ * for a cluster-scoped kind or an all-namespaces check.
+ *
+ * @generated from message kubeswift.v1.ResourceAccessCheck
+ */
+export type ResourceAccessCheck = Message<"kubeswift.v1.ResourceAccessCheck"> & {
+  /**
+   * a ResourceKind.key
+   *
+   * @generated from field: string kind = 1;
+   */
+  kind: string;
+
+  /**
+   * create | update | delete | get | list | patch
+   *
+   * @generated from field: string verb = 2;
+   */
+  verb: string;
+
+  /**
+   * @generated from field: string namespace = 3;
+   */
+  namespace: string;
+};
+
+/**
+ * Describes the message kubeswift.v1.ResourceAccessCheck.
+ * Use `create(ResourceAccessCheckSchema)` to create a new message.
+ */
+export const ResourceAccessCheckSchema: GenMessage<ResourceAccessCheck> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_resource, 12);
+
+/**
+ * CanIRequest batches access checks so the UI can gate a kind's actions
+ * (create/update/delete) in one round-trip.
+ *
+ * @generated from message kubeswift.v1.CanIRequest
+ */
+export type CanIRequest = Message<"kubeswift.v1.CanIRequest"> & {
+  /**
+   * @generated from field: string cluster = 1;
+   */
+  cluster: string;
+
+  /**
+   * @generated from field: repeated kubeswift.v1.ResourceAccessCheck checks = 2;
+   */
+  checks: ResourceAccessCheck[];
+};
+
+/**
+ * Describes the message kubeswift.v1.CanIRequest.
+ * Use `create(CanIRequestSchema)` to create a new message.
+ */
+export const CanIRequestSchema: GenMessage<CanIRequest> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_resource, 13);
+
+/**
+ * AccessDecision is the outcome for one check, positionally aligned with the
+ * request. allowed=false with an empty reason means "not permitted".
+ *
+ * @generated from message kubeswift.v1.AccessDecision
+ */
+export type AccessDecision = Message<"kubeswift.v1.AccessDecision"> & {
+  /**
+   * @generated from field: bool allowed = 1;
+   */
+  allowed: boolean;
+
+  /**
+   * @generated from field: string reason = 2;
+   */
+  reason: string;
+};
+
+/**
+ * Describes the message kubeswift.v1.AccessDecision.
+ * Use `create(AccessDecisionSchema)` to create a new message.
+ */
+export const AccessDecisionSchema: GenMessage<AccessDecision> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_resource, 14);
+
+/**
+ * @generated from message kubeswift.v1.CanIResponse
+ */
+export type CanIResponse = Message<"kubeswift.v1.CanIResponse"> & {
+  /**
+   * aligned 1:1 with CanIRequest.checks
+   *
+   * @generated from field: repeated kubeswift.v1.AccessDecision decisions = 1;
+   */
+  decisions: AccessDecision[];
+};
+
+/**
+ * Describes the message kubeswift.v1.CanIResponse.
+ * Use `create(CanIResponseSchema)` to create a new message.
+ */
+export const CanIResponseSchema: GenMessage<CanIResponse> = /*@__PURE__*/
+  messageDesc(file_kubeswift_v1_resource, 15);
+
+/**
  * ResourceService is the cluster explorer + object editor. ListResourceKinds /
- * ListResources / GetResource read; ApplyResource / DeleteResource write. Every
- * call impersonates the end user, so both the read and write planes are gated
- * entirely by that user's Kubernetes RBAC — a denial surfaces as a permission
- * error, never a silent success.
+ * ListResources / GetResource read; ApplyResource / DeleteResource write; CanI
+ * answers whether the user may write (so the UI can hide actions it can't do).
+ * Every call impersonates the end user, so both the read and write planes are
+ * gated entirely by that user's Kubernetes RBAC — a denial surfaces as a
+ * permission error, never a silent success.
  *
  * @generated from service kubeswift.v1.ResourceService
  */
@@ -439,6 +544,14 @@ export const ResourceService: GenService<{
     methodKind: "unary";
     input: typeof DeleteResourceRequestSchema;
     output: typeof DeleteResourceResponseSchema;
+  },
+  /**
+   * @generated from rpc kubeswift.v1.ResourceService.CanI
+   */
+  canI: {
+    methodKind: "unary";
+    input: typeof CanIRequestSchema;
+    output: typeof CanIResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_kubeswift_v1_resource, 0);

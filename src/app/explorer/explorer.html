@@ -50,7 +50,7 @@
           </select>
         </label>
       }
-      @if (selectedKind() && !isReadOnlyKind()) {
+      @if (selectedKind() && canCreate()) {
         <button class="newbtn" (click)="openCreate()" title="Create a new resource">
           <mat-icon>add</mat-icon> New
         </button>
@@ -100,12 +100,18 @@
                   </td>
                 }
                 <td class="acts">
-                  <button class="rowbtn" (click)="openEdit(r, $event)" title="View / edit YAML">
-                    <mat-icon>edit</mat-icon>
+                  <button
+                    class="rowbtn"
+                    (click)="openEdit(r, $event)"
+                    [title]="perms().update ? 'View / edit YAML' : 'View YAML'"
+                  >
+                    <mat-icon>{{ perms().update ? 'edit' : 'visibility' }}</mat-icon>
                   </button>
-                  <button class="rowbtn danger" (click)="deleteRow(r, $event)" title="Delete">
-                    <mat-icon>delete</mat-icon>
-                  </button>
+                  @if (perms().del) {
+                    <button class="rowbtn danger" (click)="deleteRow(r, $event)" title="Delete">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  }
                 </td>
               </tr>
             }
@@ -198,6 +204,7 @@
       [kind]="kind"
       [namespace]="editorNs()"
       [name]="editorName()"
+      [canWrite]="editorName() ? perms().update : perms().create"
       (saved)="onSaved()"
       (closed)="closeEditor()"
     />
@@ -286,6 +293,36 @@
     }
     @case ('swiftguestpools') {
       <app-create-guestpool
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('secrets') {
+      <app-create-secret
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('configmaps') {
+      <app-create-configmap
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        (created)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+        (advanced)="openAdvancedCreate()"
+      />
+    }
+    @case ('services') {
+      <app-create-service
         [clusters]="clusters()"
         [initialCluster]="selectedCluster()"
         [initialNamespace]="selectedNamespace()"

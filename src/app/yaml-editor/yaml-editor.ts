@@ -23,6 +23,7 @@ export class YamlEditor {
   readonly kind = input.required<ResourceKind>();
   readonly namespace = input<string>('');
   readonly name = input<string>(''); // '' = create
+  readonly canWrite = input<boolean>(true); // false → view-only (no update permission)
   readonly saved = output<void>();
   readonly closed = output<void>();
 
