@@ -25,6 +25,12 @@ import { CreateGuestPool } from '../create-guestpool/create-guestpool';
 import { CreateSecret } from '../create-secret/create-secret';
 import { CreateConfigMap } from '../create-configmap/create-configmap';
 import { CreateService } from '../create-service/create-service';
+import { CreateServiceAccount } from '../create-serviceaccount/create-serviceaccount';
+import { CreateIngress } from '../create-ingress/create-ingress';
+import { CreateRole } from '../create-role/create-role';
+import { CreateClusterRole } from '../create-clusterrole/create-clusterrole';
+import { CreateRoleBinding } from '../create-rolebinding/create-rolebinding';
+import { CreateClusterRoleBinding } from '../create-clusterrolebinding/create-clusterrolebinding';
 import { YamlEditor } from '../yaml-editor/yaml-editor';
 
 // Kinds that open a resource-aware detail drawer on row-click (instead of the
@@ -49,7 +55,17 @@ const NEVER_CREATABLE = new Set(['nodes', 'swiftgpunodes']);
 
 // Forms retrofitted to the ResourceForm base — they support edit + the
 // Form/YAML toggle, so row-Edit opens the form (not the raw YAML editor).
-const EDITABLE_FORM_KINDS = new Set(['configmaps', 'services', 'secrets']);
+const EDITABLE_FORM_KINDS = new Set([
+  'configmaps',
+  'services',
+  'secrets',
+  'serviceaccounts',
+  'ingresses',
+  'roles',
+  'clusterroles',
+  'rolebindings',
+  'clusterrolebindings',
+]);
 
 const GUIDED_KINDS = new Set([
   'swiftsandboxes',
@@ -64,6 +80,12 @@ const GUIDED_KINDS = new Set([
   'secrets',
   'configmaps',
   'services',
+  'serviceaccounts',
+  'ingresses',
+  'roles',
+  'clusterroles',
+  'rolebindings',
+  'clusterrolebindings',
 ]);
 
 interface KindGroup {
@@ -103,6 +125,12 @@ interface KindGroup {
     CreateSecret,
     CreateConfigMap,
     CreateService,
+    CreateServiceAccount,
+    CreateIngress,
+    CreateRole,
+    CreateClusterRole,
+    CreateRoleBinding,
+    CreateClusterRoleBinding,
     YamlEditor,
   ],
   templateUrl: './explorer.html',

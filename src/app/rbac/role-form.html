@@ -1,0 +1,46 @@
+<app-form-shell
+  [title]="isEdit() ? 'Edit ' + label : 'New ' + label"
+  [sub]="'a ' + kindName"
+  [clusters]="clusters()" [cluster]="cluster()" [edit]="isEdit()"
+  [view]="view()" [yaml]="yamlText()" [error]="error()" [canWrite]="canWrite()"
+  [busy]="busy()" [canSave]="canSave()" [saveLabel]="isEdit() ? 'Apply' : 'Create ' + label"
+  (clusterChange)="selectCluster($event)" (viewChange)="setView($event)" (yamlChange)="yamlText.set($event)"
+  (save)="save()" (close)="closed.emit()"
+>
+  <div class="row2">
+    @if (namespaced) {
+      <label class="field">
+        <span>Namespace</span>
+        @if (isEdit()) { <input [value]="namespace()" disabled /> } @else {
+          <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
+            @for (ns of namespaces(); track ns) { <option [value]="ns">{{ ns }}</option> }
+          </select>
+        }
+      </label>
+    }
+    <label class="field">
+      <span>Name *</span>
+      <input placeholder="my-role" [value]="name()" (input)="name.set($any($event.target).value)" [disabled]="isEdit()" />
+    </label>
+  </div>
+
+  <h4>Rules</h4>
+  <p class="hint">Comma-separated. API groups blank = the core group. Common verbs: get, list, watch, create, update, patch, delete.</p>
+  @for (r of rules(); track $index) {
+    <div class="kvblock">
+      <div class="kvhead">
+        <span class="kvkey" style="font-size: 12px; color: var(--mat-sys-on-surface-variant)">Rule {{ $index + 1 }}</span>
+        <button class="rowx" (click)="removeRule($index)" title="Remove rule"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="row2">
+        <label class="field"><span>API groups</span><input placeholder='"" (core), apps' [value]="r.apiGroups" (input)="setRule($index, 'apiGroups', $any($event.target).value)" /></label>
+        <label class="field"><span>Resources</span><input placeholder="pods, services" [value]="r.resources" (input)="setRule($index, 'resources', $any($event.target).value)" /></label>
+      </div>
+      <div class="row2">
+        <label class="field"><span>Verbs</span><input placeholder="get, list, watch" [value]="r.verbs" (input)="setRule($index, 'verbs', $any($event.target).value)" /></label>
+        <label class="field"><span>Resource names (opt)</span><input placeholder="(all)" [value]="r.resourceNames" (input)="setRule($index, 'resourceNames', $any($event.target).value)" /></label>
+      </div>
+    </div>
+  }
+  <button class="link" style="margin: 0" (click)="addRule()">+ Add rule</button>
+</app-form-shell>
