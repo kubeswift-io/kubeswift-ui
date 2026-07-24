@@ -1,66 +1,83 @@
-<div class="backdrop" (click)="closed.emit()"></div>
-<aside class="drawer">
-  <header>
-    <div class="title">
-      <span class="name">New kernel</span>
-      <span class="sub">a SwiftKernel OCI artifact</span>
-    </div>
-    <select class="cluster" [value]="cluster()" (change)="selectCluster($any($event.target).value)" title="Target cluster">
-      @for (c of clusters(); track c.name) {
-        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
-      }
-    </select>
-    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
-  </header>
-
-  @if (error(); as e) {
-    <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
-  }
-
-  <div class="body">
-    <div class="row2">
-      <label class="field">
-        <span>Namespace</span>
+<app-form-shell
+  [title]="isEdit() ? 'Edit kernel' : 'New kernel'"
+  sub="a SwiftKernel OCI artifact"
+  [clusters]="clusters()"
+  [cluster]="cluster()"
+  [edit]="isEdit()"
+  [view]="view()"
+  [yaml]="yamlText()"
+  [error]="error()"
+  [canWrite]="canWrite()"
+  [busy]="busy()"
+  [canSave]="canSave()"
+  [saveLabel]="isEdit() ? 'Apply' : 'Create kernel'"
+  (clusterChange)="selectCluster($event)"
+  (viewChange)="setView($event)"
+  (yamlChange)="yamlText.set($event)"
+  (save)="save()"
+  (close)="closed.emit()"
+>
+  <div class="row2">
+    <label class="field">
+      <span>Namespace</span>
+      @if (isEdit()) {
+        <input [value]="namespace()" disabled />
+      } @else {
         <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
           @for (ns of namespaces(); track ns) {
             <option [value]="ns">{{ ns }}</option>
           }
         </select>
-      </label>
-      <label class="field">
-        <span>Name *</span>
-        <input placeholder="faas-minimal" [value]="name()" (input)="name.set($any($event.target).value)" />
-      </label>
-    </div>
-
-    <label class="field">
-      <span>OCI image *</span>
-      <input placeholder="ghcr.io/kubeswift-io/kubeswift/kernels/faas:6.6.1" [value]="image()" (input)="image.set($any($event.target).value)" />
+      }
     </label>
-
-    <div class="row2">
-      <label class="field">
-        <span>Profile (optional)</span>
-        <input placeholder="faas-minimal" [value]="profile()" (input)="profile.set($any($event.target).value)" />
-      </label>
-      <label class="field">
-        <span>Pull secret (optional)</span>
-        <input placeholder="regcreds" [value]="pullSecret()" (input)="pullSecret.set($any($event.target).value)" />
-      </label>
-    </div>
-
     <label class="field">
-      <span>Kernel cmdline (optional)</span>
-      <input placeholder="console=ttyS0 reboot=k panic=1" [value]="cmdline()" (input)="cmdline.set($any($event.target).value)" />
+      <span>Name *</span>
+      <input
+        placeholder="faas-minimal"
+        [value]="name()"
+        (input)="name.set($any($event.target).value)"
+        [disabled]="isEdit()"
+      />
     </label>
-    <p class="hint">A tag change alone won’t re-pull an existing kernel — the pull Job is keyed on name + node.</p>
   </div>
 
-  <div class="actions">
-    <button class="primary" [disabled]="!canCreate() || busy()" (click)="create()">
-      {{ busy() ? 'Creating…' : 'Create kernel' }}
-    </button>
-    <button class="ghost" (click)="closed.emit()">Cancel</button>
-    <button class="link" (click)="advanced.emit()" title="Switch to the raw YAML editor">Edit as YAML</button>
+  <label class="field">
+    <span>OCI image *</span>
+    <input
+      placeholder="ghcr.io/kubeswift-io/kubeswift/kernels/faas:6.6.1"
+      [value]="image()"
+      (input)="image.set($any($event.target).value)"
+    />
+  </label>
+
+  <div class="row2">
+    <label class="field">
+      <span>Profile (optional)</span>
+      <input
+        placeholder="faas-minimal"
+        [value]="profile()"
+        (input)="profile.set($any($event.target).value)"
+      />
+    </label>
+    <label class="field">
+      <span>Pull secret (optional)</span>
+      <input
+        placeholder="regcreds"
+        [value]="pullSecret()"
+        (input)="pullSecret.set($any($event.target).value)"
+      />
+    </label>
   </div>
-</aside>
+
+  <label class="field">
+    <span>Kernel cmdline (optional)</span>
+    <input
+      placeholder="console=ttyS0 reboot=k panic=1"
+      [value]="cmdline()"
+      (input)="cmdline.set($any($event.target).value)"
+    />
+  </label>
+  <p class="hint">
+    A tag change alone won't re-pull an existing kernel — the pull Job is keyed on name + node.
+  </p>
+</app-form-shell>

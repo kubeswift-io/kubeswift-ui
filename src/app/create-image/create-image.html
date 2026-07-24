@@ -1,106 +1,133 @@
-<div class="backdrop" (click)="closed.emit()"></div>
-<aside class="drawer">
-  <header>
-    <div class="title">
-      <span class="name">New image</span>
-      <span class="sub">import a SwiftImage VM disk</span>
-    </div>
-    <select class="cluster" [value]="cluster()" (change)="selectCluster($any($event.target).value)" title="Target cluster">
-      @for (c of clusters(); track c.name) {
-        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
-      }
-    </select>
-    <button class="icon" (click)="closed.emit()" title="Close"><mat-icon>close</mat-icon></button>
-  </header>
-
-  @if (error(); as e) {
-    <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
-  }
-
-  <div class="body">
-    <div class="row2">
-      <label class="field">
-        <span>Namespace</span>
+<app-form-shell
+  [title]="isEdit() ? 'Edit image' : 'New image'"
+  sub="a SwiftImage VM disk"
+  [clusters]="clusters()"
+  [cluster]="cluster()"
+  [edit]="isEdit()"
+  [view]="view()"
+  [yaml]="yamlText()"
+  [error]="error()"
+  [canWrite]="canWrite()"
+  [busy]="busy()"
+  [canSave]="canSave()"
+  [saveLabel]="isEdit() ? 'Apply' : 'Create image'"
+  (clusterChange)="selectCluster($event)"
+  (viewChange)="setView($event)"
+  (yamlChange)="yamlText.set($event)"
+  (save)="save()"
+  (close)="closed.emit()"
+>
+  <div class="row2">
+    <label class="field">
+      <span>Namespace</span>
+      @if (isEdit()) {
+        <input [value]="namespace()" disabled />
+      } @else {
         <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
           @for (ns of namespaces(); track ns) {
             <option [value]="ns">{{ ns }}</option>
           }
         </select>
-      </label>
-      <label class="field">
-        <span>Name *</span>
-        <input placeholder="ubuntu-noble" [value]="name()" (input)="name.set($any($event.target).value)" />
-      </label>
-    </div>
-
-    <h4>Source</h4>
-    <div class="seg">
-      <button [class.on]="src() === 'http'" (click)="selectSrc('http')">HTTP(S)</button>
-      <button [class.on]="src() === 'oci'" (click)="selectSrc('oci')">OCI golden</button>
-      <button [class.on]="src() === 'pvcClone'" (click)="selectSrc('pvcClone')">PVC clone</button>
-    </div>
-
-    @if (src() === 'http') {
-      <label class="field">
-        <span>URL *</span>
-        <input placeholder="https://…/image.qcow2" [value]="url()" (input)="url.set($any($event.target).value)" />
-      </label>
-    } @else if (src() === 'oci') {
-      <div class="row2">
-        <label class="field">
-          <span>Repository *</span>
-          <input placeholder="ghcr.io/org/vm-images" [value]="ociRepo()" (input)="ociRepo.set($any($event.target).value)" />
-        </label>
-        <label class="field">
-          <span>Tag</span>
-          <input placeholder="noble-24.04" [value]="ociTag()" (input)="ociTag.set($any($event.target).value)" />
-        </label>
-      </div>
-      <label class="check">
-        <input type="checkbox" [checked]="ociInsecure()" (change)="ociInsecure.set($any($event.target).checked)" />
-        <span>Insecure registry (plaintext HTTP — test only)</span>
-      </label>
-    } @else {
-      <div class="row2">
-        <label class="field">
-          <span>Source PVC *</span>
-          <input placeholder="my-golden-pvc" [value]="pvcName()" (input)="pvcName.set($any($event.target).value)" />
-        </label>
-        <label class="field">
-          <span>PVC namespace</span>
-          <input placeholder="(this namespace)" [value]="pvcNamespace()" (input)="pvcNamespace.set($any($event.target).value)" />
-        </label>
-      </div>
-    }
-
-    <h4>Disk</h4>
-    <div class="row2">
-      <label class="field">
-        <span>Source format</span>
-        <select [value]="format()" (change)="format.set($any($event.target).value)">
-          <option value="qcow2">qcow2 (cloud images)</option>
-          <option value="raw">raw</option>
-        </select>
-      </label>
-      <label class="field">
-        <span>Resize to (optional)</span>
-        <input placeholder="40Gi" [value]="diskSize()" (input)="diskSize.set($any($event.target).value)" />
-      </label>
-    </div>
+      }
+    </label>
     <label class="field">
-      <span>OS type</span>
-      <select [value]="osType()" (change)="osType.set($any($event.target).value)">
-        <option value="linux">linux (default)</option>
-        <option value="windows">windows (virtio-ready image)</option>
-      </select>
+      <span>Name *</span>
+      <input
+        placeholder="ubuntu-noble"
+        [value]="name()"
+        (input)="name.set($any($event.target).value)"
+        [disabled]="isEdit()"
+      />
     </label>
   </div>
 
-  <div class="actions">
-    <button class="primary" [disabled]="!canCreate() || busy()" (click)="create()">
-      {{ busy() ? 'Creating…' : 'Create image' }}
-    </button>
-    <button class="ghost" (click)="closed.emit()">Cancel</button>
-    <button class="link" (click)="advanced.emit()" title="Switch to the raw YAML editor">Edit as YAML</button>
+  <h4>Source</h4>
+  <div class="seg">
+    <button [class.on]="src() === 'http'" (click)="selectSrc('http')">HTTP(S)</button>
+    <button [class.on]="src() === 'oci'" (click)="selectSrc('oci')">OCI golden</button>
+    <button [class.on]="src() === 'pvcClone'" (click)="selectSrc('pvcClone')">PVC clone</button>
   </div>
-</aside>
+
+  @if (src() === 'http') {
+    <label class="field">
+      <span>URL *</span>
+      <input
+        placeholder="https://…/image.qcow2"
+        [value]="url()"
+        (input)="url.set($any($event.target).value)"
+      />
+    </label>
+  } @else if (src() === 'oci') {
+    <div class="row2">
+      <label class="field">
+        <span>Repository *</span>
+        <input
+          placeholder="ghcr.io/org/vm-images"
+          [value]="ociRepo()"
+          (input)="ociRepo.set($any($event.target).value)"
+        />
+      </label>
+      <label class="field">
+        <span>Tag</span>
+        <input
+          placeholder="noble-24.04"
+          [value]="ociTag()"
+          (input)="ociTag.set($any($event.target).value)"
+        />
+      </label>
+    </div>
+    <label class="check">
+      <input
+        type="checkbox"
+        [checked]="ociInsecure()"
+        (change)="ociInsecure.set($any($event.target).checked)"
+      />
+      <span>Insecure registry (plaintext HTTP — test only)</span>
+    </label>
+  } @else {
+    <div class="row2">
+      <label class="field">
+        <span>Source PVC *</span>
+        <input
+          placeholder="my-golden-pvc"
+          [value]="pvcName()"
+          (input)="pvcName.set($any($event.target).value)"
+        />
+      </label>
+      <label class="field">
+        <span>PVC namespace</span>
+        <input
+          placeholder="(this namespace)"
+          [value]="pvcNamespace()"
+          (input)="pvcNamespace.set($any($event.target).value)"
+        />
+      </label>
+    </div>
+  }
+
+  <h4>Disk</h4>
+  <div class="row2">
+    <label class="field">
+      <span>Source format</span>
+      <select [value]="format()" (change)="format.set($any($event.target).value)">
+        <option value="qcow2">qcow2 (cloud images)</option>
+        <option value="raw">raw</option>
+      </select>
+    </label>
+    <label class="field">
+      <span>Resize to (optional)</span>
+      <input
+        placeholder="40Gi"
+        [value]="diskSize()"
+        (input)="diskSize.set($any($event.target).value)"
+      />
+    </label>
+  </div>
+  <label class="field">
+    <span>OS type</span>
+    <select [value]="osType()" (change)="osType.set($any($event.target).value)">
+      <option value="linux">linux (default)</option>
+      <option value="windows">windows (virtio-ready image)</option>
+    </select>
+  </label>
+</app-form-shell>

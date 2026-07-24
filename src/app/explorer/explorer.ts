@@ -77,6 +77,15 @@ const EDITABLE_FORM_KINDS = new Set([
   'replicasets',
   'jobs',
   'cronjobs',
+  'swiftsandboxes',
+  'swiftguestclasses',
+  'swiftimages',
+  'swiftseedprofiles',
+  'swiftkernels',
+  'swiftgpuprofiles',
+  'swiftsnapshotschedules',
+  'swiftsandboxpools',
+  'swiftguestpools',
 ]);
 
 const GUIDED_KINDS = new Set([
@@ -423,11 +432,6 @@ export class Explorer implements OnInit {
     this.guidedCreateKind.set('');
     this.guidedExisting.set('');
     await this.reload();
-  }
-  // A wizard's "Edit as YAML" link: drop the guided form, open the raw editor.
-  openAdvancedCreate(): void {
-    this.guidedCreateKind.set('');
-    this.openYamlCreate();
   }
   async onSaved(): Promise<void> {
     this.editorOpen.set(false);
