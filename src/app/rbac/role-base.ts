@@ -1,6 +1,6 @@
 import { Directive, signal } from '@angular/core';
 import { ResourceForm } from '../resource-form';
-import { listNames } from '../wizard-util';
+import { deepClone, listNames } from '../wizard-util';
 
 type Obj = Record<string, unknown>;
 export interface PolicyRule {
@@ -20,23 +20,34 @@ export abstract class RoleFormBase extends ResourceForm {
 
   readonly rules = signal<PolicyRule[]>([{ apiGroups: '', resources: '', verbs: '', resourceNames: '' }]);
   readonly namespaces = signal<string[]>([]);
+  /**
+   * Rules the editor cannot represent, carried through verbatim. A
+   * nonResourceURLs rule (/metrics, /healthz, /version) has no `resources`, so
+   * both the row mapping and the save-time filter would drop it — silently
+   * revoking a scrape or health-probe grant on an unrelated edit.
+   */
+  readonly passthroughRules = signal<Obj[]>([]);
 
   protected override async onCluster(cluster: string): Promise<void> {
     if (this.namespaced) this.namespaces.set(await listNames(this.gw, cluster, 'namespaces'));
   }
 
   hydrate(obj: Obj): void {
-    const rules = ((obj['rules'] ?? []) as Obj[]).map((r) => ({
-      apiGroups: ((r['apiGroups'] ?? []) as string[]).join(', '),
-      resources: ((r['resources'] ?? []) as string[]).join(', '),
-      verbs: ((r['verbs'] ?? []) as string[]).join(', '),
-      resourceNames: ((r['resourceNames'] ?? []) as string[]).join(', '),
-    }));
+    const all = (obj['rules'] ?? []) as Obj[];
+    this.passthroughRules.set(all.filter((r) => !!r['nonResourceURLs']));
+    const rules = all
+      .filter((r) => !r['nonResourceURLs'])
+      .map((r) => ({
+        apiGroups: ((r['apiGroups'] ?? []) as string[]).join(', '),
+        resources: ((r['resources'] ?? []) as string[]).join(', '),
+        verbs: ((r['verbs'] ?? []) as string[]).join(', '),
+        resourceNames: ((r['resourceNames'] ?? []) as string[]).join(', '),
+      }));
     this.rules.set(rules.length ? rules : [{ apiGroups: '', resources: '', verbs: '', resourceNames: '' }]);
   }
 
   build(base: Obj): Obj {
-    base['rules'] = this.rules()
+    const edited = this.rules()
       .filter((r) => csv(r.verbs).length && csv(r.resources).length)
       .map((r) => {
         const ag = csv(r.apiGroups);
@@ -48,12 +59,17 @@ export abstract class RoleFormBase extends ResourceForm {
           ...(rn.length ? { resourceNames: rn } : {}),
         };
       });
+    base['rules'] = [...edited, ...deepClone(this.passthroughRules())];
     return base;
   }
 
   canSave(): boolean {
     if (!this.cluster() || !this.name().trim()) return false;
     if (this.namespaced && !this.namespace()) return false;
+    // Preserved non-resource rules count: a ClusterRole made up ONLY of
+    // nonResourceURLs grants is otherwise unsavable here, since it has no row
+    // the editor can represent.
+    if (this.passthroughRules().length) return true;
     return this.rules().some((r) => csv(r.verbs).length && csv(r.resources).length);
   }
 

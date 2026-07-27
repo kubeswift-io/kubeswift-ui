@@ -46,9 +46,17 @@
     <button [class.on]="src() === 'http'" (click)="selectSrc('http')">HTTP(S)</button>
     <button [class.on]="src() === 'oci'" (click)="selectSrc('oci')">OCI golden</button>
     <button [class.on]="src() === 'pvcClone'" (click)="selectSrc('pvcClone')">PVC clone</button>
+    @if (src() === 'other') {
+      <button class="on" disabled>upload</button>
+    }
   </div>
 
-  @if (src() === 'http') {
+  @if (src() === 'other') {
+    <p class="hint">
+      This image's source has no editor here. It is preserved as-is on save — toggle to YAML to
+      change it. Choosing a source above will replace it.
+    </p>
+  } @else if (src() === 'http') {
     <label class="field">
       <span>URL *</span>
       <input

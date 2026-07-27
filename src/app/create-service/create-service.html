@@ -72,7 +72,7 @@
         <div class="prow">
           <input placeholder="http" [value]="p.name" (input)="setPort($index, 'name', $any($event.target).value)" />
           <input type="number" min="1" [value]="p.port || ''" (input)="setPort($index, 'port', $any($event.target).value)" />
-          <input type="number" min="1" placeholder="=port" [value]="p.targetPort || ''" (input)="setPort($index, 'targetPort', $any($event.target).value)" />
+          <input type="text" placeholder="=port" [value]="p.targetPort" (input)="setPort($index, 'targetPort', $any($event.target).value)" />
           <select [value]="p.protocol" (change)="setPort($index, 'protocol', $any($event.target).value)">
             <option value="TCP">TCP</option>
             <option value="UDP">UDP</option>

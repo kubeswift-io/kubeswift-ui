@@ -2,12 +2,13 @@ import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormShell } from '../form-shell/form-shell';
 import { ResourceForm } from '../resource-form';
-import { listNames } from '../wizard-util';
+import { deepClone, listNames } from '../wizard-util';
 
 type Obj = Record<string, unknown>;
 
 /** CreateSnapshotSchedule — a SwiftSnapshotSchedule (cron snapshots + keep-N).
- *  local + CSI backends here; S3/OCI object backends route through the YAML toggle. */
+ *  local + CSI backends have widgets here; an S3/OCI backend on a loaded schedule
+ *  is preserved as-is and edited through the YAML toggle. */
 @Component({
   selector: 'app-create-snapshotschedule',
   imports: [MatIconModule, FormShell],
@@ -31,6 +32,13 @@ export class CreateSnapshotSchedule extends ResourceForm {
   readonly suspend = signal(false);
   readonly namespaces = signal<string[]>([]);
   readonly guests = signal<string[]>([]);
+  /** The loaded backend, kept verbatim for s3/oci which have no widget here. */
+  readonly rawBackend = signal<Obj>({});
+
+  /** backendType is the loaded backend's type, for the preserved-backend notice. */
+  backendType(): string {
+    return String(this.rawBackend()['type'] ?? '');
+  }
 
   protected override async onCluster(cluster: string): Promise<void> {
     const [ns, g] = await Promise.all([
@@ -57,11 +65,19 @@ export class CreateSnapshotSchedule extends ResourceForm {
     this.guestRef.set(String(((tspec['guestRef'] ?? {}) as Obj)['name'] ?? ''));
     this.includeMemory.set(!!tspec['includeMemory']);
     const be = (tspec['backend'] ?? {}) as Obj;
-    if (be['type'] === 'csi-volume-snapshot') {
+    this.rawBackend.set(be);
+    const type = String(be['type'] ?? '');
+    if (type === 'csi-volume-snapshot') {
       this.backend.set('csi-volume-snapshot');
       this.csiClass.set(
         String(((be['csiVolumeSnapshot'] ?? {}) as Obj)['volumeSnapshotClassName'] ?? ''),
       );
+    } else if (type && type !== 'local') {
+      // s3 / oci — the object backends, which exist precisely to get snapshots
+      // OFF the node. They have no widget here, so keep the loaded backend
+      // verbatim: falling through to 'local' silently redirected a production
+      // offsite schedule to node-local disk, and it kept reporting success.
+      this.backend.set('other');
     } else {
       this.backend.set('local');
       this.localHostPath.set(String(((be['local'] ?? {}) as Obj)['hostPath'] ?? ''));
@@ -72,7 +88,10 @@ export class CreateSnapshotSchedule extends ResourceForm {
     const spec = (base['spec'] = (base['spec'] ?? {}) as Obj) as Obj;
     let backendObj: Obj;
     let includeMemory: boolean;
-    if (this.backend() === 'csi-volume-snapshot') {
+    if (this.backend() === 'other') {
+      backendObj = deepClone(this.rawBackend());
+      includeMemory = this.includeMemory();
+    } else if (this.backend() === 'csi-volume-snapshot') {
       const csi: Obj = {};
       if (this.csiClass().trim()) csi['volumeSnapshotClassName'] = this.csiClass().trim();
       backendObj = { type: 'csi-volume-snapshot', csiVolumeSnapshot: csi };
@@ -88,9 +107,13 @@ export class CreateSnapshotSchedule extends ResourceForm {
     }
     spec['schedule'] = this.schedule().trim();
     spec['concurrencyPolicy'] = this.concurrency();
-    spec['template'] = {
-      spec: { guestRef: { name: this.guestRef() }, backend: backendObj, includeMemory },
-    };
+    // Merge into the template rather than replacing it, so template.metadata and
+    // any template.spec field with no widget here survive the edit.
+    const tmpl = (spec['template'] = (spec['template'] ?? {}) as Obj) as Obj;
+    const tspec = (tmpl['spec'] = (tmpl['spec'] ?? {}) as Obj) as Obj;
+    tspec['guestRef'] = { name: this.guestRef() };
+    tspec['backend'] = backendObj;
+    tspec['includeMemory'] = includeMemory;
     if (this.suspend()) spec['suspend'] = true;
     else delete spec['suspend'];
     if (this.keepLast() > 0) spec['retention'] = { keepLast: Math.floor(this.keepLast()) };

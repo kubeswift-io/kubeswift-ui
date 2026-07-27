@@ -43,4 +43,10 @@
     </div>
   }
   <button class="link" style="margin: 0" (click)="addRule()">+ Add rule</button>
+  @if (passthroughRules().length) {
+    <p class="hint">
+      {{ passthroughRules().length }} non-resource URL rule(s) not shown — preserved on save. Toggle to
+      YAML to edit them.
+    </p>
+  }
 </app-form-shell>
