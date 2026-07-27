@@ -2,10 +2,11 @@ import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormShell } from '../form-shell/form-shell';
 import { ResourceForm } from '../resource-form';
-import { listNames } from '../wizard-util';
+import { deepClone, listNames } from '../wizard-util';
 
 type Obj = Record<string, unknown>;
-type Src = 'http' | 'oci' | 'pvcClone';
+// 'other' = a source variant with no widget here (spec.source.upload), kept verbatim.
+type Src = 'http' | 'oci' | 'pvcClone' | 'other';
 
 /** CreateImage — a SwiftImage VM disk (HTTP / OCI golden / PVC clone → raw runtime disk). */
 @Component({
@@ -31,6 +32,8 @@ export class CreateImage extends ResourceForm {
   readonly osType = signal('linux');
   readonly diskSize = signal('');
   readonly namespaces = signal<string[]>([]);
+  /** The loaded spec.source, so unmodelled variants and oci sub-fields survive. */
+  readonly rawSource = signal<Obj>({});
 
   protected override async onCluster(cluster: string): Promise<void> {
     this.namespaces.set(await listNames(this.gw, cluster, 'namespaces'));
@@ -46,6 +49,7 @@ export class CreateImage extends ResourceForm {
   hydrate(obj: Obj): void {
     const spec = (obj['spec'] ?? {}) as Obj;
     const source = (spec['source'] ?? {}) as Obj;
+    this.rawSource.set(source);
     if (source['oci']) {
       this.src.set('oci');
       const oci = source['oci'] as Obj;
@@ -57,6 +61,10 @@ export class CreateImage extends ResourceForm {
       const pvc = source['pvcClone'] as Obj;
       this.pvcName.set(String(pvc['name'] ?? ''));
       this.pvcNamespace.set(String(pvc['namespace'] ?? ''));
+    } else if (!source['http'] && Object.keys(source).length) {
+      // A source variant with no widget here (spec.source.upload). Falling
+      // through to 'http' rewrote it to an empty URL on save.
+      this.src.set('other');
     } else {
       this.src.set('http');
       this.url.set(String(((source['http'] ?? {}) as Obj)['url'] ?? ''));
@@ -69,12 +77,20 @@ export class CreateImage extends ResourceForm {
   build(base: Obj): Obj {
     const spec = (base['spec'] = (base['spec'] ?? {}) as Obj) as Obj;
     let source: Obj;
-    if (this.src() === 'http') {
+    if (this.src() === 'other') {
+      source = deepClone(this.rawSource());
+    } else if (this.src() === 'http') {
       source = { http: { url: this.url().trim() } };
     } else if (this.src() === 'oci') {
-      const oci: Obj = { repository: this.ociRepo().trim() };
+      // Merge onto the loaded oci block: digest (the pin), credentialsSecretRef
+      // and above all verifyKeySecretRef (cosign verify-on-pull) have no widget
+      // here, and rebuilding the block silently disabled signature verification.
+      const oci = deepClone((this.rawSource()['oci'] ?? {}) as Obj);
+      oci['repository'] = this.ociRepo().trim();
       if (this.ociTag().trim()) oci['tag'] = this.ociTag().trim();
+      else delete oci['tag'];
       if (this.ociInsecure()) oci['insecure'] = true;
+      else delete oci['insecure'];
       source = { oci };
     } else {
       const pvc: Obj = { name: this.pvcName().trim() };
@@ -92,6 +108,7 @@ export class CreateImage extends ResourceForm {
 
   canSave(): boolean {
     if (!this.cluster() || !this.namespace() || !this.name().trim()) return false;
+    if (this.src() === 'other') return true; // preserved as loaded
     if (this.src() === 'http') return !!this.url().trim();
     if (this.src() === 'oci') return !!this.ociRepo().trim();
     return !!this.pvcName().trim();

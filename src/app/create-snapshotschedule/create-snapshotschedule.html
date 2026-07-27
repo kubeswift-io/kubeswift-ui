@@ -70,8 +70,17 @@
     >
       CSI
     </button>
+    @if (backend() === 'other') {
+      <button class="on" disabled>{{ backendType() }}</button>
+    }
   </div>
-  @if (backend() === 'local') {
+  @if (backend() === 'other') {
+    <p class="hint">
+      This schedule uses the <code>{{ backendType() }}</code> object backend, which has no editor
+      here. It is preserved as-is on save — toggle to YAML to change it. Choosing local or CSI above
+      will replace it.
+    </p>
+  } @else if (backend() === 'local') {
     <label class="check">
       <input
         type="checkbox"
@@ -100,7 +109,7 @@
     </label>
     <p class="hint">CSI is disk-only; memory is not captured.</p>
   }
-  <p class="hint">S3 / OCI object backends: toggle to YAML.</p>
+  <p class="hint">To use an S3 / OCI object backend, toggle to YAML.</p>
 
   <h4>Retention &amp; policy</h4>
   <div class="row2">
