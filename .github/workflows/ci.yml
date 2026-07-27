@@ -22,3 +22,8 @@ jobs:
       - run: npm ci
       - name: Build (static)
         run: npx ng build
+      # ubuntu-latest ships Chrome, so the Karma runner needs no extra setup.
+      # podspec.spec.ts covers the PodSpec merge, where a silent regression means
+      # the editor deletes fields the operator never touched.
+      - name: Unit tests
+        run: npx ng test --watch=false --browsers=ChromeHeadless
