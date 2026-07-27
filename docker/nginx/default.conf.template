@@ -6,12 +6,31 @@
 # tokens are substituted (they are env vars); nginx's own $variables are
 # preserved because they are NOT in the environment. See docker/entrypoint.d/.
 
-# WebSocket upgrade map for the /console plane. http{} context (conf.d files are
+# WebSocket upgrade map for the raw-WS planes. http{} context (conf.d files are
 # included inside http{}); must sit outside the server block.
 map $http_upgrade $kubeswift_connection_upgrade {
     default upgrade;
     ''      close;
 }
+
+# Request path with the query string stripped, for the access log below.
+map $request_uri $kubeswift_path {
+    ~^(?<p>[^?]*)  $p;
+    default        $request_uri;
+}
+
+# Access-log format that logs the PATH, not $request.
+#
+# The three raw-WebSocket planes carry the OIDC bearer as ?token= -- a browser
+# cannot set an Authorization header on a WebSocket -- and the stock `combined`
+# format logs $request, which includes the query string. Every console /
+# sandbox-exec / sandbox-logs handshake therefore wrote a live, replayable ID
+# token into this pod's own access log, where anyone holding `pods/log` on the
+# namespace (and every log shipper) could read it. Dropping the whole query
+# rather than just `token` keeps that true for any parameter added later.
+log_format kubeswift '$remote_addr - $remote_user [$time_local] '
+                     '"$request_method $kubeswift_path $server_protocol" '
+                     '$status $body_bytes_sent "$http_referer" "$http_user_agent"';
 
 gzip on;
 gzip_comp_level 5;
@@ -28,6 +47,28 @@ server {
     root  /usr/share/nginx/html;
     index index.html;
 
+    access_log /var/log/nginx/access.log kubeswift;
+
+    # Security headers, `always` so they are set on error responses too.
+    #
+    # frame-ancestors / X-Frame-Options are the load-bearing ones: the VM serial
+    # console and the sandbox exec terminal pipe keystrokes straight into a
+    # guest, so a framed UI plus an overlay is a keystroke-injection primitive
+    # against a root shell.
+    #
+    # This is deliberately NOT a full CSP -- script-src/connect-src depend on
+    # gateway.mode (same-origin proxy vs an absolute URL known only at runtime),
+    # so a complete policy needs the entrypoint to compute connect-src. Tracked
+    # separately; frame-ancestors is correct in every mode.
+    #
+    # nginx gotcha: add_header is inherited by a location ONLY if that location
+    # declares no add_header of its own. The two locations below that set
+    # Cache-Control therefore repeat these.
+    add_header X-Frame-Options "DENY" always;
+    add_header Content-Security-Policy "frame-ancestors 'none'" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "no-referrer" always;
+
     # Cluster DNS, extracted from /etc/resolv.conf at startup
     # (10-kubeswift-resolver.envsh). Lets the variable proxy_pass below resolve
     # the gateway Service name at REQUEST time, so nginx still starts when no
@@ -40,6 +81,12 @@ server {
     # would not take effect on redeploy.
     location = /config.js {
         add_header Cache-Control "no-store" always;
+        # Repeated because this location declares an add_header of its own — see
+        # the inheritance note in the server block.
+        add_header X-Frame-Options "DENY" always;
+        add_header Content-Security-Policy "frame-ancestors 'none'" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "no-referrer" always;
         default_type application/javascript;
         try_files $uri =404;
     }
@@ -76,8 +123,18 @@ server {
         proxy_send_timeout 1h;
     }
 
-    # Serial-console plane: a raw WebSocket (not Connect), with a query string.
-    location = /console {
+    # Raw-WebSocket planes (not Connect), each with a query string. ALL THREE
+    # must be listed: only /console was proxied, so sandbox logs and sandbox
+    # exec fell through to the SPA fallback below and the handshake got a 200
+    # with index.html instead of a 101 -- both features were dead in the default
+    # gateway.mode=proxy deployment, failing as an opaque "connection closed".
+    #
+    # This regex location must stay ABOVE the static-asset regex: nginx tries
+    # regex locations in order of appearance.
+    # proxy_pass carries NO URI part -- required in a regex location, and it is
+    # what makes nginx forward the original request URI (query string included,
+    # which is where these planes carry cluster/namespace/name).
+    location ~ ^/(console|sandbox-logs|sandbox-exec)$ {
         proxy_pass http://$kubeswift_gateway_upstream;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
@@ -96,6 +153,13 @@ server {
         try_files $uri =404;
         expires 1y;
         add_header Cache-Control "public, immutable";
+        # Repeated because this location declares an add_header of its own — see
+        # the inheritance note in the server block. nosniff is the one that
+        # matters on a script/style response.
+        add_header X-Frame-Options "DENY" always;
+        add_header Content-Security-Policy "frame-ancestors 'none'" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "no-referrer" always;
     }
 
     # Angular client-side routing: every other path falls back to index.html so
