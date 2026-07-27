@@ -57,7 +57,8 @@ export class Console implements AfterViewInit, OnDestroy {
     window.addEventListener('resize', this.onResize);
 
     const r = this.ref();
-    const ws = new WebSocket(this.gw.consoleWsUrl(r.cluster, r.namespace, r.name));
+    const t = this.gw.consoleWs(r.cluster, r.namespace, r.name);
+    const ws = new WebSocket(t.url, t.protocols);
     ws.binaryType = 'arraybuffer';
     ws.onopen = () => {
       this.status.set('open');

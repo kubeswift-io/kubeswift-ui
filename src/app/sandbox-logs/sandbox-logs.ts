@@ -57,9 +57,8 @@ export class SandboxLogs implements AfterViewInit, OnDestroy {
     this.fit = fit;
     window.addEventListener('resize', this.onResize);
 
-    const ws = new WebSocket(
-      this.gw.sandboxLogsWsUrl(this.cluster(), this.namespace(), this.name()),
-    );
+    const t = this.gw.sandboxLogsWs(this.cluster(), this.namespace(), this.name());
+    const ws = new WebSocket(t.url, t.protocols);
     ws.binaryType = 'arraybuffer';
     ws.onopen = () => this.status.set('open');
     ws.onmessage = (ev) => {
