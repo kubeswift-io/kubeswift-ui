@@ -93,8 +93,16 @@
         <label class="check" style="margin: 0"><input type="checkbox" [checked]="c.readOnlyRootFs" (change)="setC(ci, 'readOnlyRootFs', $any($event.target).checked)" /><span>readOnlyRootFs</span></label>
       </div>
     </div>
-    <label class="check"><input type="checkbox" [checked]="c.allowPrivEsc" (change)="setC(ci, 'allowPrivEsc', $any($event.target).checked)" /><span>allowPrivilegeEscalation</span></label>
-    <label class="check"><input type="checkbox" [checked]="c.privileged" (change)="setC(ci, 'privileged', $any($event.target).checked)" /><span>privileged</span></label>
+    <div class="row2">
+      <label class="field"><span>allowPrivilegeEscalation</span>
+        <select [value]="c.allowPrivEsc" (change)="setC(ci, 'allowPrivEsc', $any($event.target).value)">
+          <option value="">(unset — Kubernetes allows it)</option>
+          <option value="false">false — deny (restricted PSS)</option>
+          <option value="true">true — allow</option>
+        </select>
+      </label>
+      <label class="check" style="margin-top: 18px"><input type="checkbox" [checked]="c.privileged" (change)="setC(ci, 'privileged', $any($event.target).checked)" /><span>privileged</span></label>
+    </div>
   </div>
 }
 <button class="link" style="margin: 0 0 8px" (click)="addContainer()">+ Add container</button>
@@ -104,13 +112,20 @@
   @for (v of volumes(); track vi; let vi = $index) {
     <div class="prow" style="grid-template-columns: 1fr 1fr 1.2fr 28px">
       <input placeholder="name" [value]="v.name" (input)="setVol(vi, 'name', $any($event.target).value)" />
-      <select [value]="v.type" (change)="setVol(vi, 'type', $any($event.target).value)">
-        <option value="emptyDir">emptyDir</option><option value="configMap">configMap</option><option value="secret">secret</option>
-        <option value="persistentVolumeClaim">pvc</option><option value="hostPath">hostPath</option>
-      </select>
-      @if (v.type !== 'emptyDir') {
-        <input placeholder="source" [value]="v.source" (input)="setVol(vi, 'source', $any($event.target).value)" />
-      } @else { <span></span> }
+      @if (v.type === 'other') {
+        <!-- A volume type this editor has no widget for (csi, projected, nfs...).
+             Shown read-only and passed through untouched; edit it on the YAML tab. -->
+        <span class="hint" title="Not editable here — preserved as-is. Use the YAML tab to change it.">{{ v.source }}</span>
+        <span class="hint">preserved</span>
+      } @else {
+        <select [value]="v.type" (change)="setVol(vi, 'type', $any($event.target).value)">
+          <option value="emptyDir">emptyDir</option><option value="configMap">configMap</option><option value="secret">secret</option>
+          <option value="persistentVolumeClaim">pvc</option><option value="hostPath">hostPath</option>
+        </select>
+        @if (v.type !== 'emptyDir') {
+          <input placeholder="source" [value]="v.source" (input)="setVol(vi, 'source', $any($event.target).value)" />
+        } @else { <span></span> }
+      }
       <button class="rowx" (click)="removeVolume(vi)" title="Remove"><mat-icon>close</mat-icon></button>
     </div>
   }
