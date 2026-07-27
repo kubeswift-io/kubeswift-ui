@@ -66,6 +66,10 @@ export abstract class RoleFormBase extends ResourceForm {
   canSave(): boolean {
     if (!this.cluster() || !this.name().trim()) return false;
     if (this.namespaced && !this.namespace()) return false;
+    // Preserved non-resource rules count: a ClusterRole made up ONLY of
+    // nonResourceURLs grants is otherwise unsavable here, since it has no row
+    // the editor can represent.
+    if (this.passthroughRules().length) return true;
     return this.rules().some((r) => csv(r.verbs).length && csv(r.resources).length);
   }
 
