@@ -20,6 +20,14 @@ const w = globalThis as unknown as {
 const ISSUER = (w.__KUBESWIFT_OIDC_ISSUER__ ?? '').replace(/\/$/, '');
 const CLIENT_ID = w.__KUBESWIFT_OIDC_CLIENT_ID__ ?? '';
 const STORE = 'kubeswift.oidc.tokens';
+// The refresh token lives in sessionStorage, NOT localStorage: it is the
+// long-lived half of the credential (it mints new ID tokens well past their
+// ~5-minute lifetime), and localStorage survives tab close and is readable by
+// any script on the origin. Splitting them bounds what a persistent-store read
+// yields to a token that expires in minutes. Cost: a NEW tab re-authenticates,
+// which is silent when the IdP session is still alive.
+const REFRESH_STORE = 'kubeswift.oidc.refresh';
+const NONCE_KEY = 'kubeswift.oidc.nonce';
 
 /**
  * AuthService runs a browser OIDC Authorization-Code + PKCE login against the
@@ -76,7 +84,17 @@ export class AuthService {
   }
 
   isAuthenticated(): boolean {
-    return !this.enabled || this.user() !== null;
+    // Not just "we once had a user". user was only ever cleared on a REFRESH
+    // FAILURE, so a session that simply ran out — no refresh token, nothing to
+    // fail — kept rendering as signed-in while every RPC went out with no
+    // Authorization header and came back Unauthenticated, surfacing as generic
+    // red banners instead of "sign in again".
+    return !this.enabled || (this.user() !== null && this.sessionAlive());
+  }
+
+  /** sessionAlive: the token is usable, or can still be refreshed into one. */
+  private sessionAlive(): boolean {
+    return this.valid() || !!this.tokens?.refresh_token;
   }
 
   /** A non-expired bearer for the gateway; refreshes first if near expiry. */
@@ -93,6 +111,10 @@ export class AuthService {
         return null;
       }
     }
+    // Expired with nothing to refresh from: the session is over. Say so, rather
+    // than leaving a signed-in-looking shell that cannot talk to the gateway.
+    this.clear();
+    this.user.set(null);
     return null;
   }
 
@@ -118,14 +140,20 @@ export class AuthService {
       const verifier = randomString(64);
       const challenge = await s256(verifier);
       const state = randomString(32);
+      // nonce binds the ID token to THIS authorization request, so a token
+      // captured from another flow cannot be replayed into this session. PKCE
+      // protects the code exchange; nonce protects the token itself.
+      const nonce = randomString(32);
       sessionStorage.setItem('kubeswift.oidc.verifier', verifier);
       sessionStorage.setItem('kubeswift.oidc.state', state);
+      sessionStorage.setItem(NONCE_KEY, nonce);
       const p = new URLSearchParams({
         response_type: 'code',
         client_id: CLIENT_ID,
         redirect_uri: redirectUri(),
         scope: 'openid profile email',
         state,
+        nonce,
         code_challenge: challenge,
         code_challenge_method: 'S256',
       });
@@ -169,9 +197,22 @@ export class AuthService {
       redirect_uri: redirectUri(),
       code_verifier: verifier,
     });
+    // Verify the nonce BEFORE storing: an ID token whose nonce does not match
+    // the one we just sent did not come from this authorization request, so it
+    // must not become this session's credential. The gateway independently
+    // verifies the signature — this is the replay binding the client owes.
+    const expected = sessionStorage.getItem(NONCE_KEY);
+    if (expected) {
+      const claims = decodeJwt(String(t['id_token'] ?? ''));
+      const got = claims?.['nonce'];
+      if (got !== expected) {
+        throw new Error('OIDC nonce mismatch: the ID token does not belong to this sign-in');
+      }
+    }
     this.store(t);
     sessionStorage.removeItem('kubeswift.oidc.verifier');
     sessionStorage.removeItem('kubeswift.oidc.state');
+    sessionStorage.removeItem(NONCE_KEY);
   }
 
   private async refresh(): Promise<void> {
@@ -205,7 +246,9 @@ export class AuthService {
       refresh_token: t['refresh_token'] ? String(t['refresh_token']) : this.tokens?.refresh_token,
       expires_at: Date.now() + expiresIn * 1000,
     };
-    localStorage.setItem(STORE, JSON.stringify(this.tokens));
+    const { refresh_token, ...persist } = this.tokens;
+    localStorage.setItem(STORE, JSON.stringify(persist));
+    if (refresh_token) sessionStorage.setItem(REFRESH_STORE, refresh_token);
     this.user.set(this.username());
   }
 
@@ -213,7 +256,10 @@ export class AuthService {
     const raw = localStorage.getItem(STORE);
     if (!raw) return undefined;
     try {
-      return JSON.parse(raw) as StoredTokens;
+      const t = JSON.parse(raw) as StoredTokens;
+      const rt = sessionStorage.getItem(REFRESH_STORE);
+      if (rt) t.refresh_token = rt;
+      return t;
     } catch {
       return undefined;
     }
@@ -222,6 +268,7 @@ export class AuthService {
   private clear(): void {
     this.tokens = undefined;
     localStorage.removeItem(STORE);
+    sessionStorage.removeItem(REFRESH_STORE);
   }
 
   private valid(): boolean {

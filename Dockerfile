@@ -43,12 +43,14 @@ COPY --from=build --chown=101:0 /app/dist/kubeswift-ui/browser /usr/share/nginx/
 # Server config (envsubst template) + runtime entrypoint hooks.
 COPY docker/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY docker/entrypoint.d/10-kubeswift-resolver.envsh /docker-entrypoint.d/10-kubeswift-resolver.envsh
+COPY docker/entrypoint.d/15-kubeswift-csp.envsh      /docker-entrypoint.d/15-kubeswift-csp.envsh
 COPY docker/entrypoint.d/30-kubeswift-config-js.sh   /docker-entrypoint.d/30-kubeswift-config-js.sh
 # Drop the stock welcome server; make the entrypoint hooks executable (the
 # nginx entrypoint only runs *.sh/*.envsh that are +x); keep the web root
 # group-writable for config.js regeneration.
 RUN rm -f /etc/nginx/conf.d/default.conf \
  && chmod 0755 /docker-entrypoint.d/10-kubeswift-resolver.envsh \
+               /docker-entrypoint.d/15-kubeswift-csp.envsh \
                /docker-entrypoint.d/30-kubeswift-config-js.sh \
  && chmod -R g+w /usr/share/nginx/html
 USER 101

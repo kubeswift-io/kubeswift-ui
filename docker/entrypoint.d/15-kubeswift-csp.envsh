@@ -1,0 +1,45 @@
+#!/bin/sh
+# Compute the Content-Security-Policy connect-src for the nginx template.
+#
+# Why this is not a static header: connect-src has to name wherever the SPA
+# actually talks to, and that is gateway.mode-dependent and only known at
+# runtime.
+#
+#   proxy mode (KUBESWIFT_GATEWAY_URL empty or "@origin")
+#       every call is same-origin through this nginx -> 'self' is enough.
+#
+#   url mode (an absolute URL)
+#       the browser calls the gateway directly, cross-origin, over both HTTPS
+#       and WSS -> both schemes of that exact origin must be allowed, or the
+#       console and every RPC break with a CSP violation and no useful error.
+#
+# A wrong value here breaks the app in a way that looks like a network fault, so
+# it is derived rather than hand-written.
+
+kubeswift_csp_connect() {
+    _url="${KUBESWIFT_GATEWAY_URL:-}"
+    case "$_url" in
+        "" | "@origin")
+            printf "'self'"
+            return
+            ;;
+    esac
+
+    # Strip any path/query, keep scheme://host[:port].
+    _origin=$(printf '%s' "$_url" | sed -E 's#^([a-zA-Z][a-zA-Z0-9+.-]*://[^/?#]+).*#\1#')
+    case "$_origin" in
+        http://*)  _ws="ws://${_origin#http://}" ;;
+        https://*) _ws="wss://${_origin#https://}" ;;
+        *)
+            # Unparseable: fall back to same-origin only rather than emitting a
+            # malformed directive, which browsers drop wholesale.
+            echo "kubeswift-ui: could not derive a CSP origin from KUBESWIFT_GATEWAY_URL=$_url; using 'self'" >&2
+            printf "'self'"
+            return
+            ;;
+    esac
+    printf "'self' %s %s" "$_origin" "$_ws"
+}
+
+KUBESWIFT_CSP_CONNECT=$(kubeswift_csp_connect)
+export KUBESWIFT_CSP_CONNECT
