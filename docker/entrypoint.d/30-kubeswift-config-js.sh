@@ -25,8 +25,20 @@ url="${KUBESWIFT_GATEWAY_URL:-}"
 issuer="${KUBESWIFT_OIDC_ISSUER:-}"
 client_id="${KUBESWIFT_OIDC_CLIENT_ID:-}"
 
-# JS-escape backslash and double-quote so a value is a safe JS string literal.
-jsesc() { printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'; }
+# JS-escape a value so it is a safe JS string literal.
+#
+# Newlines matter as much as quotes here, and used to be missed: a value with an
+# embedded newline (a stray \n in a Helm value, a multiline ConfigMap key) emitted
+# an unterminated string literal, config.js threw a SyntaxError, and then NO
+# window.__KUBESWIFT_* global was set at all -- so AuthService.enabled was false,
+# the app rendered with no login screen, and the gateway URL silently fell back to
+# a built-in default. Not an auth bypass (the gateway still rejects the tokenless
+# calls) but it LOOKS like an unauthenticated console, which is worse than failing.
+# Carriage return and tab get the same treatment.
+jsesc() {
+    printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' \
+        -e 's/\r/\\r/g' -e 's/\t/\\t/g' | awk 'BEGIN{ORS=""} NR>1{print "\\n"} {print}'
+}
 
 # --- gateway URL (truncates/creates config.js) ---
 case "$url" in

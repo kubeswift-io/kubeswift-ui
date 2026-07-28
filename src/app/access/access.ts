@@ -113,6 +113,14 @@ export class Access implements OnInit {
   }
 
   async remove(a: Assignment): Promise<void> {
+    // Explorer's delete confirms; this one did not. Removing the wrong binding
+    // can revoke the grant that lets you manage RBAC at all, and then only a
+    // direct kubeconfig gets it back.
+    const where = a.namespace ? `namespace ${a.namespace}` : 'the cluster';
+    const who = a.subject?.name ?? "this subject";
+    if (!confirm(`Remove "${who}" from ${a.role} in ${where}? This cannot be undone.`)) {
+      return;
+    }
     await this.run(() =>
       this.gw.access.removeAssignment({
         cluster: this.selectedCluster(),
@@ -149,6 +157,9 @@ export class Access implements OnInit {
 
   async deleteRole(r: Role): Promise<void> {
     if (r.predefined) return;
+    if (!confirm(`Delete role "${r.name}"? Every assignment using it loses its grant. This cannot be undone.`)) {
+      return;
+    }
     await this.run(() =>
       this.gw.access.deleteRole({ cluster: this.selectedCluster(), name: r.name }),
     );

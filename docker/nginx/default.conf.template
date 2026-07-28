@@ -56,16 +56,21 @@ server {
     # guest, so a framed UI plus an overlay is a keystroke-injection primitive
     # against a root shell.
     #
-    # This is deliberately NOT a full CSP -- script-src/connect-src depend on
-    # gateway.mode (same-origin proxy vs an absolute URL known only at runtime),
-    # so a complete policy needs the entrypoint to compute connect-src. Tracked
-    # separately; frame-ancestors is correct in every mode.
+    # connect-src is computed at start-up by 15-kubeswift-csp.envsh, because it
+    # depends on gateway.mode: 'self' in proxy mode, and 'self' + the gateway's
+    # https:// AND wss:// origins when the SPA calls an absolute URL directly.
+    # Getting it wrong breaks every RPC and the console with what looks like a
+    # network fault, so it is derived rather than hand-written.
+    #
+    # style-src keeps 'unsafe-inline': Angular Material injects component styles
+    # inline at runtime, so removing it blanks the app. script-src does NOT --
+    # that is the directive that matters for injection.
     #
     # nginx gotcha: add_header is inherited by a location ONLY if that location
     # declares no add_header of its own. The two locations below that set
     # Cache-Control therefore repeat these.
     add_header X-Frame-Options "DENY" always;
-    add_header Content-Security-Policy "frame-ancestors 'none'" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src ${KUBESWIFT_CSP_CONNECT}; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "no-referrer" always;
 
@@ -84,7 +89,7 @@ server {
         # Repeated because this location declares an add_header of its own — see
         # the inheritance note in the server block.
         add_header X-Frame-Options "DENY" always;
-        add_header Content-Security-Policy "frame-ancestors 'none'" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src ${KUBESWIFT_CSP_CONNECT}; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'" always;
         add_header X-Content-Type-Options "nosniff" always;
         add_header Referrer-Policy "no-referrer" always;
         default_type application/javascript;
@@ -157,7 +162,7 @@ server {
         # the inheritance note in the server block. nosniff is the one that
         # matters on a script/style response.
         add_header X-Frame-Options "DENY" always;
-        add_header Content-Security-Policy "frame-ancestors 'none'" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src ${KUBESWIFT_CSP_CONNECT}; frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'" always;
         add_header X-Content-Type-Options "nosniff" always;
         add_header Referrer-Policy "no-referrer" always;
     }
