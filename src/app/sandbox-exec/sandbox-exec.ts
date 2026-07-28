@@ -60,7 +60,8 @@ export class SandboxExec implements AfterViewInit, OnDestroy {
     window.addEventListener('resize', this.onResize);
 
     const enc = new TextEncoder();
-    const ws = new WebSocket(this.gw.sandboxExecWsUrl(this.cluster(), this.namespace(), this.name()));
+    const t = this.gw.sandboxExecWs(this.cluster(), this.namespace(), this.name());
+    const ws = new WebSocket(t.url, t.protocols);
     ws.binaryType = 'arraybuffer';
     ws.onopen = () => {
       this.status.set('open');
