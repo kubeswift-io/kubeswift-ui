@@ -22,6 +22,12 @@ jobs:
       - run: npm ci
       - name: Build (static)
         run: npx ng build
+      # The container serves script-src 'self', which blocks inline handlers.
+      # An Angular build that defers the stylesheet behind onload="this.media='all'"
+      # therefore drops every non-critical rule silently -- it renders, it just
+      # loses CSS. Gate the artifact rather than trusting review to catch it.
+      - name: Build is loadable under the CSP
+        run: scripts/check-csp-safe-build.sh
       # ubuntu-latest ships Chrome, so the Karma runner needs no extra setup.
       # podspec.spec.ts covers the PodSpec merge, where a silent regression means
       # the editor deletes fields the operator never touched.
