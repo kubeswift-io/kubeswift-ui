@@ -1,9 +1,17 @@
 #!/bin/sh
 # Compute the Content-Security-Policy connect-src for the nginx template.
 #
-# Why this is not a static header: connect-src has to name wherever the SPA
-# actually talks to, and that is gateway.mode-dependent and only known at
-# runtime.
+# Why this is not a static header: connect-src has to name EVERY origin the SPA
+# opens a connection to, and those are only known at runtime. There are two, and
+# missing either one breaks the app in a way that looks like a network fault:
+#
+#   the gateway  — every Connect RPC and the three raw-WS planes
+#   the IdP      — OIDC discovery (.well-known) and the code->token exchange are
+#                  plain cross-origin fetch() calls from the browser to Keycloak.
+#                  Omitting this origin blocks the token exchange, init() swallows
+#                  the error, and the user is bounced straight back to the sign-in
+#                  page with no visible reason. (That regression shipped once;
+#                  hence this comment.)
 #
 #   proxy mode (KUBESWIFT_GATEWAY_URL empty or "@origin")
 #       every call is same-origin through this nginx -> 'self' is enough.
@@ -16,29 +24,52 @@
 # A wrong value here breaks the app in a way that looks like a network fault, so
 # it is derived rather than hand-written.
 
+# origin_of prints scheme://host[:port] for a URL, or nothing if unparseable.
+origin_of() {
+    printf '%s' "$1" | sed -nE 's#^([a-zA-Z][a-zA-Z0-9+.-]*://[^/?#]+).*#\1#p'
+}
+
 kubeswift_csp_connect() {
+    _out="'self'"
+
+    # --- the gateway ---
     _url="${KUBESWIFT_GATEWAY_URL:-}"
     case "$_url" in
         "" | "@origin")
-            printf "'self'"
-            return
+            : # same-origin through this nginx; 'self' already covers it
+            ;;
+        *)
+            _origin=$(origin_of "$_url")
+            if [ -n "$_origin" ]; then
+                case "$_origin" in
+                    http://*)  _ws="ws://${_origin#http://}" ;;
+                    https://*) _ws="wss://${_origin#https://}" ;;
+                    *)         _ws="" ;;
+                esac
+                _out="$_out $_origin${_ws:+ $_ws}"
+            else
+                echo "kubeswift-ui: could not derive a CSP origin from KUBESWIFT_GATEWAY_URL=$_url" >&2
+            fi
             ;;
     esac
 
-    # Strip any path/query, keep scheme://host[:port].
-    _origin=$(printf '%s' "$_url" | sed -E 's#^([a-zA-Z][a-zA-Z0-9+.-]*://[^/?#]+).*#\1#')
-    case "$_origin" in
-        http://*)  _ws="ws://${_origin#http://}" ;;
-        https://*) _ws="wss://${_origin#https://}" ;;
-        *)
-            # Unparseable: fall back to same-origin only rather than emitting a
-            # malformed directive, which browsers drop wholesale.
-            echo "kubeswift-ui: could not derive a CSP origin from KUBESWIFT_GATEWAY_URL=$_url; using 'self'" >&2
-            printf "'self'"
-            return
-            ;;
-    esac
-    printf "'self' %s %s" "$_origin" "$_ws"
+    # --- the IdP ---
+    # Needed even in gateway.mode=proxy: the browser talks to the IdP DIRECTLY
+    # for discovery and the token exchange; those never traverse this nginx.
+    _iss="${KUBESWIFT_OIDC_ISSUER:-}"
+    if [ -n "$_iss" ]; then
+        _iorigin=$(origin_of "$_iss")
+        if [ -n "$_iorigin" ]; then
+            case " $_out " in
+                *" $_iorigin "*) : ;;          # already listed (IdP == gateway host)
+                *) _out="$_out $_iorigin" ;;
+            esac
+        else
+            echo "kubeswift-ui: could not derive a CSP origin from KUBESWIFT_OIDC_ISSUER=$_iss; sign-in will be blocked" >&2
+        fi
+    fi
+
+    printf '%s' "$_out"
 }
 
 KUBESWIFT_CSP_CONNECT=$(kubeswift_csp_connect)
