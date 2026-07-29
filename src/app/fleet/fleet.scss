@@ -33,6 +33,12 @@
     &.on .dot {
       background: #1e8e3e;
     }
+    // Amber, not green and not red: the fleet answered, but not all of it.
+    // Distinct on purpose — a partial answer rendering as "live" is what made
+    // an unreachable cluster look like an empty one.
+    &.degraded .dot {
+      background: #f9ab00;
+    }
   }
   .count {
     font-size: 13px;
@@ -177,4 +183,9 @@
   text-align: center;
   padding: 48px;
   color: var(--mat-sys-on-surface-variant);
+
+  // "we could not ask" must not look like the calm "nothing here" message.
+  &.unknown {
+    color: var(--mat-sys-error);
+  }
 }
