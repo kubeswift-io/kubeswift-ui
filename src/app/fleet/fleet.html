@@ -1,8 +1,11 @@
 <div class="fleet">
   <div class="head">
     <h2>Fleet inventory</h2>
-    <span class="live" [class.on]="live()">
-      <span class="dot"></span>{{ live() ? 'live' : 'reconnecting' }}
+    <!-- Three states, not two. "degraded" exists because a partial-fleet answer
+         used to render as "live" over a table missing the failing member's rows,
+         which reads as "those VMs are gone" rather than "we could not ask". -->
+    <span class="live" [class.on]="live()" [class.degraded]="!live() && errors().length > 0">
+      <span class="dot"></span>{{ live() ? 'live' : errors().length ? 'degraded' : 'reconnecting' }}
     </span>
     <span class="count">{{ filtered().length }} VM{{ filtered().length === 1 ? '' : 's' }}</span>
     <span class="spacer"></span>
@@ -91,10 +94,21 @@
     <tr mat-row *matRowDef="let row; columns: columns" class="clickable" (click)="select(row)"></tr>
   </table>
 
+  <!-- "No VMs" is a POSITIVE claim about the cluster, so it may only be made
+       when every member actually answered. When a member errored, the truthful
+       statement is that we could not ask it — saying "No VMs" there is how a
+       failed query came to look like a fleet-wide deletion. -->
   @if (filtered().length === 0 && !loadError()) {
-    <div class="empty">
-      {{ selectedCluster() ? 'No VMs on ' + selectedCluster() + '.' : 'No VMs across the fleet.' }}
-    </div>
+    @if (errors().length) {
+      <div class="empty unknown">
+        Could not reach {{ errors().length === 1 ? 'a cluster' : errors().length + ' clusters' }};
+        the VMs there are unknown, not absent. See the errors above.
+      </div>
+    } @else {
+      <div class="empty">
+        {{ selectedCluster() ? 'No VMs on ' + selectedCluster() + '.' : 'No VMs across the fleet.' }}
+      </div>
+    }
   }
 
   @if (selected(); as g) {

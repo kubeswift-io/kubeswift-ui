@@ -42,6 +42,8 @@ export class Fleet implements OnInit, OnDestroy {
   readonly selected = signal<Guest | null>(null);
   readonly loadError = signal<string | null>(null);
   readonly live = signal(false);
+  /** Clusters whose last query failed; their rows are shown but are stale. */
+  readonly staleClusters = signal<Set<string>>(new Set());
   readonly showCreate = signal(false); // Create-VM wizard
   readonly wizardCluster = signal(''); // cluster the wizard targets
   readonly clonePrefill = signal<GuestPrefill | null>(null); // set when cloning
@@ -135,13 +137,28 @@ export class Fleet implements OnInit, OnDestroy {
       const signal = this.abort.signal;
       try {
         const snap = await this.gw.guests.listGuests({}, { signal });
-        this.guestMap.clear();
+        // ListGuests is a partial-fleet RPC: a member that fails yields an entry
+        // in snap.errors while the call still returns OK. Clearing the whole map
+        // and repopulating from snap.guests therefore DELETED the rows of every
+        // failing member -- and if all members failed, emptied the table while
+        // the header still read "live". A failed query is not evidence the VMs
+        // are gone; blanking them asserts a deletion that did not happen.
+        //
+        // So drop only the rows we just re-queried successfully, and keep the
+        // last-known rows of any cluster that errored, flagged stale.
+        const errored = new Set(snap.errors.map((e) => e.cluster));
+        for (const k of [...this.guestMap.keys()]) {
+          if (!errored.has(this.clusterOf(k))) this.guestMap.delete(k);
+        }
         this.errMap.clear();
         for (const g of snap.guests) this.guestMap.set(this.key(g), g);
         for (const e of snap.errors) this.errMap.set(e.cluster, e.message);
+        this.staleClusters.set(errored);
         this.flush();
         this.loadError.set(null);
-        this.live.set(true);
+        // "live" means the whole fleet answered. A partial answer is degraded,
+        // and saying "live" over it is what made the empty table look truthful.
+        this.live.set(errored.size === 0);
 
         for await (const ev of this.gw.guests.watchGuests({}, { signal })) {
           this.applyEvent(ev);
@@ -182,6 +199,16 @@ export class Fleet implements OnInit, OnDestroy {
 
   private key(g: Guest): string {
     return `${g.ref?.cluster}/${g.ref?.namespace}/${g.ref?.name}`;
+  }
+
+  /** The cluster segment of a guestMap key. */
+  private clusterOf(k: string): string {
+    return k.slice(0, k.indexOf('/'));
+  }
+
+  /** True when a row's cluster did not answer the last query. */
+  isStale(g: Guest): boolean {
+    return this.staleClusters().has(g.ref?.cluster ?? '');
   }
 
   private flush(): void {

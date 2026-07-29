@@ -208,7 +208,19 @@ export class GuestDetail {
   async del(): Promise<void> {
     const ref = this.guest().ref;
     if (!ref || this.acting()) return;
-    if (!confirm(`Delete VM "${ref.name}"? This cannot be undone.`)) return;
+    // Type-to-confirm, not a yes/no box. Deleting a SwiftGuest is irreversible
+    // and leaves nothing behind: no finalizer, no owner reference, and the
+    // launcher pod and events go with it. A misplaced Enter on a focused OK
+    // button is not an adequate gate for that, and it is indistinguishable
+    // afterwards from a delete nobody performed.
+    const typed = prompt(
+      `Deleting VM "${ref.name}" in ${ref.namespace} cannot be undone.\n` +
+        `Type the VM name to confirm:`,
+    );
+    if (typed?.trim() !== ref.name) {
+      if (typed !== null) this.actionError.set(`Not deleted: "${typed}" does not match "${ref.name}".`);
+      return;
+    }
     this.acting.set(true);
     this.actionError.set(null);
     try {
