@@ -20,7 +20,24 @@
 #   gateway's auth-mode=insecure for dev).
 set -eu
 
-target="/usr/share/nginx/html/config.js"
+# Written OUTSIDE the web root so the container can run with
+# readOnlyRootFilesystem: true (kubeswift#493 Phase 4; issue #43).
+#
+# This used to be /usr/share/nginx/html/config.js. That is the directory the SPA
+# itself is baked into, so it cannot be made writable by mounting a volume over
+# it — the volume would hide the application. Under a read-only root the write
+# simply failed and nginx never started.
+#
+# /tmp is already the one writable path this image needs (nginx puts its pid and
+# all five *_temp_path directories there), so putting the generated shim in a
+# subdirectory of it adds no new mount: an emptyDir at /tmp covers both. nginx
+# serves it via an explicit `alias` on `location = /config.js`, so the URL the
+# SPA fetches is unchanged.
+#
+# Keep this path in sync with docker/nginx/default.conf.template.
+config_dir="/tmp/kubeswift-ui"
+target="${config_dir}/config.js"
+mkdir -p "$config_dir"
 url="${KUBESWIFT_GATEWAY_URL:-}"
 issuer="${KUBESWIFT_OIDC_ISSUER:-}"
 client_id="${KUBESWIFT_OIDC_CLIENT_ID:-}"

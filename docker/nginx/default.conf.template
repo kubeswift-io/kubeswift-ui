@@ -93,7 +93,17 @@ server {
         add_header X-Content-Type-Options "nosniff" always;
         add_header Referrer-Policy "no-referrer" always;
         default_type application/javascript;
-        try_files $uri =404;
+        # Served from OUTSIDE the web root (see 30-kubeswift-config-js.sh). The
+        # generated shim cannot live in /usr/share/nginx/html: that directory
+        # holds the SPA, so it cannot be made writable by mounting over it, and
+        # under readOnlyRootFilesystem the write failed and nginx never started
+        # (issue #43). /tmp is already writable for nginx's own pid and temp
+        # paths, so this needs no additional volume.
+        #
+        # `alias` names the file directly; try_files is gone because it would
+        # resolve against `root`, not the alias. A missing file 404s, which is
+        # the correct behaviour — the SPA falls back to its built-in default.
+        alias /tmp/kubeswift-ui/config.js;
     }
 
     # The UI pod's OWN health (NOT proxied) — reports whether nginx is serving.
