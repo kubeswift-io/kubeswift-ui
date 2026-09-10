@@ -38,22 +38,21 @@ jobs:
   # is distinguishable from a broken build at a glance, and so it still reports
   # when the build fails.
   #
-  # GATING POLICY -- fail on what is actionable now, report the rest:
+  # GATING POLICY: fail on high and above.
   #
-  #   critical   FAIL the job.
-  #   high/below report to the log and the step summary, do not fail.
+  # This started at `critical` because the tree carried 27 advisories (1
+  # critical, 18 high) and gating at `high` would have landed a permanently red
+  # CI -- which is how a scanner ends up disabled. That is no longer the case:
+  # re-resolving the lockfile inside the ranges package.json already allowed
+  # took Angular to 20.3.31 and the tree to ZERO advisories, so `high` costs
+  # nothing to enforce and is the threshold that was always intended.
   #
-  # The asymmetry is deliberate and temporary. When this job was added the tree
-  # carried 27 advisories (1 critical, 18 high); refreshing the lockfile inside
-  # the existing semver ranges cleared the critical and took it to 12. Gating at
-  # `high` today would land a permanently red CI and block unrelated work, which
-  # is how a scanner ends up disabled.
+  # The two that mattered were an i18n XSS and a HttpTransferCache cache-key
+  # ambiguity leaking responses across requests -- both real for an
+  # authenticated operator console, both fixed in 20.3.27.
   #
-  # The remaining highs are Angular framework advisories -- an i18n XSS and a
-  # HttpTransferCache cache-key ambiguity -- fixed in 20.3.27+. They need the
-  # whole @angular/* set moved together (exact peer deps), which is exactly what
-  # the `angular` group in dependabot.yml now produces. Once that PR lands,
-  # raise this to `high` -- that is the intended end state, not `critical`.
+  # Moderate and below are still reported rather than enforced: they are worth
+  # seeing, but holding the build for one invites turning the gate off.
   audit:
     runs-on: ubuntu-latest
     steps:
@@ -66,16 +65,16 @@ jobs:
 
       # Gate. `npm audit` exits non-zero when anything at or above the level is
       # found, so this is the whole enforcement.
-      - name: Audit (fail on critical)
-        run: npm audit --audit-level=critical
+      - name: Audit (fail on high and above)
+        run: npm audit --audit-level=high
 
       # Report. Everything below the gate, visible without holding the build
       # hostage -- nothing is hidden just because it is not yet enforced.
-      - name: Audit report (high and below, non-gating)
+      - name: Audit report (moderate and below, non-gating)
         if: always()
         run: |
           set -uo pipefail
-          npm audit --audit-level=high || true
+          npm audit --audit-level=moderate || true
           {
             echo "### npm audit"
             echo

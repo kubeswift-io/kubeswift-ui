@@ -15,6 +15,19 @@ updates:
     directory: /
     schedule: {interval: weekly}
     open-pull-requests-limit: 5
+    # Majors of what Angular pins cannot merge on their own -- the peer range
+    # rejects them until the framework moves first. Proposing them produces a
+    # red PR that has to be closed by hand every release, which is how people
+    # learn to ignore Dependabot. They arrive as part of a deliberate Angular
+    # upgrade instead.
+    ignore:
+      - dependency-name: "@angular/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "zone.js"
+        # ~0.15.0 is a PATCH range: 0.16 is already outside what Angular accepts.
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
     groups:
       # The Angular framework packages peer-depend on each other at an EXACT
       # version (@angular/common 20.3.25 requires @angular/core 20.3.25, not
@@ -33,15 +46,37 @@ updates:
       # looser (^20.0.0 || ^21.0.0): they track the framework, and holding them
       # in the same PR keeps the set consistent rather than saving a day.
       angular:
-        patterns: ["@angular/*"]
-        update-types: [major, minor, patch]
+        patterns:
+          - "@angular/*"
+          # Not @angular/* by name, but pinned BY Angular's peer ranges, so they
+          # only move when the framework says they may. Leaving them in the
+          # catch-all is what produced two unmergeable PRs on the very first
+          # Dependabot run:
+          #
+          #   #54  zone.js 0.15.1 -> 0.16.3   vs peer zone.js ~0.15.0
+          #   #56  typescript 5.9.3 -> 7.0.2  vs peer typescript >=5.8 <6.0
+          #
+          # Grouped, they travel with the framework instead of ahead of it.
+          - "zone.js"     # @angular/core peers ~0.15.0
+          - "typescript"  # @angular/build peers >=5.8 <6.0
+          - "rxjs"        # ^6.5.3 || ^7.4.0
+          - "tslib"       # ^2.3.0
+        # NOT major. The first run proposed 20.3.25 -> 22.1.7 in one PR, which
+        # needs TypeScript 6.x and is a framework upgrade project, not a
+        # dependency bump -- and it buried the security patch it was supposed to
+        # deliver: the Angular XSS and HttpTransferCache advisories are fixed in
+        # 20.3.27, a PATCH inside the range package.json already allows.
+        #
+        # An Angular major stays deliberate and manual, which it has to be
+        # anyway given the coordinated TypeScript move.
+        update-types: [minor, patch]
 
       # Everything else, excluding what the group above owns. The exclusion is
       # what actually keeps them apart: a group with no `patterns` matches
       # every dependency, so whichever group is evaluated first would otherwise
       # claim the Angular packages and reintroduce the unmergeable-PR problem.
       npm-minor-patch:
-        exclude-patterns: ["@angular/*"]
+        exclude-patterns: ["@angular/*", "zone.js", "typescript", "rxjs", "tslib"]
         update-types: [minor, patch]
 
   # The workflows pin actions by tag, and inconsistently — actions/checkout
