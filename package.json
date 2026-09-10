@@ -30,28 +30,28 @@
     "@angular/material": "^20.2.14",
     "@angular/platform-browser": "^20.3.0",
     "@angular/router": "^20.3.0",
-    "@bufbuild/protobuf": "^2.12.1",
-    "@connectrpc/connect": "^2.1.2",
-    "@connectrpc/connect-web": "^2.1.2",
+    "@bufbuild/protobuf": "^2.14.1",
+    "@connectrpc/connect": "^2.2.0",
+    "@connectrpc/connect-web": "^2.2.0",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "yaml": "^2.9.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.16.3"
   },
   "devDependencies": {
     "@angular/build": "^20.3.29",
     "@angular/cli": "^20.3.29",
     "@angular/compiler-cli": "^20.3.0",
-    "@bufbuild/protoc-gen-es": "^2.12.1",
+    "@bufbuild/protoc-gen-es": "^2.14.1",
     "@types/jasmine": "~6.0.0",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
+    "karma-jasmine-html-reporter": "~2.3.0",
     "typescript": "~5.9.2"
   }
 }
