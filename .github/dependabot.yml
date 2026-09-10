@@ -15,11 +15,11 @@ updates:
     directory: /
     schedule: {interval: weekly}
     open-pull-requests-limit: 5
-    # Majors of what Angular pins cannot merge on their own -- the peer range
-    # rejects them until the framework moves first. Proposing them produces a
-    # red PR that has to be closed by hand every release, which is how people
-    # learn to ignore Dependabot. They arrive as part of a deliberate Angular
-    # upgrade instead.
+    # Majors of a dependency that something else pins cannot merge on their own
+    # -- the range above rejects them until the pinning package moves first.
+    # Proposing them produces a red PR that has to be closed by hand every
+    # release, which is how people learn to ignore Dependabot. They arrive as
+    # part of a deliberate upgrade instead.
     ignore:
       - dependency-name: "@angular/*"
         update-types: ["version-update:semver-major"]
@@ -28,6 +28,25 @@ updates:
       - dependency-name: "zone.js"
         # ~0.15.0 is a PATCH range: 0.16 is already outside what Angular accepts.
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "jasmine-core"
+        # Not Angular's doing, and worth spelling out because the root pin looks
+        # like it selects the test framework and does not.
+        #
+        # karma-jasmine@5.1.0 -- the newest published, last touched Nov 2024 --
+        # DEPENDS on jasmine-core ^4.1.0 rather than peer-depending on it, so npm
+        # nests its own copy and karma-jasmine/lib/index.js serves that one:
+        #
+        #   require.resolve('jasmine-core')
+        #     -> node_modules/karma-jasmine/node_modules/jasmine-core   4.6.1
+        #
+        # Specs run on 4.6.1 whatever the root declares. A major here changes no
+        # behaviour, it only widens the gap between the declaration and what runs.
+        # #57 (5.9 -> 7.0) could not even resolve: karma-jasmine-html-reporter
+        # 2.1.0 peers ^4 || ^5.
+        #
+        # Actually leaving jasmine 4 means leaving karma -- @angular/build ships
+        # a `unit-test` builder now -- which is a decision, not a bump.
+        update-types: ["version-update:semver-major"]
     groups:
       # The Angular framework packages peer-depend on each other at an EXACT
       # version (@angular/common 20.3.25 requires @angular/core 20.3.25, not
