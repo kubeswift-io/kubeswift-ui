@@ -4,7 +4,7 @@
 # reverse-proxy the kubeswift-gateway. See docker/ and README.md.
 
 # ---- build: compile the Angular app to static assets ----------------------
-FROM node:20-bookworm-slim AS build
+FROM node:26-bookworm-slim AS build
 WORKDIR /app
 
 ARG VERSION=dev
