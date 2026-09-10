@@ -1,0 +1,60 @@
+version: 2
+
+# The UI had no dependency automation at all: no Dependabot config, and nothing
+# in CI looking at the npm tree. A baseline audit found 27 advisories — 1
+# critical and 18 high — including an Angular i18n XSS and a HttpTransferCache
+# cache-key ambiguity that leaks responses across requests. Both matter here:
+# this is an authenticated operator console, not a static site.
+#
+# Weekly and grouped, matching the operator repo's posture: ungrouped daily
+# updates across three ecosystems produce more PRs than anyone reviews, and
+# unreviewed dependency PRs are worse than none — they train people to merge
+# dependency changes without looking.
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule: {interval: weekly}
+    open-pull-requests-limit: 5
+    groups:
+      # The Angular framework packages peer-depend on each other at an EXACT
+      # version (@angular/common 20.3.25 requires @angular/core 20.3.25, not
+      # ^20.3.25). Bumping one alone is unresolvable — npm fails the install
+      # with ERESOLVE rather than picking a working set. Verified the hard way
+      # while preparing this change: upgrading core+common without
+      # compiler-cli/build produced
+      #
+      #   Conflicting peer dependency: @angular/core@20.3.31
+      #
+      # So they must arrive as one PR or every one of them is unmergeable.
+      # This is the same failure the operator repo hit with kube-rs and
+      # k8s-openapi, and the same remedy.
+      #
+      # cdk/material are included deliberately even though their peer ranges are
+      # looser (^20.0.0 || ^21.0.0): they track the framework, and holding them
+      # in the same PR keeps the set consistent rather than saving a day.
+      angular:
+        patterns: ["@angular/*"]
+        update-types: [major, minor, patch]
+
+      # Everything else, excluding what the group above owns. The exclusion is
+      # what actually keeps them apart: a group with no `patterns` matches
+      # every dependency, so whichever group is evaluated first would otherwise
+      # claim the Angular packages and reintroduce the unmergeable-PR problem.
+      npm-minor-patch:
+        exclude-patterns: ["@angular/*"]
+        update-types: [minor, patch]
+
+  # The workflows pin actions by tag, and inconsistently — actions/checkout
+  # appears as both @v4 and @v6 across ci.yml and release.yml. Dependabot is
+  # what reconciles that and moves the pins forward.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: {interval: weekly}
+    open-pull-requests-limit: 5
+
+  # The image the UI ships in. Base-image CVEs are disclosed against images
+  # already published, without anything in this repo changing.
+  - package-ecosystem: docker
+    directory: /
+    schedule: {interval: weekly}
+    open-pull-requests-limit: 5
