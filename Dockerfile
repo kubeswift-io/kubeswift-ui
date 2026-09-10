@@ -19,7 +19,7 @@ COPY . .
 RUN npx ng build --configuration production
 
 # ---- serve: unprivileged nginx --------------------------------------------
-FROM nginxinc/nginx-unprivileged:1.27-alpine AS serve
+FROM nginxinc/nginx-unprivileged:1.31-alpine AS serve
 
 ARG VERSION=dev
 ARG GIT_COMMIT=unknown
