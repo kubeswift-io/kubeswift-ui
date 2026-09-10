@@ -33,3 +33,56 @@ jobs:
       # the editor deletes fields the operator never touched.
       - name: Unit tests
         run: npx ng test --watch=false --browsers=ChromeHeadless
+
+  # Dependency vulnerabilities. Split from `build` so a vulnerable dependency
+  # is distinguishable from a broken build at a glance, and so it still reports
+  # when the build fails.
+  #
+  # GATING POLICY -- fail on what is actionable now, report the rest:
+  #
+  #   critical   FAIL the job.
+  #   high/below report to the log and the step summary, do not fail.
+  #
+  # The asymmetry is deliberate and temporary. When this job was added the tree
+  # carried 27 advisories (1 critical, 18 high); refreshing the lockfile inside
+  # the existing semver ranges cleared the critical and took it to 12. Gating at
+  # `high` today would land a permanently red CI and block unrelated work, which
+  # is how a scanner ends up disabled.
+  #
+  # The remaining highs are Angular framework advisories -- an i18n XSS and a
+  # HttpTransferCache cache-key ambiguity -- fixed in 20.3.27+. They need the
+  # whole @angular/* set moved together (exact peer deps), which is exactly what
+  # the `angular` group in dependabot.yml now produces. Once that PR lands,
+  # raise this to `high` -- that is the intended end state, not `critical`.
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+
+      # Gate. `npm audit` exits non-zero when anything at or above the level is
+      # found, so this is the whole enforcement.
+      - name: Audit (fail on critical)
+        run: npm audit --audit-level=critical
+
+      # Report. Everything below the gate, visible without holding the build
+      # hostage -- nothing is hidden just because it is not yet enforced.
+      - name: Audit report (high and below, non-gating)
+        if: always()
+        run: |
+          set -uo pipefail
+          npm audit --audit-level=high || true
+          {
+            echo "### npm audit"
+            echo
+            echo '```'
+            npm audit 2>&1 | tail -20 || true
+            echo '```'
+            echo
+            echo "Gate is \`critical\`. Highs are reported but not enforced yet -- see the"
+            echo "policy comment in ci.yml."
+          } >> "$GITHUB_STEP_SUMMARY"
