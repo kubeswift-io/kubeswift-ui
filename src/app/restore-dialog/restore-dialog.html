@@ -16,45 +16,98 @@
         <span>Restore name</span>
         <input [value]="name()" (input)="name.set($any($event.target).value)" />
       </label>
-      <label class="field">
-        <span>Target guest</span>
-        <input [value]="targetGuest()" (input)="targetGuest.set($any($event.target).value)" />
-      </label>
-      <p class="hint">
-        @if (isInPlace()) {
-          Same name as the source — <strong>in-place restore</strong> (requires overwrite).
-        } @else {
-          Different name — restores as a <strong>clone</strong>.
-        }
-      </p>
 
-      @if (isInPlace()) {
-        <label class="check">
-          <input
-            type="checkbox"
-            [checked]="overwrite()"
-            (change)="overwrite.set($any($event.target).checked)"
-          />
-          Overwrite the existing guest
+      <label class="field">
+        <span>Restore into</span>
+        <select [value]="mode()" (change)="setMode($any($event.target).value)">
+          <option value="new">A new guest</option>
+          <option value="inplace" [disabled]="!canRestoreInPlace()">
+            Over the source guest{{ sourceGuest() ? ' (' + sourceGuest() + ')' : '' }}
+          </option>
+        </select>
+      </label>
+      @if (isCSI()) {
+        <p class="hint">
+          A csi-volume-snapshot holds the disk only and restores into a new guest; restoring over
+          an existing guest is not supported.
+        </p>
+      }
+
+      @if (mode() === 'new') {
+        <label class="field">
+          <span>New guest name</span>
+          <input [value]="targetGuest()" (input)="targetGuest.set($any($event.target).value)" />
         </label>
+        @if (targetProblem(); as p) {
+          <p class="hint problem">{{ p }}</p>
+        }
+        @if (isMemory()) {
+          <p class="hint">
+            The new guest resumes the snapshot's memory, so its MAC addresses are regenerated
+            (two guests with one MAC on the same network cannot work).
+          </p>
+          <label class="check">
+            <input
+              type="checkbox"
+              [checked]="regenOther()"
+              (change)="regenOther.set($any($event.target).checked)"
+            />
+            Also regenerate hostname, machine-id and SSH host keys
+          </label>
+        }
       } @else {
+        <p class="hint">
+          <strong>{{ sourceGuest() }}</strong> is stopped and resumes the snapshot's memory.
+        </p>
+        @if (divergesInPlace()) {
+          <div class="banner warn">
+            <mat-icon>warning</mat-icon>
+            <span>
+              This snapshot holds memory, not the disk, and the guest was resumed after the capture,
+              so its disk has moved on. Resuming the old memory over the newer disk can corrupt its
+              filesystems; the restore is refused unless you accept that. A new guest, or a
+              csi-volume-snapshot, has no such risk.
+            </span>
+          </div>
+          <label class="check">
+            <input
+              type="checkbox"
+              [checked]="acceptDivergence()"
+              (change)="acceptDivergence.set($any($event.target).checked)"
+            />
+            Restore anyway: I accept the risk of a diverged disk
+          </label>
+        } @else if (isMemory() && !fullState()) {
+          <p class="hint">
+            If the guest has been started from its disk since the capture, the restore is refused
+            (its disk has moved on).
+          </p>
+        }
+      }
+
+      @if (usesTargetNode()) {
+        <label class="field">
+          <span>Node{{ mode() === 'new' ? ' *' : ' (default: the guest\'s current node)' }}</span>
+          <select [value]="targetNode()" (change)="targetNode.set($any($event.target).value)">
+            <option value="">— choose a node —</option>
+            @for (n of nodes(); track n) {
+              <option [value]="n">{{ n }}</option>
+            }
+          </select>
+        </label>
+        <p class="hint">The snapshot is downloaded onto this node, and the guest runs there.</p>
+      }
+
+      @if (isMemory()) {
         <label class="check">
           <input
             type="checkbox"
-            [checked]="regen()"
-            (change)="regen.set($any($event.target).checked)"
+            [checked]="resumeAfterRestore()"
+            (change)="resumeAfterRestore.set($any($event.target).checked)"
           />
-          Regenerate identity (hostname / machine-id / SSH keys / MAC)
+          Resume the guest after the restore (untick to leave it paused)
         </label>
       }
-      <label class="field">
-        <span>Target node (required for s3 cross-node)</span>
-        <input
-          [value]="targetNode()"
-          (input)="targetNode.set($any($event.target).value)"
-          placeholder="— capture node —"
-        />
-      </label>
     </div>
 
     <div class="actions">

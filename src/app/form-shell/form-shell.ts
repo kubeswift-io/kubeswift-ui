@@ -26,6 +26,7 @@ export class FormShell {
   readonly view = input<View>('form');
   readonly yaml = input('');
   readonly error = input<string | null>(null);
+  readonly warning = input<string | null>(null); // e.g. a picker that could not list
   readonly canWrite = input(true);
   readonly busy = input(false);
   readonly canSave = input(false);

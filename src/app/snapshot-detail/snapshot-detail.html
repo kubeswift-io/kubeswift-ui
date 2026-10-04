@@ -57,6 +57,9 @@
     [namespace]="namespace()"
     [snapshot]="name()"
     [sourceGuest]="guest()"
+    [backend]="backend()"
+    [resumedAfterCapture]="resumeAfterSnapshot()"
+    [fullState]="includeDisk()"
     (saved)="onRestored()"
     (closed)="showRestore.set(false)"
   />

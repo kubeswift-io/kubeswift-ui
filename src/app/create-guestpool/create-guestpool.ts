@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormShell } from '../form-shell/form-shell';
 import { ResourceForm } from '../resource-form';
-import { listNames } from '../wizard-util';
+import { keepIfListed, listNames, listNamesReport, pickerErrors } from '../wizard-util';
 
 type Obj = Record<string, unknown>;
 type Boot = 'image' | 'kernel';
@@ -57,24 +57,26 @@ export class CreateGuestPool extends ResourceForm {
     ]);
     this.guestClasses.set(gc);
     this.namespaces.set(ns);
-    await this.loadNamespaced(cluster, this.namespace());
+    await this.onNamespace(cluster, this.namespace());
   }
 
-  async selectNamespace(ns: string): Promise<void> {
-    this.namespace.set(ns);
-    await this.loadNamespaced(this.cluster(), ns);
-  }
-  private async loadNamespaced(cluster: string, ns: string): Promise<void> {
+  protected override async onNamespace(cluster: string, ns: string): Promise<void> {
     const [img, krn, seed, gpu] = await Promise.all([
-      listNames(this.gw, cluster, 'swiftimages', ns),
-      listNames(this.gw, cluster, 'swiftkernels', ns),
-      listNames(this.gw, cluster, 'swiftseedprofiles', ns),
-      listNames(this.gw, cluster, 'swiftgpuprofiles', ns),
+      listNamesReport(this.gw, cluster, 'swiftimages', ns),
+      listNamesReport(this.gw, cluster, 'swiftkernels', ns),
+      listNamesReport(this.gw, cluster, 'swiftseedprofiles', ns),
+      listNamesReport(this.gw, cluster, 'swiftgpuprofiles', ns),
     ]);
-    this.images.set(img);
-    this.kernels.set(krn);
-    this.seeds.set(seed);
-    this.gpuProfiles.set(gpu);
+    if (this.isStale(cluster, ns)) return;
+    this.images.set(img.names);
+    this.kernels.set(krn.names);
+    this.seeds.set(seed.names);
+    this.gpuProfiles.set(gpu.names);
+    this.imageRef.set(keepIfListed(this.imageRef(), img.names));
+    this.kernelRef.set(keepIfListed(this.kernelRef(), krn.names));
+    this.seedRef.set(keepIfListed(this.seedRef(), seed.names));
+    this.gpuRef.set(keepIfListed(this.gpuRef(), gpu.names));
+    this.pickerError.set(pickerErrors({ images: img, kernels: krn, 'seed profiles': seed, 'GPU profiles': gpu }));
   }
 
   hydrate(obj: Obj): void {

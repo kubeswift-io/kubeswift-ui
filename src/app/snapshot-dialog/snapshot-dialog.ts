@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, input, output, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { GatewayService } from '../gateway.service';
+import { listGuestNames, listSnapshotClasses } from '../wizard-util';
 
 /**
  * SnapshotDialog creates a SwiftSnapshot of a guest. Reused from the Fleet
@@ -27,10 +28,13 @@ export class SnapshotDialog implements OnInit {
   readonly guest = signal('');
   readonly name = signal('');
   readonly backend = signal('local'); // local | csi-volume-snapshot | s3
-  readonly includeMemory = signal(true);
+  readonly resumeAfterSnapshot = signal(true);
   readonly deletionPolicy = signal('Delete');
   readonly volumeSnapshotClass = signal('');
+  readonly snapshotClasses = signal<string[]>([]);
+  readonly defaultClasses = signal<string[]>([]);
   readonly s3Bucket = signal('');
+  readonly s3Region = signal('');
   readonly s3Endpoint = signal('');
   readonly s3Prefix = signal('');
   readonly s3Insecure = signal(false);
@@ -40,28 +44,25 @@ export class SnapshotDialog implements OnInit {
   readonly error = signal<string | null>(null);
 
   ngOnInit(): void {
+    void listSnapshotClasses(this.gw, this.cluster()).then((l) => {
+      this.snapshotClasses.set(l.names);
+      this.defaultClasses.set(l.defaults);
+    });
     const fixed = this.fixedGuest();
     if (fixed) {
       this.guest.set(fixed);
       this.name.set(`${fixed}-snap`);
       return;
     }
-    void this.gw.guests
-      .listGuests({})
-      .then((res) => {
-        const ns = this.namespace();
-        const cl = this.cluster();
-        const names = res.guests
-          .filter((g) => g.ref?.cluster === cl && g.ref?.namespace === ns)
-          .map((g) => g.ref?.name ?? '')
-          .filter(Boolean)
-          .sort();
-        this.guests.set(names);
-        if (names.length && !this.guest()) this.selectGuest(names[0]);
-      })
-      .catch(() => {
-        /* leave the picker empty; the user can still type a name */
-      });
+    void listGuestNames(this.gw, this.cluster(), this.namespace()).then((l) => {
+      this.guests.set(l.names);
+      if (l.names.length && !this.guest()) this.selectGuest(l.names[0]);
+    });
+  }
+
+  /** capturesMemory: local and s3 always capture memory, csi never does. */
+  capturesMemory(): boolean {
+    return this.backend() !== 'csi-volume-snapshot';
   }
 
   selectGuest(g: string): void {
@@ -71,7 +72,11 @@ export class SnapshotDialog implements OnInit {
 
   canSave(): boolean {
     if (!this.guest() || !this.name().trim()) return false;
-    if (this.backend() === 's3' && !this.s3Bucket().trim()) return false;
+    if (this.backend() === 's3') {
+      // The webhook requires credentials, and a region unless an endpoint is set.
+      if (!this.s3Bucket().trim() || !this.s3Secret().trim()) return false;
+      if (!this.s3Region().trim() && !this.s3Endpoint().trim()) return false;
+    }
     return true;
   }
 
@@ -85,10 +90,11 @@ export class SnapshotDialog implements OnInit {
     }
     if (this.backend() === 's3') {
       const s3: Record<string, unknown> = { bucket: this.s3Bucket().trim() };
+      if (this.s3Region().trim()) s3['region'] = this.s3Region().trim();
       if (this.s3Endpoint().trim()) s3['endpoint'] = this.s3Endpoint().trim();
       if (this.s3Prefix().trim()) s3['prefix'] = this.s3Prefix().trim();
       if (this.s3Insecure()) s3['insecure'] = true;
-      if (this.s3Secret().trim()) s3['credentialsSecretRef'] = { name: this.s3Secret().trim() };
+      s3['credentialsSecretRef'] = { name: this.s3Secret().trim() };
       backend['s3'] = s3;
     }
     const obj = {
@@ -98,7 +104,10 @@ export class SnapshotDialog implements OnInit {
       spec: {
         guestRef: { name: this.guest() },
         backend,
-        includeMemory: this.includeMemory(),
+        // What the backend captures: a checkbox here changed nothing (the API
+        // documents includeMemory=false as a no-op), so none is offered.
+        includeMemory: this.capturesMemory(),
+        ...(this.capturesMemory() ? { resumeAfterSnapshot: this.resumeAfterSnapshot() } : {}),
         deletionPolicy: this.deletionPolicy(),
       },
     };

@@ -23,12 +23,17 @@
       <mat-icon>error</mat-icon> <span>{{ e }}</span>
     </div>
   }
+  @if (pickerError(); as w) {
+    <div class="banner warn">
+      <mat-icon>warning</mat-icon> <span>{{ w }}</span>
+    </div>
+  }
 
   <div class="body">
     <div class="row2">
       <label class="field">
         <span>Namespace</span>
-        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
+        <select [value]="namespace()" (change)="selectNamespace($any($event.target).value)">
           @for (ns of namespaces(); track ns) {
             <option [value]="ns">{{ ns }}</option>
           }

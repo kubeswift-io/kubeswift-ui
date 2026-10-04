@@ -6,8 +6,15 @@ interface RawImage {
   spec?: {
     source?: {
       http?: { url?: string };
-      upload?: object;
-      pvcClone?: { sourcePVC?: string };
+      pvcClone?: { name?: string; namespace?: string };
+      oci?: {
+        repository?: string;
+        tag?: string;
+        digest?: string;
+        insecure?: boolean;
+        credentialsSecretRef?: { name?: string };
+        verifyKeySecretRef?: { name?: string };
+      };
     };
     format?: string;
     cloneStrategy?: string;
@@ -21,8 +28,32 @@ interface RawImage {
 }
 
 /**
+ * describeSource says where an image is imported from: an HTTP URL, an OCI
+ * artifact (repository:tag, or @digest when pinned, with how it is pulled), or
+ * a PVC clone (namespace/name; the image's own namespace when none is set).
+ */
+export function describeSource(s: NonNullable<RawImage['spec']>['source'], imageNamespace: string): string {
+  if (s?.http?.url) return 'HTTP: ' + s.http.url;
+  if (s?.oci?.repository) {
+    const o = s.oci;
+    const ref = o.digest
+      ? `${o.repository}@${o.digest}`
+      : o.tag
+        ? `${o.repository}:${o.tag}`
+        : `${o.repository} (no tag or digest: the import cannot pull it)`;
+    const how: string[] = [];
+    if (o.verifyKeySecretRef?.name) how.push('signature verified with ' + o.verifyKeySecretRef.name);
+    if (o.credentialsSecretRef?.name) how.push('credentials ' + o.credentialsSecretRef.name);
+    if (o.insecure) how.push('plain HTTP');
+    return 'OCI: ' + ref + (how.length ? ' (' + how.join(', ') + ')' : '');
+  }
+  if (s?.pvcClone?.name) return 'PVC clone: ' + (s.pvcClone.namespace || imageNamespace) + '/' + s.pvcClone.name;
+  return '—';
+}
+
+/**
  * ImageDrawer is the resource-aware detail drawer for a SwiftImage, opened from
- * the Explorer's Images kind. It shows the import source (HTTP / upload / PVC
+ * the Explorer's Images kind. It shows the import source (HTTP / OCI / PVC
  * clone), format, clone strategy, and the import status (phase, prepared format,
  * size). Read-only; create/import an image with the Explorer's New button.
  */
@@ -57,16 +88,7 @@ export class ImageDrawer implements OnInit {
         name: this.name(),
       });
       const o = JSON.parse(r.json) as RawImage;
-      const s = o.spec?.source;
-      this.source.set(
-        s?.http?.url
-          ? 'HTTP: ' + s.http.url
-          : s?.pvcClone?.sourcePVC
-            ? 'PVC clone: ' + s.pvcClone.sourcePVC
-            : s?.upload
-              ? 'Upload'
-              : '—',
-      );
+      this.source.set(describeSource(o.spec?.source, this.namespace()));
       this.format.set(o.spec?.format ?? '');
       this.cloneStrategy.set(o.spec?.cloneStrategy ?? '');
       this.phase.set(o.status?.phase ?? '');
