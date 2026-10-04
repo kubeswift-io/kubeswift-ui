@@ -47,6 +47,30 @@
         <dt>Uploaded</dt>
         <dd>{{ humanBytes(bytes()) }}</dd>
       }
+      @if (locationSource()) {
+        <dt>Location</dt>
+        <dd>{{ locationSource() }}</dd>
+        @if (locationWhere()) {
+          <dt>{{ backend() === 'csi-volume-snapshot' ? 'Snapshot class' : 'Stored in' }}</dt>
+          <dd><code>{{ locationWhere() }}</code></dd>
+        }
+        @if (locationCredentials()) {
+          <dt>Credentials</dt>
+          <dd>{{ locationCredentials() }}</dd>
+        }
+      }
+      @if (ociReference()) {
+        <dt>Pushed</dt>
+        <dd><code>{{ ociReference() }}</code></dd>
+        <dt>Digest</dt>
+        <dd><code>{{ ociDigest() }}</code></dd>
+        <dt>Signed</dt>
+        <dd>{{ ociSigned() ? 'yes (cosign)' : 'no' }}</dd>
+        @if (ociDisk()) {
+          <dt>Disk</dt>
+          <dd><code>{{ ociDisk() }}</code></dd>
+        }
+      }
     </dl>
   </section>
 </aside>

@@ -1,0 +1,148 @@
+<app-form-shell
+  [title]="(isEdit() ? 'Edit ' : 'New ') + (namespaced ? 'storage location' : 'cluster storage location')"
+  [sub]="namespaced ? 'where this namespace\'s snapshots are stored' : 'where every namespace\'s snapshots are stored'"
+  [clusters]="clusters()"
+  [cluster]="cluster()"
+  [edit]="isEdit()"
+  [view]="view()"
+  [yaml]="yamlText()"
+  [error]="error()"
+  [warning]="pickerError()"
+  [canWrite]="canWrite()"
+  [busy]="busy()"
+  [canSave]="canSave()"
+  [saveLabel]="isEdit() ? 'Apply' : 'Create location'"
+  (clusterChange)="selectCluster($event)"
+  (viewChange)="setView($event)"
+  (yamlChange)="yamlText.set($event)"
+  (save)="save()"
+  (close)="closed.emit()"
+>
+  <div [class.row2]="namespaced">
+    @if (namespaced) {
+      <label class="field">
+        <span>Namespace</span>
+        @if (isEdit()) {
+          <input [value]="namespace()" disabled />
+        } @else {
+          <select [value]="namespace()" (change)="selectNamespace($any($event.target).value)">
+            @for (ns of namespaces(); track ns) {
+              <option [value]="ns">{{ ns }}</option>
+            }
+          </select>
+        }
+      </label>
+    }
+    <label class="field">
+      <span>Name *</span>
+      <input
+        placeholder="registry"
+        [value]="name()"
+        (input)="name.set($any($event.target).value)"
+        [disabled]="isEdit()"
+      />
+    </label>
+  </div>
+
+  <label class="check">
+    <input type="checkbox" [checked]="isDefault()" (change)="isDefault.set($any($event.target).checked)" />
+    <span>{{ namespaced ? 'Default for this namespace' : 'Default for the cluster' }}</span>
+  </label>
+  <p class="hint">
+    @if (namespaced) {
+      Snapshots in this namespace that name no registry use it, instead of the cluster default.
+    } @else {
+      Snapshots that name no registry, in a namespace without its own default, use it.
+    }
+    One default at a time: a second is refused.
+  </p>
+
+  <label class="check">
+    <input type="checkbox" [checked]="useOCI()" (change)="useOCI.set($any($event.target).checked)" />
+    <span>Registry (oci snapshots)</span>
+  </label>
+  @if (useOCI()) {
+    <label class="field">
+      <span>Repository *</span>
+      <input
+        placeholder="registry.example.com/kubeswift"
+        [value]="repository()"
+        (input)="repository.set($any($event.target).value)"
+      />
+    </label>
+    <p class="hint">
+      No tag or digest. Snapshots go to <code>{{ pathExample() }}</code>, each tagged with its name
+      and UID.
+    </p>
+    <div class="seg">
+      <button [class.on]="!anonymous()" (click)="anonymous.set(false)">Credentials Secret</button>
+      <button [class.on]="anonymous()" (click)="anonymous.set(true)">No credentials</button>
+    </div>
+    @if (!anonymous()) {
+      <label class="field">
+        <span>Secret name</span>
+        <input
+          [placeholder]="defaultSecret"
+          [value]="credentialsSecretName()"
+          (input)="credentialsSecretName.set($any($event.target).value)"
+        />
+      </label>
+      <p class="hint">
+        A <code>kubernetes.io/dockerconfigjson</code> Secret of this name, looked up in the namespace of
+        each snapshot{{ namespaced ? '' : ' (every namespace brings its own)' }}. A snapshot whose
+        namespace lacks it waits, naming it.
+      </p>
+    }
+    <label class="check">
+      <input type="checkbox" [checked]="insecure()" (change)="insecure.set($any($event.target).checked)" />
+      <span>Plain HTTP (unsafe; a trusted in-cluster or test registry only)</span>
+    </label>
+    <label class="field">
+      <span>CA bundle (PEM, for a registry behind a private CA)</span>
+      <textarea
+        rows="4"
+        placeholder="-----BEGIN CERTIFICATE-----"
+        [value]="caBundle()"
+        (input)="caBundle.set($any($event.target).value)"
+      ></textarea>
+    </label>
+    <label class="field">
+      <span>Signing key Secret (optional)</span>
+      <input
+        placeholder="cosign-key"
+        [value]="signingKeySecretName()"
+        (input)="signingKeySecretName.set($any($event.target).value)"
+      />
+    </label>
+    <p class="hint">
+      Signs every push with the cosign key pair in this Secret (keys <code>cosign.key</code>,
+      <code>cosign.password</code>), in each snapshot's namespace.
+    </p>
+    <label class="field">
+      <span>Verify key (PEM cosign public key, optional)</span>
+      <textarea
+        rows="3"
+        placeholder="-----BEGIN PUBLIC KEY-----"
+        [value]="verifyKey()"
+        (input)="verifyKey.set($any($event.target).value)"
+      ></textarea>
+    </label>
+  }
+
+  <label class="check">
+    <input type="checkbox" [checked]="useCSI()" (change)="useCSI.set($any($event.target).checked)" />
+    <span>VolumeSnapshotClass (csi-volume-snapshot snapshots)</span>
+  </label>
+  @if (useCSI()) {
+    <label class="field">
+      <span>VolumeSnapshotClass *</span>
+      <select [value]="className()" (change)="className.set($any($event.target).value)">
+        <option value="">— choose a class —</option>
+        @for (c of snapshotClasses(); track c) {
+          <option [value]="c">{{ c }}</option>
+        }
+      </select>
+    </label>
+    <p class="hint">Used by csi snapshots that name no class, instead of the cluster's default class.</p>
+  }
+</app-form-shell>

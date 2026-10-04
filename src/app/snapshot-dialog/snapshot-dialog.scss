@@ -142,3 +142,7 @@ select {
   line-height: 1.4;
   color: var(--mat-sys-on-surface-variant);
 }
+
+.hint.problem {
+  color: var(--mat-sys-error);
+}

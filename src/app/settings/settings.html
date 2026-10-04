@@ -1,0 +1,190 @@
+<div class="page">
+  <div class="head">
+    <h2>Settings</h2>
+    <select class="cluster" [value]="selectedCluster()" (change)="selectCluster($any($event.target).value)">
+      @for (c of clusters(); track c.name) {
+        <option [value]="c.name">{{ c.name }}{{ c.ready ? '' : ' (unreachable)' }}</option>
+      }
+    </select>
+  </div>
+
+  @if (error(); as e) {
+    <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
+  }
+
+  <section class="card">
+    <h3>Snapshot storage: cluster default</h3>
+    @if (clusterDefault(); as d) {
+      <div class="loc">
+        <div class="main">
+          <span class="name">{{ d.name }}</span>
+          @if (d.repository) {
+            <code>{{ d.repository }}/&lt;namespace&gt;/snapshots</code>
+          }
+          @if (d.volumeSnapshotClassName) {
+            <span class="muted">VolumeSnapshotClass {{ d.volumeSnapshotClassName }}</span>
+          }
+        </div>
+        <div class="status">
+          <span class="pill" [class.ok]="d.ready === 'True'" [title]="d.readyMessage">Ready {{ d.ready || '—' }}</span>
+          @if (d.repository) {
+            <span class="pill" [class.ok]="d.reachable === 'True'" [class.bad]="d.reachable === 'False'" [title]="d.reachableMessage">
+              Reachable {{ d.reachable || '—' }}
+            </span>
+          }
+          <span class="muted">
+            {{ d.anonymous ? 'no credentials' : 'credentials: Secret ' + (d.credentialsSecretName || 'kubeswift-registry') + ' in each namespace' }}
+          </span>
+          @if (perms().cluster) {
+            <button class="link" (click)="editLocation(d)">Edit</button>
+          }
+        </div>
+        @if (d.reachable === 'False') {
+          <p class="hint problem">{{ d.reachableMessage }}</p>
+        }
+      </div>
+    } @else {
+      <p class="hint">{{ clusterDefaultProblem() }}</p>
+    }
+    @if (perms().cluster) {
+      <button class="primary" (click)="newLocation('cluster')">New cluster location</button>
+    }
+    @if (locs().cluster.length > (clusterDefault() ? 1 : 0)) {
+      <table class="tbl">
+        <thead>
+          <tr><th>Cluster location</th><th>Default</th><th>Registry / class</th><th>Ready</th><th>Reachable</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (l of locs().cluster; track l.name) {
+            <tr>
+              <td>{{ l.name }}</td>
+              <td>{{ l.isDefault ? 'yes' : '' }}</td>
+              <td>
+                @if (l.repository) { <code>{{ l.repository }}</code> }
+                @if (l.volumeSnapshotClassName) { <span class="muted">class {{ l.volumeSnapshotClassName }}</span> }
+              </td>
+              <td [title]="l.readyMessage">{{ l.ready }}</td>
+              <td [title]="l.reachableMessage">{{ l.reachable }}</td>
+              <td class="right">
+                @if (perms().cluster) {
+                  <button class="link" (click)="editLocation(l)">Edit</button>
+                  <button class="link danger" [disabled]="busy()" (click)="deleteLocation(l)">Delete</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+
+  <section class="card">
+    <h3>
+      Namespaces <span class="count">where an oci snapshot that names no registry is stored</span>
+    </h3>
+    <table class="tbl">
+      <thead>
+        <tr><th>Namespace</th><th>Stored in</th><th>From</th><th>Credentials Secret</th><th></th></tr>
+      </thead>
+      <tbody>
+        @for (r of rows(); track r.namespace) {
+          <tr>
+            <td>{{ r.namespace }}</td>
+            <td>
+              @if (r.location) {
+                <code>{{ r.repository }}</code>
+              } @else {
+                <span class="problem">{{ r.problem }}</span>
+              }
+            </td>
+            <td>{{ r.location ? source(r.location) : '' }}</td>
+            <td>
+              @switch (r.secretState) {
+                @case ('ok') { <span class="ok">{{ r.secret }} ✓</span> }
+                @case ('missing') { <span class="problem">{{ r.secret }} missing: snapshots here wait</span> }
+                @case ('wrong-type') { <span class="problem">{{ r.secret }} is not a dockerconfigjson Secret</span> }
+                @case ('unknown') { <span class="muted">{{ r.secret }} (cannot check: no permission to list Secrets)</span> }
+                @default { <span class="muted">{{ r.location ? 'none needed' : '' }}</span> }
+              }
+            </td>
+            <td class="right">
+              @if (r.secretState === 'missing' && perms().secret) {
+                <button class="link" (click)="createSecret(r)">Create Secret</button>
+              }
+              @if (perms().namespace) {
+                <button class="link" (click)="newLocation('namespace', r.namespace)">Own location</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h3>Namespace locations <span class="count">{{ locs().namespaced.length }}</span></h3>
+    @if (locs().namespaced.length) {
+      <table class="tbl">
+        <thead>
+          <tr><th>Namespace</th><th>Name</th><th>Default</th><th>Registry / class</th><th>Ready</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (l of locs().namespaced; track l.namespace + '/' + l.name) {
+            <tr>
+              <td>{{ l.namespace }}</td>
+              <td>{{ l.name }}</td>
+              <td>{{ l.isDefault ? 'yes' : '' }}</td>
+              <td>
+                @if (l.repository) { <code>{{ l.repository }}/snapshots</code> }
+                @if (l.volumeSnapshotClassName) { <span class="muted">class {{ l.volumeSnapshotClassName }}</span> }
+              </td>
+              <td [title]="l.readyMessage">{{ l.ready }}</td>
+              <td class="right">
+                <button class="link" (click)="editLocation(l)">Edit</button>
+                <button class="link danger" [disabled]="busy()" (click)="deleteLocation(l)">Delete</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <div class="empty">No namespace has its own location; every namespace uses the cluster default.</div>
+    }
+  </section>
+</div>
+
+@switch (form()) {
+  @case ('cluster') {
+    <app-create-clusterstoragelocation
+      [clusters]="clusters()"
+      [initialCluster]="selectedCluster()"
+      [existing]="formExisting()"
+      [canWrite]="perms().cluster"
+      (saved)="onSaved()"
+      (closed)="closeForm()"
+    />
+  }
+  @case ('namespace') {
+    <app-create-storagelocation
+      [clusters]="clusters()"
+      [initialCluster]="selectedCluster()"
+      [initialNamespace]="formNamespace()"
+      [existing]="formExisting()"
+      [canWrite]="true"
+      (saved)="onSaved()"
+      (closed)="closeForm()"
+    />
+  }
+  @case ('secret') {
+    <app-create-secret
+      [clusters]="clusters()"
+      [initialCluster]="selectedCluster()"
+      [initialNamespace]="formNamespace()"
+      [presetName]="secretPreset()"
+      presetType="dockerconfigjson"
+      [canWrite]="perms().secret"
+      (saved)="onSaved()"
+      (closed)="closeForm()"
+    />
+  }
+}

@@ -1,6 +1,15 @@
 import { Component, OnInit, inject, input, output, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { GatewayService } from '../gateway.service';
+import {
+  type Location,
+  type Locations,
+  loadLocations,
+  ociLocations,
+  resolveOCI,
+  snapshotRepository,
+  source,
+} from '../storage-locations';
 import { listGuestNames, listSnapshotClasses } from '../wizard-util';
 
 /**
@@ -27,7 +36,7 @@ export class SnapshotDialog implements OnInit {
   readonly guests = signal<string[]>([]);
   readonly guest = signal('');
   readonly name = signal('');
-  readonly backend = signal('local'); // local | csi-volume-snapshot | s3
+  readonly backend = signal('local'); // local | csi-volume-snapshot | s3 | oci
   readonly resumeAfterSnapshot = signal(true);
   readonly deletionPolicy = signal('Delete');
   readonly volumeSnapshotClass = signal('');
@@ -39,11 +48,17 @@ export class SnapshotDialog implements OnInit {
   readonly s3Prefix = signal('');
   readonly s3Insecure = signal(false);
   readonly s3Secret = signal('');
+  // oci: '' = the default location (the namespace's, else the cluster's), or
+  // the source ("<Kind>/<name>") of a named one.
+  readonly ociLocation = signal('');
+  readonly includeDisk = signal(false);
+  readonly locs = signal<Locations>({ cluster: [], namespaced: [], error: '' });
 
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
 
   ngOnInit(): void {
+    void loadLocations(this.gw, this.cluster(), this.namespace()).then((l) => this.locs.set(l));
     void listSnapshotClasses(this.gw, this.cluster()).then((l) => {
       this.snapshotClasses.set(l.names);
       this.defaultClasses.set(l.defaults);
@@ -60,7 +75,22 @@ export class SnapshotDialog implements OnInit {
     });
   }
 
-  /** capturesMemory: local and s3 always capture memory, csi never does. */
+  /** ociChoices are the locations an oci snapshot here may name. */
+  ociChoices(): Location[] {
+    return ociLocations(this.locs(), this.namespace());
+  }
+
+  /** ociTarget is where an oci snapshot would be stored, or why it could not be. */
+  ociTarget(): { where: string; from: string; problem: string } {
+    const chosen = this.ociChoices().find((l) => source(l) === this.ociLocation());
+    const loc = this.ociLocation() ? chosen : resolveOCI(this.locs(), this.namespace()).location;
+    if (!loc) {
+      return { where: '', from: '', problem: resolveOCI(this.locs(), this.namespace()).problem };
+    }
+    return { where: snapshotRepository(loc, this.namespace()), from: source(loc), problem: '' };
+  }
+
+  /** capturesMemory: local, s3 and oci always capture memory, csi never does. */
   capturesMemory(): boolean {
     return this.backend() !== 'csi-volume-snapshot';
   }
@@ -77,6 +107,8 @@ export class SnapshotDialog implements OnInit {
       if (!this.s3Bucket().trim() || !this.s3Secret().trim()) return false;
       if (!this.s3Region().trim() && !this.s3Endpoint().trim()) return false;
     }
+    // An oci snapshot with nowhere to go would only wait (NoStorageLocation).
+    if (this.backend() === 'oci' && this.ociTarget().problem) return false;
     return true;
   }
 
@@ -97,6 +129,13 @@ export class SnapshotDialog implements OnInit {
       s3['credentialsSecretRef'] = { name: this.s3Secret().trim() };
       backend['s3'] = s3;
     }
+    if (this.backend() === 'oci' && this.ociLocation()) {
+      // No oci block: the registry comes from the location, which the
+      // controller resolves and records in status.location.
+      const [kind, name] = this.ociLocation().split('/');
+      backend['locationRef'] = { kind, name };
+    }
+    const fullState = this.backend() === 'oci' && this.includeDisk();
     const obj = {
       apiVersion: 'snapshot.kubeswift.io/v1alpha1',
       kind: 'SwiftSnapshot',
@@ -107,7 +146,9 @@ export class SnapshotDialog implements OnInit {
         // What the backend captures: a checkbox here changed nothing (the API
         // documents includeMemory=false as a no-op), so none is offered.
         includeMemory: this.capturesMemory(),
-        ...(this.capturesMemory() ? { resumeAfterSnapshot: this.resumeAfterSnapshot() } : {}),
+        ...(fullState ? { includeDisk: true } : {}),
+        // A full-state capture stops the guest; there is nothing to resume.
+        ...(this.capturesMemory() && !fullState ? { resumeAfterSnapshot: this.resumeAfterSnapshot() } : {}),
         deletionPolicy: this.deletionPolicy(),
       },
     };

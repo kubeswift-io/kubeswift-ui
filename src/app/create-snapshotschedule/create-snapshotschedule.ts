@@ -3,6 +3,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormShell } from '../form-shell/form-shell';
 import { ResourceForm } from '../resource-form';
 import {
+  type Locations,
+  loadLocations,
+  ociLocations,
+  resolveOCI,
+  snapshotRepository,
+  source,
+} from '../storage-locations';
+import {
   deepClone,
   keepIfListed,
   listGuestNames,
@@ -14,8 +22,9 @@ import {
 type Obj = Record<string, unknown>;
 
 /** CreateSnapshotSchedule — a SwiftSnapshotSchedule (cron snapshots + keep-N).
- *  local + CSI backends have widgets here; an S3/OCI backend on a loaded schedule
- *  is preserved as-is and edited through the YAML toggle. */
+ *  local, CSI and oci-through-a-storage-location backends have widgets here; an
+ *  s3 backend, or an oci one naming its registry itself, on a loaded schedule is
+ *  preserved as-is and edited through the YAML toggle. */
 @Component({
   selector: 'app-create-snapshotschedule',
   imports: [MatIconModule, FormShell],
@@ -40,6 +49,10 @@ export class CreateSnapshotSchedule extends ResourceForm {
   readonly suspend = signal(false);
   readonly namespaces = signal<string[]>([]);
   readonly guests = signal<string[]>([]);
+  // oci: '' = the default location, or the source ("<Kind>/<name>") of one.
+  readonly ociLocation = signal('');
+  readonly locs = signal<Locations>({ cluster: [], namespaced: [], error: '' });
+  readonly source = source;
   /** The loaded backend, kept verbatim for s3/oci which have no widget here. */
   readonly rawBackend = signal<Obj>({});
 
@@ -63,11 +76,27 @@ export class CreateSnapshotSchedule extends ResourceForm {
   // through GuestService; listing them as a catalog kind always came back
   // empty and left a schedule unsaveable from the form.
   protected override async onNamespace(cluster: string, ns: string): Promise<void> {
-    const g = await listGuestNames(this.gw, cluster, ns);
+    const [g, locs] = await Promise.all([listGuestNames(this.gw, cluster, ns), loadLocations(this.gw, cluster, ns)]);
     if (this.isStale(cluster, ns)) return;
+    this.locs.set(locs);
     this.guests.set(g.names);
     this.guestRef.set(keepIfListed(this.guestRef(), g.names));
     this.pickerError.set(pickerErrors({ guests: g }));
+  }
+
+  ociChoices() {
+    return ociLocations(this.locs(), this.namespace());
+  }
+
+  /** ociNow says where a snapshot made now would go; each resolves at its own creation. */
+  ociNow(): string {
+    const chosen = this.ociChoices().find((l) => source(l) === this.ociLocation());
+    const r = resolveOCI(this.locs(), this.namespace());
+    const loc = this.ociLocation() ? chosen : r.location;
+    return loc ? `${snapshotRepository(loc, this.namespace())} (from ${source(loc)})` : '';
+  }
+  ociProblem(): string {
+    return this.ociLocation() ? '' : resolveOCI(this.locs(), this.namespace()).problem;
   }
 
   hydrate(obj: Obj): void {
@@ -87,6 +116,11 @@ export class CreateSnapshotSchedule extends ResourceForm {
       this.csiClass.set(
         String(((be['csiVolumeSnapshot'] ?? {}) as Obj)['volumeSnapshotClassName'] ?? ''),
       );
+    } else if (type === 'oci' && !be['oci']) {
+      // oci through a storage location (no oci block of its own).
+      this.backend.set('oci');
+      const ref = be['locationRef'] as Obj | undefined;
+      this.ociLocation.set(ref ? `${String(ref['kind'] ?? 'SwiftStorageLocation')}/${String(ref['name'] ?? '')}` : '');
     } else if (type && type !== 'local') {
       // s3 / oci — the object backends, which exist precisely to get snapshots
       // OFF the node. They have no widget here, so keep the loaded backend
@@ -108,6 +142,13 @@ export class CreateSnapshotSchedule extends ResourceForm {
     if (this.backend() === 'other') {
       backendObj = deepClone(this.rawBackend());
       includeMemory = this.includeMemory();
+    } else if (this.backend() === 'oci') {
+      backendObj = { type: 'oci' };
+      if (this.ociLocation()) {
+        const [kind, name] = this.ociLocation().split('/');
+        backendObj['locationRef'] = { kind, name };
+      }
+      includeMemory = true;
     } else if (this.backend() === 'csi-volume-snapshot') {
       const csi: Obj = {};
       if (this.csiClass().trim()) csi['volumeSnapshotClassName'] = this.csiClass().trim();

@@ -37,6 +37,7 @@
           <option value="local">local — memory (Tier B)</option>
           <option value="csi-volume-snapshot">csi-volume-snapshot — disk</option>
           <option value="s3">s3 — object storage</option>
+          <option value="oci">oci — registry (storage location)</option>
         </select>
       </label>
 
@@ -102,7 +103,41 @@
         </label>
       }
 
-      @if (capturesMemory()) {
+      @if (backend() === 'oci') {
+        <label class="field">
+          <span>Storage location</span>
+          <select [value]="ociLocation()" (change)="ociLocation.set($any($event.target).value)">
+            <option value="">— the default —</option>
+            @for (l of ociChoices(); track l.kind + l.name) {
+              <option [value]="l.kind + '/' + l.name">
+                {{ l.kind === 'SwiftClusterStorageLocation' ? 'cluster/' : '' }}{{ l.name }}{{ l.isDefault ? ' (default)' : '' }}
+              </option>
+            }
+          </select>
+        </label>
+        @if (ociTarget(); as t) {
+          @if (t.problem) {
+            <p class="hint problem">{{ t.problem }}. Set one up in Settings.</p>
+          } @else {
+            <p class="hint">Stored in <code>{{ t.where }}</code> (from {{ t.from }}).</p>
+          }
+        }
+        <label class="check">
+          <input
+            type="checkbox"
+            [checked]="includeDisk()"
+            (change)="includeDisk.set($any($event.target).checked)"
+          />
+          Full state: also capture the disk (to import elsewhere)
+        </label>
+        @if (includeDisk()) {
+          <p class="hint problem">
+            The guest is stopped after the capture, as for a migration, so its disk is frozen at the
+            snapshot instant.
+          </p>
+        }
+      }
+      @if (capturesMemory() && !(backend() === 'oci' && includeDisk())) {
         <label class="check">
           <input
             type="checkbox"

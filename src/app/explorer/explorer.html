@@ -277,6 +277,27 @@
         (closed)="closeGuidedCreate()"
       />
     }
+    @case ('swiftclusterstoragelocations') {
+      <app-create-clusterstoragelocation
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
+    @case ('swiftstoragelocations') {
+      <app-create-storagelocation
+        [clusters]="clusters()"
+        [initialCluster]="selectedCluster()"
+        [initialNamespace]="selectedNamespace()"
+        [existing]="guidedExisting()"
+        [canWrite]="guidedExisting() ? perms().update : perms().create"
+        (saved)="onGuidedCreated()"
+        (closed)="closeGuidedCreate()"
+      />
+    }
     @case ('swiftsnapshotschedules') {
       <app-create-snapshotschedule
         [clusters]="clusters()"
