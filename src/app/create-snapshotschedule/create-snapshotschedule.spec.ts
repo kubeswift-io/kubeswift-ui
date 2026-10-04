@@ -54,7 +54,7 @@ describe('CreateSnapshotSchedule oci', () => {
     f.ociLocation.set('');
     const out = f.build({ spec: {} }) as Obj;
     expect(out['spec']['template']['spec']['backend']).toEqual({ type: 'oci' });
-    expect(out['spec']['template']['spec']['includeMemory']).toBeTrue();
+    expect(out['spec']['template']['spec']['includeMemory']).toBe(true);
   });
 
   it('still preserves an oci backend that names its own registry', () => {

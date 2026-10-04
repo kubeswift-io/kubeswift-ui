@@ -58,8 +58,8 @@ describe('Settings', () => {
     const s = await settings();
     expect(s.clusterDefault()?.name).toBe('main');
     const rows = Object.fromEntries(s.rows().map((r) => [r.namespace, r]));
-    expect(rows['team-a']).toEqual(jasmine.objectContaining({ repository: 'reg.example/k/team-a/snapshots', secret: 'kubeswift-registry', secretState: 'ok' }));
-    expect(rows['team-b']).toEqual(jasmine.objectContaining({ repository: 'reg.example/b/snapshots', secret: '', secretState: 'none' }));
+    expect(rows['team-a']).toEqual(expect.objectContaining({ repository: 'reg.example/k/team-a/snapshots', secret: 'kubeswift-registry', secretState: 'ok' }));
+    expect(rows['team-b']).toEqual(expect.objectContaining({ repository: 'reg.example/b/snapshots', secret: '', secretState: 'none' }));
     expect(rows['team-c'].secretState).toBe('wrong-type');
     expect(rows['team-d'].secretState).toBe('missing');
   });

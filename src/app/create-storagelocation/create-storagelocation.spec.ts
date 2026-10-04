@@ -18,9 +18,9 @@ describe('storage location forms', () => {
     f.credentialsSecretName.set('regcreds');
     f.caBundle.set('-----BEGIN CERTIFICATE-----\nx\n-----END CERTIFICATE-----\n');
     f.signingKeySecretName.set('cosign-key');
-    expect(f.canSave()).toBeFalse(); // no cluster yet
+    expect(f.canSave()).toBe(false); // no cluster yet
     f.cluster.set('c1');
-    expect(f.canSave()).toBeTrue();
+    expect(f.canSave()).toBe(true);
     const out = f.build({ spec: {} }) as Obj;
     expect(out['spec']).toEqual({
       default: true,
@@ -49,7 +49,7 @@ describe('storage location forms', () => {
   it('a csi-only location, and an edit that keeps what the form has no widget for', () => {
     const f = make(CreateStorageLocation);
     f.hydrate({ spec: { oci: { repository: 'r/x', futureField: 1 }, csi: { volumeSnapshotClassName: 'fast' } } });
-    expect(f.useOCI()).toBeTrue();
+    expect(f.useOCI()).toBe(true);
     expect(f.className()).toBe('fast');
     const kept = f.build({ spec: { oci: { repository: 'r/x', futureField: 1 } } }) as Obj;
     expect(kept['spec']['oci']['futureField']).toBe(1);
@@ -64,10 +64,10 @@ describe('storage location forms', () => {
     f.namespace.set('team-a');
     f.name.set('x');
     f.useOCI.set(false);
-    expect(f.canSave()).toBeFalse();
+    expect(f.canSave()).toBe(false);
     f.useCSI.set(true);
-    expect(f.canSave()).toBeFalse(); // no class chosen
+    expect(f.canSave()).toBe(false); // no class chosen
     f.className.set('fast');
-    expect(f.canSave()).toBeTrue();
+    expect(f.canSave()).toBe(true);
   });
 });
