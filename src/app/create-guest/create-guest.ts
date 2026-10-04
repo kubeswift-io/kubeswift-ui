@@ -1,6 +1,7 @@
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { GatewayService } from '../gateway.service';
+import { keepIfListed, listNames, listNamesReport, pickerErrors } from '../wizard-util';
 import type { Cluster } from '../gen/kubeswift/v1/cluster_pb';
 
 interface PortRow {
@@ -80,6 +81,7 @@ export class CreateGuest {
 
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
+  readonly pickerError = signal<string | null>(null);
 
   private prefillApplied = false;
 
@@ -101,6 +103,7 @@ export class CreateGuest {
       if (!p || this.prefillApplied) return;
       this.prefillApplied = true;
       this.namespace.set(p.namespace || 'default');
+      if (this.cluster()) void this.loadNamespaced(this.cluster(), this.namespace());
       this.name.set(p.name);
       this.guestClassRef.set(p.guestClassRef);
       this.seedProfileRef.set(p.seedProfileRef);
@@ -126,36 +129,23 @@ export class CreateGuest {
     await this.loadPickers(c);
   }
 
+  async selectNamespace(ns: string): Promise<void> {
+    this.namespace.set(ns);
+    await this.loadNamespaced(this.cluster(), ns);
+  }
+
+  // loadPickers loads what does not depend on the namespace: namespaces, the
+  // cluster-scoped guest classes, and nodes; then the namespace's own.
   private async loadPickers(cluster: string): Promise<void> {
     if (!cluster) return;
-    const names = async (kind: string): Promise<string[]> => {
-      try {
-        const r = await this.gw.resources.listResources({ cluster, kind });
-        return r.resources
-          .map((x) => x.ref?.name ?? '')
-          .filter(Boolean)
-          .sort();
-      } catch {
-        return [];
-      }
-    };
-    const [ns, img, krn, cls, sd, gpu, snap] = await Promise.all([
-      names('namespaces'),
-      names('swiftimages'),
-      names('swiftkernels'),
-      names('swiftguestclasses'),
-      names('swiftseedprofiles'),
-      names('swiftgpuprofiles'),
-      names('swiftsnapshots'),
+    const [ns, cls] = await Promise.all([
+      listNames(this.gw, cluster, 'namespaces'),
+      listNames(this.gw, cluster, 'swiftguestclasses'),
     ]);
     this.namespaces.set(ns);
-    this.images.set(img);
-    this.kernels.set(krn);
     this.classes.set(cls);
-    this.seeds.set(sd);
-    this.gpuProfiles.set(gpu);
-    this.snapshots.set(snap);
     if (!this.guestClassRef() && cls.length) this.guestClassRef.set(cls[0]);
+    await this.loadNamespaced(cluster, this.namespace());
     try {
       const n = await this.gw.clusters.listNodes({ cluster });
       this.nodes.set(
@@ -167,6 +157,36 @@ export class CreateGuest {
     } catch {
       this.nodes.set([]);
     }
+  }
+
+  // loadNamespaced lists what a SwiftGuest names in its own namespace: images,
+  // kernels, seed and GPU profiles, and snapshots to clone. Listing them across
+  // namespaces offered objects the guest could not find, and a name used in two
+  // namespaces twice. A selection the new namespace lacks is cleared, and a
+  // result that lands after the user has moved on is dropped.
+  private async loadNamespaced(cluster: string, ns: string): Promise<void> {
+    if (!cluster) return;
+    const [img, krn, sd, gpu, snap] = await Promise.all([
+      listNamesReport(this.gw, cluster, 'swiftimages', ns),
+      listNamesReport(this.gw, cluster, 'swiftkernels', ns),
+      listNamesReport(this.gw, cluster, 'swiftseedprofiles', ns),
+      listNamesReport(this.gw, cluster, 'swiftgpuprofiles', ns),
+      listNamesReport(this.gw, cluster, 'swiftsnapshots', ns),
+    ]);
+    if (cluster !== this.cluster() || ns !== this.namespace()) return;
+    this.images.set(img.names);
+    this.kernels.set(krn.names);
+    this.seeds.set(sd.names);
+    this.gpuProfiles.set(gpu.names);
+    this.snapshots.set(snap.names);
+    this.imageRef.set(keepIfListed(this.imageRef(), img.names));
+    this.kernelRef.set(keepIfListed(this.kernelRef(), krn.names));
+    this.seedProfileRef.set(keepIfListed(this.seedProfileRef(), sd.names));
+    this.gpuProfileRef.set(keepIfListed(this.gpuProfileRef(), gpu.names));
+    this.cloneSnapshotRef.set(keepIfListed(this.cloneSnapshotRef(), snap.names));
+    this.pickerError.set(
+      pickerErrors({ images: img, kernels: krn, 'seed profiles': sd, 'GPU profiles': gpu, snapshots: snap }),
+    );
   }
 
   addPort(): void {

@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormShell } from '../form-shell/form-shell';
 import { ResourceForm } from '../resource-form';
-import { listNames } from '../wizard-util';
+import { keepIfListed, listNames, listNamesReport, pickerErrors } from '../wizard-util';
 
 type Obj = Record<string, unknown>;
 type Source = 'new' | 'pool';
@@ -47,14 +47,23 @@ export class CreateSandbox extends ResourceForm {
   readonly gpuProfiles = signal<string[]>([]);
 
   protected override async onCluster(cluster: string): Promise<void> {
-    const [ns, pl, gpu] = await Promise.all([
-      listNames(this.gw, cluster, 'namespaces'),
-      listNames(this.gw, cluster, 'swiftsandboxpools'),
-      listNames(this.gw, cluster, 'swiftgpuprofiles'),
+    this.namespaces.set(await listNames(this.gw, cluster, 'namespaces'));
+    await this.onNamespace(cluster, this.namespace());
+  }
+
+  // Pools and GPU profiles are namespaced: a sandbox names them in its own
+  // namespace, so only that namespace's are offered.
+  protected override async onNamespace(cluster: string, ns: string): Promise<void> {
+    const [pl, gpu] = await Promise.all([
+      listNamesReport(this.gw, cluster, 'swiftsandboxpools', ns),
+      listNamesReport(this.gw, cluster, 'swiftgpuprofiles', ns),
     ]);
-    this.namespaces.set(ns);
-    this.pools.set(pl);
-    this.gpuProfiles.set(gpu);
+    if (this.isStale(cluster, ns)) return;
+    this.pools.set(pl.names);
+    this.gpuProfiles.set(gpu.names);
+    this.poolRef.set(keepIfListed(this.poolRef(), pl.names));
+    this.gpuProfileRef.set(keepIfListed(this.gpuProfileRef(), gpu.names));
+    this.pickerError.set(pickerErrors({ 'sandbox pools': pl, 'GPU profiles': gpu }));
   }
 
   // Choosing a pool prefills the image from the pool's spec so the checkout is

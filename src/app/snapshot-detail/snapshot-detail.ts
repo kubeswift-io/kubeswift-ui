@@ -8,6 +8,8 @@ interface RawSnapshot {
     guestRef?: { name?: string };
     backend?: { type?: string };
     includeMemory?: boolean;
+    includeDisk?: boolean;
+    resumeAfterSnapshot?: boolean;
     deletionPolicy?: string;
   };
   status?: {
@@ -42,6 +44,8 @@ export class SnapshotDetail implements OnInit {
   readonly backend = signal('');
   readonly phase = signal('');
   readonly includeMemory = signal(false);
+  readonly includeDisk = signal(false);
+  readonly resumeAfterSnapshot = signal(true);
   readonly deletionPolicy = signal('');
   readonly hypervisor = signal('');
   readonly pauseMs = signal(0);
@@ -62,6 +66,8 @@ export class SnapshotDetail implements OnInit {
       this.guest.set(o.spec?.guestRef?.name ?? '');
       this.backend.set(o.spec?.backend?.type ?? '');
       this.includeMemory.set(!!o.spec?.includeMemory);
+      this.includeDisk.set(!!o.spec?.includeDisk);
+      this.resumeAfterSnapshot.set(o.spec?.resumeAfterSnapshot !== false);
       this.deletionPolicy.set(o.spec?.deletionPolicy ?? '');
       this.phase.set(o.status?.phase ?? '');
       this.hypervisor.set(o.status?.hypervisorVersion ?? '');

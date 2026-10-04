@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormShell } from '../form-shell/form-shell';
 import { ResourceForm } from '../resource-form';
-import { listNames } from '../wizard-util';
+import { keepIfListed, listNames, listNamesReport, pickerErrors } from '../wizard-util';
 
 type Obj = Record<string, unknown>;
 
@@ -35,12 +35,17 @@ export class CreateSandboxPool extends ResourceForm {
   readonly gpuProfiles = signal<string[]>([]);
 
   protected override async onCluster(cluster: string): Promise<void> {
-    const [ns, gpu] = await Promise.all([
-      listNames(this.gw, cluster, 'namespaces'),
-      listNames(this.gw, cluster, 'swiftgpuprofiles'),
-    ]);
-    this.namespaces.set(ns);
-    this.gpuProfiles.set(gpu);
+    this.namespaces.set(await listNames(this.gw, cluster, 'namespaces'));
+    await this.onNamespace(cluster, this.namespace());
+  }
+
+  // GPU profiles are namespaced: the pool names one in its own namespace.
+  protected override async onNamespace(cluster: string, ns: string): Promise<void> {
+    const gpu = await listNamesReport(this.gw, cluster, 'swiftgpuprofiles', ns);
+    if (this.isStale(cluster, ns)) return;
+    this.gpuProfiles.set(gpu.names);
+    this.gpuProfileRef.set(keepIfListed(this.gpuProfileRef(), gpu.names));
+    this.pickerError.set(pickerErrors({ 'GPU profiles': gpu }));
   }
 
   hydrate(obj: Obj): void {

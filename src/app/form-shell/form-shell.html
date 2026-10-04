@@ -23,6 +23,9 @@
   @if (error(); as e) {
     <div class="banner error"><mat-icon>error</mat-icon> <span>{{ e }}</span></div>
   }
+  @if (warning(); as w) {
+    <div class="banner warn"><mat-icon>warning</mat-icon> <span>{{ w }}</span></div>
+  }
 
   <div class="seg viewtoggle">
     <button [class.on]="view() === 'form'" (click)="viewChange.emit('form')">Form</button>

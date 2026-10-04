@@ -135,3 +135,10 @@ select {
 .check input {
   width: auto;
 }
+
+.hint {
+  margin: -4px 0 4px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--mat-sys-on-surface-variant);
+}

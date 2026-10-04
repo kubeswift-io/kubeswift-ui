@@ -2,7 +2,14 @@ import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormShell } from '../form-shell/form-shell';
 import { ResourceForm } from '../resource-form';
-import { deepClone, listNames } from '../wizard-util';
+import {
+  deepClone,
+  keepIfListed,
+  listGuestNames,
+  listNames,
+  listSnapshotClasses,
+  pickerErrors,
+} from '../wizard-util';
 
 type Obj = Record<string, unknown>;
 
@@ -25,8 +32,9 @@ export class CreateSnapshotSchedule extends ResourceForm {
   readonly schedule = signal('0 2 * * *');
   readonly backend = signal('local');
   readonly includeMemory = signal(true);
-  readonly localHostPath = signal(''); // '' -> auto-derived under the required prefix
   readonly csiClass = signal('');
+  readonly snapshotClasses = signal<string[]>([]);
+  readonly defaultClasses = signal<string[]>([]);
   readonly keepLast = signal<number>(7);
   readonly concurrency = signal('Forbid');
   readonly suspend = signal(false);
@@ -41,18 +49,25 @@ export class CreateSnapshotSchedule extends ResourceForm {
   }
 
   protected override async onCluster(cluster: string): Promise<void> {
-    const [ns, g] = await Promise.all([
+    const [ns, vsc] = await Promise.all([
       listNames(this.gw, cluster, 'namespaces'),
-      listNames(this.gw, cluster, 'swiftguests', this.namespace()),
+      listSnapshotClasses(this.gw, cluster),
     ]);
     this.namespaces.set(ns);
-    this.guests.set(g);
+    this.snapshotClasses.set(vsc.names);
+    this.defaultClasses.set(vsc.defaults);
+    await this.onNamespace(cluster, this.namespace());
   }
 
-  async selectNamespace(ns: string): Promise<void> {
-    this.namespace.set(ns);
-    this.guestRef.set('');
-    this.guests.set(await listNames(this.gw, this.cluster(), 'swiftguests', ns));
+  // SwiftGuests have their own view, not a catalog entry, so they are listed
+  // through GuestService; listing them as a catalog kind always came back
+  // empty and left a schedule unsaveable from the form.
+  protected override async onNamespace(cluster: string, ns: string): Promise<void> {
+    const g = await listGuestNames(this.gw, cluster, ns);
+    if (this.isStale(cluster, ns)) return;
+    this.guests.set(g.names);
+    this.guestRef.set(keepIfListed(this.guestRef(), g.names));
+    this.pickerError.set(pickerErrors({ guests: g }));
   }
 
   hydrate(obj: Obj): void {
@@ -79,8 +94,10 @@ export class CreateSnapshotSchedule extends ResourceForm {
       // offsite schedule to node-local disk, and it kept reporting success.
       this.backend.set('other');
     } else {
+      // A template hostPath is no longer accepted (each scheduled snapshot is
+      // captured into a directory derived from its own name), so one loaded
+      // from an older schedule is dropped on save.
       this.backend.set('local');
-      this.localHostPath.set(String(((be['local'] ?? {}) as Obj)['hostPath'] ?? ''));
     }
   }
 
@@ -97,12 +114,9 @@ export class CreateSnapshotSchedule extends ResourceForm {
       backendObj = { type: 'csi-volume-snapshot', csiVolumeSnapshot: csi };
       includeMemory = false; // CSI is disk-only by definition
     } else {
-      // The webhook requires backend.local.hostPath under a fixed prefix; derive
-      // a per-schedule default when the operator leaves the field blank.
-      const hp =
-        this.localHostPath().trim() ||
-        `/var/lib/kubeswift/snapshots/${this.namespace()}-${this.name().trim()}`;
-      backendObj = { type: 'local', local: { hostPath: hp } };
+      // No hostPath: the webhook refuses one on a template, since every
+      // snapshot of the schedule would share the directory.
+      backendObj = { type: 'local' };
       includeMemory = this.includeMemory();
     }
     spec['schedule'] = this.schedule().trim();

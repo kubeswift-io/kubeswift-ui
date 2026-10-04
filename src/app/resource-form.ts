@@ -83,9 +83,29 @@ export abstract class ResourceForm {
   // Forms override to (re)load their pickers when the cluster changes.
   protected async onCluster(_cluster: string): Promise<void> {}
 
+  // Forms with namespaced pickers override to reload them when the namespace
+  // changes: a reference to an object is by name, in the object's own
+  // namespace, so a picker must offer that namespace's objects only.
+  protected async onNamespace(_cluster: string, _namespace: string): Promise<void> {}
+
+  // pickerError says which pickers could not list, so an empty dropdown is
+  // not read as "there are none".
+  readonly pickerError = signal<string | null>(null);
+
   async selectCluster(c: string): Promise<void> {
     this.cluster.set(c);
     await this.onCluster(c);
+  }
+
+  async selectNamespace(ns: string): Promise<void> {
+    this.namespace.set(ns);
+    await this.onNamespace(this.cluster(), ns);
+  }
+
+  // isStale reports whether a picker load for (cluster, namespace) finished
+  // after the user moved on, so its result must not land.
+  protected isStale(cluster: string, namespace: string): boolean {
+    return cluster !== this.cluster() || namespace !== this.namespace();
   }
 
   private skeleton(): Obj {

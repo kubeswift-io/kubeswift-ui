@@ -134,3 +134,19 @@ select {
 .check input {
   width: auto;
 }
+
+.banner.warn {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+}
+
+.hint.problem {
+  color: var(--mat-sys-error);
+}

@@ -42,13 +42,26 @@
 
       @if (backend() === 'csi-volume-snapshot') {
         <label class="field">
-          <span>VolumeSnapshotClass (optional)</span>
-          <input
+          <span>VolumeSnapshotClass</span>
+          <select
             [value]="volumeSnapshotClass()"
-            (input)="volumeSnapshotClass.set($any($event.target).value)"
-            placeholder="longhorn-snapshot"
-          />
+            (change)="volumeSnapshotClass.set($any($event.target).value)"
+          >
+            <option value="">— a storage location's class, else the cluster default —</option>
+            @for (c of snapshotClasses(); track c) {
+              <option [value]="c">
+                {{ c }}{{ defaultClasses().includes(c) ? ' (cluster default)' : '' }}
+              </option>
+            }
+          </select>
         </label>
+        @if (!volumeSnapshotClass() && defaultClasses().length === 0) {
+          <p class="hint">
+            No VolumeSnapshotClass is marked as this cluster's default. Choose one, or give a
+            storage location a VolumeSnapshotClass; otherwise the snapshot fails at once.
+          </p>
+        }
+        <p class="hint">Disk only: the guest keeps running and its memory is not captured.</p>
       }
       @if (backend() === 's3') {
         <label class="field">
@@ -56,7 +69,15 @@
           <input [value]="s3Bucket()" (input)="s3Bucket.set($any($event.target).value)" />
         </label>
         <label class="field">
-          <span>Endpoint (optional)</span>
+          <span>Region (required unless an endpoint is set)</span>
+          <input
+            [value]="s3Region()"
+            (input)="s3Region.set($any($event.target).value)"
+            placeholder="eu-central-1"
+          />
+        </label>
+        <label class="field">
+          <span>Endpoint (S3-compatible stores)</span>
           <input
             [value]="s3Endpoint()"
             (input)="s3Endpoint.set($any($event.target).value)"
@@ -68,7 +89,7 @@
           <input [value]="s3Prefix()" (input)="s3Prefix.set($any($event.target).value)" />
         </label>
         <label class="field">
-          <span>Credentials Secret (optional)</span>
+          <span>Credentials Secret * (keys accessKeyId, secretAccessKey)</span>
           <input [value]="s3Secret()" (input)="s3Secret.set($any($event.target).value)" />
         </label>
         <label class="check">
@@ -81,15 +102,22 @@
         </label>
       }
 
-      <div class="row2">
+      @if (capturesMemory()) {
         <label class="check">
           <input
             type="checkbox"
-            [checked]="includeMemory()"
-            (change)="includeMemory.set($any($event.target).checked)"
+            [checked]="resumeAfterSnapshot()"
+            (change)="resumeAfterSnapshot.set($any($event.target).checked)"
           />
-          Include memory
+          Resume the guest after the capture
         </label>
+        <p class="hint">
+          Captures memory and disk. A guest that runs on afterwards can no longer be restored in
+          place from this snapshot (its disk has moved on); a new guest can. Untick to leave it
+          paused.
+        </p>
+      }
+      <div class="row2">
         <label class="field">
           <span>Deletion policy</span>
           <select
