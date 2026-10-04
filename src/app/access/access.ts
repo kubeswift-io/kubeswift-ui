@@ -165,6 +165,20 @@ export class Access implements OnInit {
     );
   }
 
+  /**
+   * updateRole rewrites an outdated role to what its capabilities grant in this
+   * version, as the signed-in user: Kubernetes refuses it unless they hold
+   * every rule it would grant, and the refusal shows in the banner.
+   */
+  async updateRole(r: Role): Promise<void> {
+    await this.run(() => this.gw.access.syncRole({ cluster: this.selectedCluster(), name: r.name }));
+  }
+
+  /** outdatedCount is how many roles on this cluster an earlier version wrote. */
+  outdatedCount(): number {
+    return this.roles().filter((r) => r.outdated).length;
+  }
+
   // run executes a mutating call, then refreshes; errors surface in the banner.
   private async run(fn: () => Promise<unknown>): Promise<void> {
     this.busy.set(true);

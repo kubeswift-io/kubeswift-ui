@@ -217,6 +217,10 @@ select {
         border: 1px solid var(--mat-sys-outline-variant);
         border-radius: 8px;
         padding: 1px 8px;
+        &.warn {
+          border-color: var(--mat-sys-error);
+          color: var(--mat-sys-error);
+        }
       }
     }
     .chips {
@@ -232,4 +236,16 @@ select {
       }
     }
   }
+}
+
+.outdated {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--mat-sys-error);
+}
+
+.banner.warn {
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
 }

@@ -130,6 +130,17 @@
       </div>
     }
 
+    @if (outdatedCount(); as n) {
+      <div class="banner warn">
+        <mat-icon>warning</mat-icon>
+        <span>
+          {{ n }} role{{ n === 1 ? ' was' : 's were' }} written by an earlier KubeSwift version and no
+          longer grant{{ n === 1 ? 's' : '' }} exactly what {{ n === 1 ? 'its' : 'their' }} capabilities
+          grant now. Users assigned to {{ n === 1 ? 'it' : 'them' }} keep the old rules until it is
+          updated.
+        </span>
+      </div>
+    }
     <div class="roles">
       @for (r of roles(); track r.name) {
         <div class="role">
@@ -137,6 +148,10 @@
             <strong>{{ r.displayName || r.name }}</strong>
             <code>{{ r.name }}</code>
             <span class="spacer"></span>
+            @if (r.outdated) {
+              <span class="badge warn" [title]="r.outdatedReason">out of date</span>
+              <button class="link" [disabled]="busy()" (click)="updateRole(r)">Update</button>
+            }
             @if (r.predefined) {
               <span class="badge">predefined</span>
             } @else {
@@ -150,6 +165,12 @@
               <span class="chip">{{ capName(cap) }}</span>
             }
           </div>
+          @if (r.outdated) {
+            <p class="outdated">
+              Written by an earlier version. It {{ r.outdatedReason.startsWith('its ') ? 'differs: ' : '' }}{{ r.outdatedReason }}.
+              Update rewrites it to what its capabilities grant now; assigning it also updates it first.
+            </p>
+          }
         </div>
       }
     </div>
