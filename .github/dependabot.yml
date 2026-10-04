@@ -28,24 +28,9 @@ updates:
       - dependency-name: "zone.js"
         # ~0.15.0 is a PATCH range: 0.16 is already outside what Angular accepts.
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
-      - dependency-name: "jasmine-core"
-        # Not Angular's doing, and worth spelling out because the root pin looks
-        # like it selects the test framework and does not.
-        #
-        # karma-jasmine@5.1.0 -- the newest published, last touched Nov 2024 --
-        # DEPENDS on jasmine-core ^4.1.0 rather than peer-depending on it, so npm
-        # nests its own copy and karma-jasmine/lib/index.js serves that one:
-        #
-        #   require.resolve('jasmine-core')
-        #     -> node_modules/karma-jasmine/node_modules/jasmine-core   4.6.1
-        #
-        # Specs run on 4.6.1 whatever the root declares. A major here changes no
-        # behaviour, it only widens the gap between the declaration and what runs.
-        # #57 (5.9 -> 7.0) could not even resolve: karma-jasmine-html-reporter
-        # 2.1.0 peers ^4 || ^5.
-        #
-        # Actually leaving jasmine 4 means leaving karma -- @angular/build ships
-        # a `unit-test` builder now -- which is a decision, not a bump.
+      - dependency-name: "vitest"
+        # @angular/build 20 runs the unit tests and peers vitest ^3.1.1, so a
+        # major cannot resolve. Vitest 4 arrives with the Angular 21 upgrade.
         update-types: ["version-update:semver-major"]
     groups:
       # The Angular framework packages peer-depend on each other at an EXACT

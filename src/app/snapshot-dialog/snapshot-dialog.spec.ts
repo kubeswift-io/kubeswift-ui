@@ -35,7 +35,7 @@ describe('SnapshotDialog', () => {
     d.volumeSnapshotClass.set('fast');
     await d.save();
     const spec = sent()!['spec'];
-    expect(spec['includeMemory']).toBeFalse();
+    expect(spec['includeMemory']).toBe(false);
     expect(spec['resumeAfterSnapshot']).toBeUndefined();
     expect(spec['backend']).toEqual({ type: 'csi-volume-snapshot', csiVolumeSnapshot: { volumeSnapshotClassName: 'fast' } });
   });
@@ -45,19 +45,19 @@ describe('SnapshotDialog', () => {
     d.backend.set('local');
     d.resumeAfterSnapshot.set(false);
     await d.save();
-    expect(sent()!['spec']['includeMemory']).toBeTrue();
-    expect(sent()!['spec']['resumeAfterSnapshot']).toBeFalse();
+    expect(sent()!['spec']['includeMemory']).toBe(true);
+    expect(sent()!['spec']['resumeAfterSnapshot']).toBe(false);
   });
 
   it('s3 needs credentials, and a region unless an endpoint is set, as the webhook does', async () => {
     const { d, sent } = open();
     d.backend.set('s3');
     d.s3Bucket.set('backups');
-    expect(d.canSave()).toBeFalse();
+    expect(d.canSave()).toBe(false);
     d.s3Secret.set('s3-creds');
-    expect(d.canSave()).toBeFalse();
+    expect(d.canSave()).toBe(false);
     d.s3Region.set('eu-central-1');
-    expect(d.canSave()).toBeTrue();
+    expect(d.canSave()).toBe(true);
     await d.save();
     expect(sent()!['spec']['backend']['s3']).toEqual({
       bucket: 'backups',
@@ -66,7 +66,7 @@ describe('SnapshotDialog', () => {
     });
     d.s3Region.set('');
     d.s3Endpoint.set('minio.example:9000');
-    expect(d.canSave()).toBeTrue();
+    expect(d.canSave()).toBe(true);
   });
 });
 
@@ -87,7 +87,7 @@ describe('SnapshotDialog oci', () => {
     expect(d.ociTarget()).toEqual({ where: 'reg.example/k/team-a/snapshots', from: 'SwiftClusterStorageLocation/main', problem: '' });
     await d.save();
     expect(sent()!['spec']['backend']).toEqual({ type: 'oci' });
-    expect(sent()!['spec']['resumeAfterSnapshot']).toBeTrue();
+    expect(sent()!['spec']['resumeAfterSnapshot']).toBe(true);
   });
 
   it('names a chosen location, and a full-state capture sends no resume', async () => {
@@ -98,7 +98,7 @@ describe('SnapshotDialog oci', () => {
     await d.save();
     const spec = sent()!['spec'];
     expect(spec['backend']).toEqual({ type: 'oci', locationRef: { kind: 'SwiftClusterStorageLocation', name: 'main' } });
-    expect(spec['includeDisk']).toBeTrue();
+    expect(spec['includeDisk']).toBe(true);
     expect(spec['resumeAfterSnapshot']).toBeUndefined();
   });
 
@@ -106,6 +106,6 @@ describe('SnapshotDialog oci', () => {
     const { d } = open();
     d.backend.set('oci');
     expect(d.ociTarget().problem).toContain('NoStorageLocation');
-    expect(d.canSave()).toBeFalse();
+    expect(d.canSave()).toBe(false);
   });
 });

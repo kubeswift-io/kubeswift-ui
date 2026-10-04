@@ -28,11 +28,11 @@ jobs:
       # loses CSS. Gate the artifact rather than trusting review to catch it.
       - name: Build is loadable under the CSP
         run: scripts/check-csp-safe-build.sh
-      # ubuntu-latest ships Chrome, so the Karma runner needs no extra setup.
+      # Vitest in jsdom, through Angular's unit-test builder: no browser needed.
       # podspec.spec.ts covers the PodSpec merge, where a silent regression means
       # the editor deletes fields the operator never touched.
       - name: Unit tests
-        run: npx ng test --watch=false --browsers=ChromeHeadless
+        run: npx ng test --watch=false
 
   # Dependency vulnerabilities. Split from `build` so a vulnerable dependency
   # is distinguishable from a broken build at a glance, and so it still reports

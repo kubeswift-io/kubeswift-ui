@@ -34,7 +34,7 @@ describe('RestoreDialog', () => {
   it('a CSI snapshot restores into a new guest only, with no memory options', async () => {
     const { d, sent } = open({ backend: 'csi-volume-snapshot' });
     expect(d.mode()).toBe('new');
-    expect(d.canRestoreInPlace()).toBeFalse();
+    expect(d.canRestoreInPlace()).toBe(false);
     expect(d.targetGuest()).toBe('web-clone');
     await d.save();
     const spec = sent()!['spec'];
@@ -60,10 +60,10 @@ describe('RestoreDialog', () => {
     const { d, sent } = open({ backend: 'local', resumedAfterCapture: true });
     d.setMode('inplace');
     expect(d.targetGuest()).toBe('web');
-    expect(d.divergesInPlace()).toBeTrue();
-    expect(d.canSave()).toBeFalse();
+    expect(d.divergesInPlace()).toBe(true);
+    expect(d.canSave()).toBe(false);
     d.acceptDivergence.set(true);
-    expect(d.canSave()).toBeTrue();
+    expect(d.canSave()).toBe(true);
     await d.save();
     const o = sent()!;
     expect(o['metadata']['annotations']).toEqual({ 'snapshot.kubeswift.io/accept-disk-divergence': 'true' });
@@ -74,19 +74,19 @@ describe('RestoreDialog', () => {
   it('a full-state snapshot restores in place without a divergence warning', () => {
     const { d } = open({ backend: 'oci', resumedAfterCapture: true, fullState: true });
     d.setMode('inplace');
-    expect(d.divergesInPlace()).toBeFalse();
-    expect(d.canSave()).toBeTrue(); // in place, the node defaults to the guest's
+    expect(d.divergesInPlace()).toBe(false);
+    expect(d.canSave()).toBe(true); // in place, the node defaults to the guest's
   });
 
   it('an s3 or oci restore into a new guest needs a node', async () => {
     const { d, sent } = open({ backend: 's3' });
-    expect(d.usesTargetNode()).toBeTrue();
-    expect(d.canSave()).toBeFalse();
+    expect(d.usesTargetNode()).toBe(true);
+    expect(d.canSave()).toBe(false);
     d.targetNode.set('node-b');
-    expect(d.canSave()).toBeTrue();
+    expect(d.canSave()).toBe(true);
     await d.save();
     expect(sent()!['spec']['targetNode']).toBe('node-b');
-    expect(sent()!['spec']['resumeAfterRestore']).toBeTrue();
+    expect(sent()!['spec']['resumeAfterRestore']).toBe(true);
   });
 
   it('refuses a target named like the snapshot, or the source guest as a new guest', () => {
@@ -95,6 +95,6 @@ describe('RestoreDialog', () => {
     expect(d.targetProblem()).toContain('same name as the snapshot');
     d.targetGuest.set('web');
     expect(d.targetProblem()).toContain('source guest');
-    expect(d.canSave()).toBeFalse();
+    expect(d.canSave()).toBe(false);
   });
 });

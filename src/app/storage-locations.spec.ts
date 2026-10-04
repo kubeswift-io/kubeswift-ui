@@ -74,7 +74,7 @@ describe('storage-locations', () => {
       },
     } as unknown as GatewayService;
     const l = await loadLocations(gw, 'c1');
-    expect(l.cluster[0]).toEqual(jasmine.objectContaining({ name: 'main', isDefault: true, anonymous: true, hasCABundle: true, ready: 'True', reachable: 'False', reachableMessage: 'x509' }));
-    expect(l.namespaced[0]).toEqual(jasmine.objectContaining({ kind: 'SwiftStorageLocation', namespace: 'team-a', volumeSnapshotClassName: 'fast', repository: '' }));
+    expect(l.cluster[0]).toEqual(expect.objectContaining({ name: 'main', isDefault: true, anonymous: true, hasCABundle: true, ready: 'True', reachable: 'False', reachableMessage: 'x509' }));
+    expect(l.namespaced[0]).toEqual(expect.objectContaining({ kind: 'SwiftStorageLocation', namespace: 'team-a', volumeSnapshotClassName: 'fast', repository: '' }));
   });
 });
