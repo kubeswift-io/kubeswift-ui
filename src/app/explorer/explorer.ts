@@ -20,6 +20,10 @@ import { CreateSeedProfile } from '../create-seedprofile/create-seedprofile';
 import { CreateKernel } from '../create-kernel/create-kernel';
 import { CreateGPUProfile } from '../create-gpuprofile/create-gpuprofile';
 import { CreateSnapshotSchedule } from '../create-snapshotschedule/create-snapshotschedule';
+import {
+  CreateClusterStorageLocation,
+  CreateStorageLocation,
+} from '../create-storagelocation/create-storagelocation';
 import { CreateSandboxPool } from '../create-sandboxpool/create-sandboxpool';
 import { CreateGuestPool } from '../create-guestpool/create-guestpool';
 import { CreateSecret } from '../create-secret/create-secret';
@@ -86,6 +90,8 @@ const EDITABLE_FORM_KINDS = new Set([
   'swiftsnapshotschedules',
   'swiftsandboxpools',
   'swiftguestpools',
+  'swiftclusterstoragelocations',
+  'swiftstoragelocations',
 ]);
 
 const GUIDED_KINDS = new Set([
@@ -98,6 +104,8 @@ const GUIDED_KINDS = new Set([
   'swiftsnapshotschedules',
   'swiftsandboxpools',
   'swiftguestpools',
+  'swiftclusterstoragelocations',
+  'swiftstoragelocations',
   'secrets',
   'configmaps',
   'services',
@@ -147,6 +155,8 @@ interface KindGroup {
     CreateKernel,
     CreateGPUProfile,
     CreateSnapshotSchedule,
+    CreateClusterStorageLocation,
+    CreateStorageLocation,
     CreateSandboxPool,
     CreateGuestPool,
     CreateSecret,

@@ -1,0 +1,60 @@
+@use '../access/access.scss';
+
+.loc {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  .main,
+  .status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  .name {
+    font-weight: 500;
+  }
+}
+
+.pill {
+  font-size: 12px;
+  border-radius: 10px;
+  padding: 2px 8px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  &.ok {
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+  &.bad {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+}
+
+.muted {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 13px;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 4px 0 10px;
+}
+
+.problem {
+  color: var(--mat-sys-error);
+}
+
+.ok {
+  color: var(--mat-sys-primary);
+}
+
+code {
+  font-size: 12px;
+}
+
+section .primary {
+  margin: 4px 0 12px;
+}

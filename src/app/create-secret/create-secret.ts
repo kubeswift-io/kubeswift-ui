@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, effect, input, signal, untracked } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormShell } from '../form-shell/form-shell';
 import { ResourceForm } from '../resource-form';
@@ -39,6 +39,24 @@ export class CreateSecret extends ResourceForm {
   readonly tlsCrt = signal('');
   readonly tlsKey = signal('');
   readonly namespaces = signal<string[]>([]);
+
+  // presetName / presetType open the form for a Secret something else names,
+  // e.g. the credentials Secret a storage location expects (Settings).
+  readonly presetName = input('');
+  readonly presetType = input<SecretType | ''>('');
+
+  constructor() {
+    super();
+    effect(() => {
+      const n = this.presetName();
+      const t = this.presetType();
+      if (this.isEdit()) return;
+      untracked(() => {
+        if (n && !this.name()) this.name.set(n);
+        if (t) this.secretType.set(t);
+      });
+    });
+  }
 
   protected override async onCluster(cluster: string): Promise<void> {
     this.namespaces.set(await listNames(this.gw, cluster, 'namespaces'));

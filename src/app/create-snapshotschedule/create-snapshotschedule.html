@@ -71,6 +71,7 @@
     >
       CSI
     </button>
+    <button [class.on]="backend() === 'oci'" (click)="backend.set('oci')">oci</button>
     @if (backend() === 'other') {
       <button class="on" disabled>{{ backendType() }}</button>
     }
@@ -81,6 +82,26 @@
       here. It is preserved as-is on save — toggle to YAML to change it. Choosing local or CSI above
       will replace it.
     </p>
+  } @else if (backend() === 'oci') {
+    <label class="field">
+      <span>Storage location</span>
+      <select [value]="ociLocation()" (change)="ociLocation.set($any($event.target).value)">
+        <option value="">— the default —</option>
+        @for (l of ociChoices(); track l.kind + l.name) {
+          <option [value]="l.kind + '/' + l.name">
+            {{ l.kind === 'SwiftClusterStorageLocation' ? 'cluster/' : '' }}{{ l.name }}{{ l.isDefault ? ' (default)' : '' }}
+          </option>
+        }
+      </select>
+    </label>
+    @if (ociProblem(); as p) {
+      <p class="hint">{{ p }}. Set one up in Settings, or the scheduled snapshots will wait.</p>
+    } @else {
+      <p class="hint">
+        Each snapshot resolves its location when it is created, so the schedule follows a changed
+        default; one made now would go to <code>{{ ociNow() }}</code>, under its own tag.
+      </p>
+    }
   } @else if (backend() === 'local') {
     <label class="check">
       <input
@@ -112,7 +133,7 @@
     }
     <p class="hint">CSI is disk-only; memory is not captured.</p>
   }
-  <p class="hint">To use an S3 / OCI object backend, toggle to YAML.</p>
+  <p class="hint">For an s3 backend, or an oci one naming its registry itself, toggle to YAML.</p>
 
   <h4>Retention &amp; policy</h4>
   <div class="row2">

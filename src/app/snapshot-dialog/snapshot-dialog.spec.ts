@@ -69,3 +69,43 @@ describe('SnapshotDialog', () => {
     expect(d.canSave()).toBeTrue();
   });
 });
+
+describe('SnapshotDialog oci', () => {
+  function withLocations(): { d: SnapshotDialog; sent: () => Obj | undefined } {
+    const r = open();
+    r.d.locs.set({
+      cluster: [{ kind: 'SwiftClusterStorageLocation', name: 'main', namespace: '', isDefault: true, repository: 'reg.example/k' } as any],
+      namespaced: [],
+      error: '',
+    });
+    return r;
+  }
+
+  it('takes the default location and says where the snapshot goes', async () => {
+    const { d, sent } = withLocations();
+    d.backend.set('oci');
+    expect(d.ociTarget()).toEqual({ where: 'reg.example/k/team-a/snapshots', from: 'SwiftClusterStorageLocation/main', problem: '' });
+    await d.save();
+    expect(sent()!['spec']['backend']).toEqual({ type: 'oci' });
+    expect(sent()!['spec']['resumeAfterSnapshot']).toBeTrue();
+  });
+
+  it('names a chosen location, and a full-state capture sends no resume', async () => {
+    const { d, sent } = withLocations();
+    d.backend.set('oci');
+    d.ociLocation.set('SwiftClusterStorageLocation/main');
+    d.includeDisk.set(true);
+    await d.save();
+    const spec = sent()!['spec'];
+    expect(spec['backend']).toEqual({ type: 'oci', locationRef: { kind: 'SwiftClusterStorageLocation', name: 'main' } });
+    expect(spec['includeDisk']).toBeTrue();
+    expect(spec['resumeAfterSnapshot']).toBeUndefined();
+  });
+
+  it('will not create an oci snapshot with nowhere to go', () => {
+    const { d } = open();
+    d.backend.set('oci');
+    expect(d.ociTarget().problem).toContain('NoStorageLocation');
+    expect(d.canSave()).toBeFalse();
+  });
+});

@@ -17,6 +17,21 @@ interface RawSnapshot {
     hypervisorVersion?: string;
     observedPauseWindowMs?: number;
     s3?: { uploadedBytes?: number };
+    location?: {
+      source?: string;
+      repository?: string;
+      tag?: string;
+      credentialsSecretName?: string;
+      signingKeySecretName?: string;
+      volumeSnapshotClassName?: string;
+    };
+    oci?: {
+      reference?: string;
+      manifestDigest?: string;
+      pushedBytes?: number;
+      signed?: boolean;
+      disk?: { reference?: string };
+    };
   };
 }
 
@@ -50,6 +65,15 @@ export class SnapshotDetail implements OnInit {
   readonly hypervisor = signal('');
   readonly pauseMs = signal(0);
   readonly bytes = signal(0);
+  // Where it is stored, as resolved before the capture (status.location).
+  readonly locationSource = signal('');
+  readonly locationWhere = signal('');
+  readonly locationCredentials = signal('');
+  // What was pushed (status.oci).
+  readonly ociReference = signal('');
+  readonly ociDigest = signal('');
+  readonly ociSigned = signal(false);
+  readonly ociDisk = signal('');
   readonly error = signal<string | null>(null);
   readonly busy = signal(false);
   readonly showRestore = signal(false);
@@ -72,7 +96,17 @@ export class SnapshotDetail implements OnInit {
       this.phase.set(o.status?.phase ?? '');
       this.hypervisor.set(o.status?.hypervisorVersion ?? '');
       this.pauseMs.set(o.status?.observedPauseWindowMs ?? 0);
-      this.bytes.set(o.status?.s3?.uploadedBytes ?? 0);
+      this.bytes.set(o.status?.s3?.uploadedBytes ?? o.status?.oci?.pushedBytes ?? 0);
+      const loc = o.status?.location;
+      this.locationSource.set(loc?.source ?? '');
+      this.locationWhere.set(
+        loc?.repository ? `${loc.repository}:${loc.tag ?? ''}` : (loc?.volumeSnapshotClassName ?? ''),
+      );
+      this.locationCredentials.set(loc?.repository ? loc.credentialsSecretName || 'none (anonymous)' : '');
+      this.ociReference.set(o.status?.oci?.reference ?? '');
+      this.ociDigest.set(o.status?.oci?.manifestDigest ?? '');
+      this.ociSigned.set(!!o.status?.oci?.signed);
+      this.ociDisk.set(o.status?.oci?.disk?.reference ?? '');
     } catch (e) {
       this.error.set(this.msg(e));
     }
