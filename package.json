@@ -41,8 +41,8 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^20.3.29",
-    "@angular/cli": "^20.3.29",
+    "@angular/build": "^20.3.39",
+    "@angular/cli": "^20.3.39",
     "@angular/compiler-cli": "^20.3.33",
     "@bufbuild/protoc-gen-es": "^2.15.0",
     "jsdom": "^29.1.1",
