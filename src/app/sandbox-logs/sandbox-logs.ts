@@ -16,10 +16,13 @@ import { FitAddon } from '@xterm/addon-fit';
 import { GatewayService } from '../gateway.service';
 
 /**
- * SandboxLogs is a read-only xterm view of a SwiftSandbox's captured console
- * log. It opens a raw WebSocket to the gateway's /sandbox-logs exec-tail and
- * streams frames into the terminal (follow). An overlay opened from the sandbox
- * drawer; mirrors Console but has no input side (disableStdin, no onData send).
+ * SandboxLogs is a read-only xterm view of a SwiftSandbox's console. It opens a
+ * raw WebSocket to the gateway's /sandbox-logs and streams frames into the
+ * terminal (follow). Since kubeswift v0.20 the gateway reads the launcher pod's
+ * console container with the pod logs API (an exec tail for older pods); a warm
+ * checkout's console is its workload's output only, and ends with its slot. An
+ * overlay opened from the sandbox drawer; mirrors Console but has no input side
+ * (disableStdin, no onData send).
  */
 @Component({
   selector: 'app-sandbox-logs',

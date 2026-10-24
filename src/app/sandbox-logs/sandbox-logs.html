@@ -10,5 +10,11 @@
     </button>
   </header>
   <div #term class="term"></div>
-  <footer>Read-only — following the microVM console log.</footer>
+  <footer>
+    @if (status() === 'closed') {
+      Stream ended. A warm checkout's console ends with its workload: its slot is removed.
+    } @else {
+      Read-only — the sandbox console. For a warm checkout, its workload's output only.
+    }
+  </footer>
 </div>
