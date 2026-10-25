@@ -23,13 +23,13 @@
   "private": true,
   "dependencies": {
     "@angular/cdk": "^20.2.14",
-    "@angular/common": "^20.3.33",
-    "@angular/compiler": "^20.3.33",
-    "@angular/core": "^20.3.33",
-    "@angular/forms": "^20.3.33",
+    "@angular/common": "^20.3.34",
+    "@angular/compiler": "^20.3.34",
+    "@angular/core": "^20.3.34",
+    "@angular/forms": "^20.3.34",
     "@angular/material": "^20.2.14",
-    "@angular/platform-browser": "^20.3.33",
-    "@angular/router": "^20.3.33",
+    "@angular/platform-browser": "^20.3.34",
+    "@angular/router": "^20.3.34",
     "@bufbuild/protobuf": "^2.15.0",
     "@connectrpc/connect": "^2.1.2",
     "@connectrpc/connect-web": "^2.1.2",
@@ -41,15 +41,18 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^20.3.29",
-    "@angular/cli": "^20.3.29",
-    "@angular/compiler-cli": "^20.3.33",
+    "@angular/build": "^20.3.41",
+    "@angular/cli": "^20.3.41",
+    "@angular/compiler-cli": "^20.3.34",
     "@bufbuild/protoc-gen-es": "^2.15.0",
     "jsdom": "^29.1.1",
     "typescript": "~5.9.2",
     "vitest": "^3.2.7"
   },
   "overrides": {
-    "piscina": "^5.3.2"
+    "piscina": "^5.3.2",
+    "vitest": {
+      "tinypool": "^2.2.0"
+    }
   }
 }
