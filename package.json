@@ -36,13 +36,13 @@
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "^6.0.0",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
+    "tslib": "^2.9.1",
     "yaml": "^2.9.1",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^20.3.41",
-    "@angular/cli": "^20.3.41",
+    "@angular/build": "^20.3.42",
+    "@angular/cli": "^20.3.42",
     "@angular/compiler-cli": "^20.3.34",
     "@bufbuild/protoc-gen-es": "^2.16.0",
     "jsdom": "^29.1.1",
