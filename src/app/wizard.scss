@@ -351,3 +351,8 @@ textarea {
     color: var(--mat-sys-on-surface-variant);
   }
 }
+
+.hint.warn {
+  margin-top: -6px;
+  color: var(--mat-sys-error);
+}

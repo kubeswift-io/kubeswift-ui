@@ -138,3 +138,62 @@ export async function listSnapshotClasses(
     return { names: [], defaults: [], error: e instanceof Error ? e.message : String(e) };
   }
 }
+
+/** REGISTRY_SECRET_TYPE is the Secret type every registry credential field expects. */
+export const REGISTRY_SECRET_TYPE = 'kubernetes.io/dockerconfigjson';
+
+/**
+ * SecretList is one namespace's Secret names, split by whether they are
+ * registry credentials, for the Secret fields. error says why they could not
+ * be listed; a form must not then claim a typed name is missing.
+ */
+export interface SecretList {
+  registry: string[];
+  other: string[];
+  error: string;
+}
+
+/**
+ * listSecrets lists a namespace's Secret NAMES and types (the gateway never
+ * returns values), as the signed-in user.
+ */
+export async function listSecrets(
+  gw: GatewayService,
+  cluster: string,
+  namespace: string,
+): Promise<SecretList> {
+  if (!cluster || !namespace) return { registry: [], other: [], error: '' };
+  try {
+    const r = await gw.resources.listResources({ cluster, kind: 'secrets', namespace });
+    const registry: string[] = [];
+    const other: string[] = [];
+    for (const s of r.resources) {
+      const name = s.ref?.name ?? '';
+      if (!name) continue;
+      (s.columns['type'] === REGISTRY_SECRET_TYPE ? registry : other).push(name);
+    }
+    return { registry: registry.sort(), other: other.sort(), error: r.error?.message ?? '' };
+  } catch (e) {
+    return { registry: [], other: [], error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/**
+ * secretWarning says what is wrong with a typed Secret name, or '' when
+ * nothing is (or nothing can be said: empty name, Secrets not listed).
+ * kind 'registry' expects a kubernetes.io/dockerconfigjson Secret; 'any'
+ * only expects the Secret to exist (a cosign public key is an Opaque Secret).
+ */
+export function secretWarning(
+  name: string,
+  list: SecretList | null,
+  kind: 'registry' | 'any',
+): string {
+  const n = name.trim();
+  if (!n || !list || list.error) return '';
+  if (list.registry.includes(n)) return '';
+  if (list.other.includes(n)) {
+    return kind === 'registry' ? `Secret ${n} is not of type ${REGISTRY_SECRET_TYPE}.` : '';
+  }
+  return `No Secret ${n} in this namespace yet.`;
+}

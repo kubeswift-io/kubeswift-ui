@@ -2,7 +2,8 @@ import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormShell } from '../form-shell/form-shell';
 import { ResourceForm } from '../resource-form';
-import { listNames } from '../wizard-util';
+import { SecretField } from '../secret-field/secret-field';
+import { SecretList, listNames, listSecrets } from '../wizard-util';
 
 type Obj = Record<string, unknown>;
 
@@ -10,7 +11,7 @@ type Obj = Record<string, unknown>;
  *  A tag change alone won't re-pull an existing kernel (pull Job keyed on name+node). */
 @Component({
   selector: 'app-create-kernel',
-  imports: [MatIconModule, FormShell],
+  imports: [MatIconModule, FormShell, SecretField],
   templateUrl: './create-kernel.html',
   styleUrl: '../wizard.scss',
 })
@@ -25,9 +26,18 @@ export class CreateKernel extends ResourceForm {
   readonly cmdline = signal('');
   readonly pullSecret = signal('');
   readonly namespaces = signal<string[]>([]);
+  readonly secrets = signal<SecretList | null>(null);
 
   protected override async onCluster(cluster: string): Promise<void> {
     this.namespaces.set(await listNames(this.gw, cluster, 'namespaces'));
+    await this.onNamespace(cluster, this.namespace());
+  }
+
+  // The pull Secret is referenced in the kernel's own namespace.
+  protected override async onNamespace(cluster: string, ns: string): Promise<void> {
+    const secrets = await listSecrets(this.gw, cluster, ns);
+    if (this.isStale(cluster, ns)) return;
+    this.secrets.set(secrets);
   }
 
   hydrate(obj: Obj): void {

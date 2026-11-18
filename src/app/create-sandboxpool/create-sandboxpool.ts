@@ -2,7 +2,15 @@ import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormShell } from '../form-shell/form-shell';
 import { ResourceForm } from '../resource-form';
-import { keepIfListed, listNames, listNamesReport, pickerErrors } from '../wizard-util';
+import { SecretField } from '../secret-field/secret-field';
+import {
+  SecretList,
+  keepIfListed,
+  listNames,
+  listNamesReport,
+  listSecrets,
+  pickerErrors,
+} from '../wizard-util';
 
 type Obj = Record<string, unknown>;
 
@@ -10,7 +18,7 @@ type Obj = Record<string, unknown>;
  *  Optionally each slot holds a GPU (warm GPU pool) and/or a preloaded model. */
 @Component({
   selector: 'app-create-sandboxpool',
-  imports: [MatIconModule, FormShell],
+  imports: [MatIconModule, FormShell, SecretField],
   templateUrl: './create-sandboxpool.html',
   styleUrl: '../wizard.scss',
 })
@@ -31,6 +39,8 @@ export class CreateSandboxPool extends ResourceForm {
   readonly modelRef = signal('');
   readonly modelMount = signal('/model');
   readonly imagePullSecret = signal('');
+  readonly verifyKey = signal('');
+  readonly secrets = signal<SecretList | null>(null);
   readonly namespaces = signal<string[]>([]);
   readonly gpuProfiles = signal<string[]>([]);
 
@@ -39,10 +49,14 @@ export class CreateSandboxPool extends ResourceForm {
     await this.onNamespace(cluster, this.namespace());
   }
 
-  // GPU profiles are namespaced: the pool names one in its own namespace.
+  // GPU profiles and Secrets are namespaced: the pool names them in its own namespace.
   protected override async onNamespace(cluster: string, ns: string): Promise<void> {
-    const gpu = await listNamesReport(this.gw, cluster, 'swiftgpuprofiles', ns);
+    const [gpu, secrets] = await Promise.all([
+      listNamesReport(this.gw, cluster, 'swiftgpuprofiles', ns),
+      listSecrets(this.gw, cluster, ns),
+    ]);
     if (this.isStale(cluster, ns)) return;
+    this.secrets.set(secrets);
     this.gpuProfiles.set(gpu.names);
     this.gpuProfileRef.set(keepIfListed(this.gpuProfileRef(), gpu.names));
     this.pickerError.set(pickerErrors({ 'GPU profiles': gpu }));
@@ -58,6 +72,7 @@ export class CreateSandboxPool extends ResourceForm {
     this.minWarm.set(Number(spec['minWarm'] ?? 1));
     this.maxWarm.set(Number(spec['maxWarm'] ?? 0));
     this.imagePullSecret.set(String(spec['imagePullSecret'] ?? ''));
+    this.verifyKey.set(String(((spec['verifyKeySecretRef'] ?? {}) as Obj)['name'] ?? ''));
     this.gpuProfileRef.set(String(((spec['gpuProfileRef'] ?? {}) as Obj)['name'] ?? ''));
     const model = (spec['model'] ?? {}) as Obj;
     this.modelRef.set(String(model['imageRef'] ?? ''));
@@ -78,6 +93,8 @@ export class CreateSandboxPool extends ResourceForm {
     else delete spec['maxWarm'];
     if (this.imagePullSecret().trim()) spec['imagePullSecret'] = this.imagePullSecret().trim();
     else delete spec['imagePullSecret'];
+    if (this.verifyKey().trim()) spec['verifyKeySecretRef'] = { name: this.verifyKey().trim() };
+    else delete spec['verifyKeySecretRef'];
     if (this.gpuProfileRef()) spec['gpuProfileRef'] = { name: this.gpuProfileRef() };
     else delete spec['gpuProfileRef'];
     const model = this.modelRef().trim();

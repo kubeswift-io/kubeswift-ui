@@ -82,6 +82,31 @@
   </label>
 
   <div class="row2">
+    <app-secret-field
+      label="Image pull secret (optional)"
+      placeholder="(anonymous)"
+      [value]="imagePullSecret()"
+      [secrets]="secrets()"
+      (valueChange)="imagePullSecret.set($event)"
+    />
+    <app-secret-field
+      label="Verify key Secret (optional)"
+      placeholder="(no signature check)"
+      kind="any"
+      [value]="verifyKey()"
+      [secrets]="secrets()"
+      (valueChange)="verifyKey.set($event)"
+    />
+  </div>
+  <p class="hint">
+    The verify key Secret holds a cosign public key under <code>cosign.pub</code>; the sandbox boots
+    only if the image's signature verifies.
+    @if (source() === 'pool') {
+      A checkout must name the pool's verify key to get a warm slot.
+    }
+  </p>
+
+  <div class="row2">
     <label class="field">
       <span>vCPUs</span>
       <input

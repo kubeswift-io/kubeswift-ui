@@ -2,7 +2,8 @@ import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormShell } from '../form-shell/form-shell';
 import { ResourceForm } from '../resource-form';
-import { deepClone, listNames } from '../wizard-util';
+import { SecretField } from '../secret-field/secret-field';
+import { SecretList, deepClone, listNames, listSecrets } from '../wizard-util';
 
 type Obj = Record<string, unknown>;
 // 'other' = a source variant with no widget here (spec.source.upload), kept verbatim.
@@ -11,7 +12,7 @@ type Src = 'http' | 'oci' | 'pvcClone' | 'other';
 /** CreateImage — a SwiftImage VM disk (HTTP / OCI golden / PVC clone → raw runtime disk). */
 @Component({
   selector: 'app-create-image',
-  imports: [MatIconModule, FormShell],
+  imports: [MatIconModule, FormShell, SecretField],
   templateUrl: './create-image.html',
   styleUrl: '../wizard.scss',
 })
@@ -25,7 +26,11 @@ export class CreateImage extends ResourceForm {
   readonly url = signal('');
   readonly ociRepo = signal('');
   readonly ociTag = signal('');
+  readonly ociDigest = signal('');
   readonly ociInsecure = signal(false);
+  readonly ociCredentials = signal('');
+  readonly ociVerifyKey = signal('');
+  readonly secrets = signal<SecretList | null>(null);
   readonly pvcName = signal('');
   readonly pvcNamespace = signal('');
   readonly format = signal('qcow2');
@@ -37,6 +42,14 @@ export class CreateImage extends ResourceForm {
 
   protected override async onCluster(cluster: string): Promise<void> {
     this.namespaces.set(await listNames(this.gw, cluster, 'namespaces'));
+    await this.onNamespace(cluster, this.namespace());
+  }
+
+  // Secrets are referenced in the image's own namespace.
+  protected override async onNamespace(cluster: string, ns: string): Promise<void> {
+    const secrets = await listSecrets(this.gw, cluster, ns);
+    if (this.isStale(cluster, ns)) return;
+    this.secrets.set(secrets);
   }
 
   // Golden OCI images are already raw; default the source-artifact format to raw
@@ -55,7 +68,10 @@ export class CreateImage extends ResourceForm {
       const oci = source['oci'] as Obj;
       this.ociRepo.set(String(oci['repository'] ?? ''));
       this.ociTag.set(String(oci['tag'] ?? ''));
+      this.ociDigest.set(String(oci['digest'] ?? ''));
       this.ociInsecure.set(!!oci['insecure']);
+      this.ociCredentials.set(String(((oci['credentialsSecretRef'] ?? {}) as Obj)['name'] ?? ''));
+      this.ociVerifyKey.set(String(((oci['verifyKeySecretRef'] ?? {}) as Obj)['name'] ?? ''));
     } else if (source['pvcClone']) {
       this.src.set('pvcClone');
       const pvc = source['pvcClone'] as Obj;
@@ -82,15 +98,17 @@ export class CreateImage extends ResourceForm {
     } else if (this.src() === 'http') {
       source = { http: { url: this.url().trim() } };
     } else if (this.src() === 'oci') {
-      // Merge onto the loaded oci block: digest (the pin), credentialsSecretRef
-      // and above all verifyKeySecretRef (cosign verify-on-pull) have no widget
-      // here, and rebuilding the block silently disabled signature verification.
+      // Merge onto the loaded oci block so fields this form does not model survive.
       const oci = deepClone((this.rawSource()['oci'] ?? {}) as Obj);
       oci['repository'] = this.ociRepo().trim();
-      if (this.ociTag().trim()) oci['tag'] = this.ociTag().trim();
-      else delete oci['tag'];
-      if (this.ociInsecure()) oci['insecure'] = true;
-      else delete oci['insecure'];
+      const set = (k: string, v: unknown) => (v ? (oci[k] = v) : delete oci[k]);
+      set('tag', this.ociTag().trim());
+      set('digest', this.ociDigest().trim());
+      set('insecure', this.ociInsecure());
+      const cred = this.ociCredentials().trim();
+      set('credentialsSecretRef', cred && { name: cred });
+      const key = this.ociVerifyKey().trim();
+      set('verifyKeySecretRef', key && { name: key });
       source = { oci };
     } else {
       const pvc: Obj = { name: this.pvcName().trim() };
@@ -110,7 +128,19 @@ export class CreateImage extends ResourceForm {
     if (!this.cluster() || !this.namespace() || !this.name().trim()) return false;
     if (this.src() === 'other') return true; // preserved as loaded
     if (this.src() === 'http') return !!this.url().trim();
-    if (this.src() === 'oci') return !!this.ociRepo().trim();
+    if (this.src() === 'oci') return !!this.ociRepo().trim() && !this.ociProblem();
     return !!this.pvcName().trim();
+  }
+
+  /** ociProblem is why the OCI source would be refused at admission, or ''. */
+  ociProblem(): string {
+    if (this.ociTag().trim() && this.ociDigest().trim()) return 'Set a tag or a digest, not both.';
+    if (this.ociVerifyKey().trim() && this.ociInsecure())
+      return 'Signature verification needs a TLS registry: cosign cannot verify over plaintext HTTP.';
+    const d = this.ociDigest().trim();
+    // The OCI digest grammar (algorithm:encoded); the import pulls repository@digest.
+    if (d && !/^[a-z0-9]+(?:[.+_-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$/.test(d))
+      return 'A digest looks like sha256:<hex>.';
+    return '';
   }
 }
