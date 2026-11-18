@@ -1,0 +1,12 @@
+{
+  "_comment": "Advisories the audit gate tolerates. Each entry needs a reason and a review date. Remove an entry as soon as a fixed version is installable; scripts/audit-gate.mjs warns when an entry no longer matches anything.",
+  "advisories": [
+    {
+      "id": "GHSA-fc5q-39xc-vjpf",
+      "package": "picomatch",
+      "reason": "ReDoS through single-branch repeated extglobs. Affects every picomatch release up to 4.0.7, the newest, so no fixed version exists. Reached only through build tooling (@angular/build, vite, sass via @parcel/watcher); `npm audit --omit=dev` is clean, so nothing in the served bundle is affected.",
+      "added": "2026-11-18",
+      "review_by": "2026-12-18"
+    }
+  ]
+}

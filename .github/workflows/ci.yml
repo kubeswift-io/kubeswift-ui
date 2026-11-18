@@ -38,7 +38,9 @@ jobs:
   # is distinguishable from a broken build at a glance, and so it still reports
   # when the build fails.
   #
-  # GATING POLICY: fail on high and above.
+  # GATING POLICY: fail on high and above. Exceptions live in
+  # scripts/audit-allowlist.json, each with a reason and a review date; the
+  # gate warns when an entry no longer matches and should be removed.
   #
   # This started at `critical` because the tree carried 27 advisories (1
   # critical, 18 high) and gating at `high` would have landed a permanently red
@@ -63,10 +65,13 @@ jobs:
           cache: npm
       - run: npm ci
 
-      # Gate. `npm audit` exits non-zero when anything at or above the level is
-      # found, so this is the whole enforcement.
-      - name: Audit (fail on high and above)
-        run: npm audit --audit-level=high
+      # Gate. Fails on any high or critical advisory except the ones listed in
+      # scripts/audit-allowlist.json, each with a reason and a review date.
+      # `npm audit --audit-level=high` cannot skip a single advisory, so one
+      # with no fixed release (GHSA-fc5q-39xc-vjpf in picomatch, build tooling
+      # only) would otherwise turn every branch red.
+      - name: Audit (fail on high and above, minus the allowlist)
+        run: node scripts/audit-gate.mjs
 
       # Report. Everything below the gate, visible without holding the build
       # hostage -- nothing is hidden just because it is not yet enforced.
@@ -82,6 +87,6 @@ jobs:
             npm audit 2>&1 | tail -20 || true
             echo '```'
             echo
-            echo "Gate is \`critical\`. Highs are reported but not enforced yet -- see the"
+            echo "Gate is \`high\`, minus scripts/audit-allowlist.json -- see the"
             echo "policy comment in ci.yml."
           } >> "$GITHUB_STEP_SUMMARY"
