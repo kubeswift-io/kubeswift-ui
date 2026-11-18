@@ -1,8 +1,10 @@
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
+// Angular Material 3 theme, mapped onto the KubeSwift design tokens.
+//
+// The tokens (src/design/tokens/tokens.css, vendored from kubeswift-io/design)
+// define every colour for light and dark; ThemeService sets data-theme on
+// <html>, which switches them. Material still generates its own palette below,
+// but every system colour the console uses is overridden to point at a token,
+// so the components and our own styles both follow the KubeSwift brand.
 @use '@angular/material' as mat;
 
 html {
@@ -10,37 +12,133 @@ html {
     (
       color: (
         primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
+        tertiary: mat.$cyan-palette,
       ),
-      typography: Roboto,
+      typography: (
+        brand-family: 'Space Grotesk',
+        plain-family: 'Space Grotesk',
+        bold-weight: 700,
+        medium-weight: 600,
+        regular-weight: 400,
+      ),
       density: 0,
     )
   );
+
+  // ---- Material system colours -> KubeSwift tokens ----
+  // Primary: azure on light, teal on dark (the brand accent).
+  --mat-sys-primary: var(--accent);
+  --mat-sys-on-primary: var(--on-accent-fill);
+  --mat-sys-primary-container: var(--tint-blue);
+  --mat-sys-on-primary-container: var(--ink);
+  --mat-sys-inverse-primary: var(--teal);
+  --mat-sys-surface-tint: var(--accent);
+
+  // Secondary: neutral blue-grey, for chips and quiet fills.
+  --mat-sys-secondary: var(--sub);
+  --mat-sys-on-secondary: var(--surface);
+  --mat-sys-secondary-container: var(--status-neutral-bg);
+  --mat-sys-on-secondary-container: var(--ink);
+
+  // Tertiary: teal, readable as text in both themes.
+  --mat-sys-tertiary: var(--teal-text);
+  --mat-sys-on-tertiary: var(--on-accent-fill);
+  --mat-sys-tertiary-container: var(--tint-teal);
+  --mat-sys-on-tertiary-container: var(--ink);
+
+  --mat-sys-error: var(--status-danger);
+  --mat-sys-on-error: var(--on-accent-fill);
+  --mat-sys-error-container: var(--status-danger-bg);
+  --mat-sys-on-error-container: var(--status-danger);
+
+  // Surfaces: the page is mist (light) or navy (dark); cards and bars sit on
+  // surface; raised and selected areas step up through the neutral fills.
+  --mat-sys-background: var(--bg);
+  --mat-sys-on-background: var(--ink);
+  --mat-sys-surface: var(--bg);
+  --mat-sys-on-surface: var(--ink);
+  --mat-sys-surface-variant: var(--status-neutral-bg);
+  --mat-sys-on-surface-variant: var(--sub);
+  --mat-sys-surface-dim: var(--bg);
+  --mat-sys-surface-bright: var(--surface);
+  --mat-sys-surface-container-lowest: var(--bg);
+  --mat-sys-surface-container-low: var(--surface);
+  --mat-sys-surface-container: var(--surface);
+  --mat-sys-surface-container-high: var(--status-neutral-bg);
+  --mat-sys-surface-container-highest: var(--rule);
+
+  // Input borders need 3:1, so they use muted; dividers use rule.
+  --mat-sys-outline: var(--muted);
+  --mat-sys-outline-variant: var(--rule);
+
+  // Mono for kind names, YAML, logs and commands.
+  --mat-sys-typeface-mono: var(--font-mono);
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings. ThemeService sets it on <html>; the body inherits.
+  // ThemeService sets color-scheme and data-theme on <html>; the body inherits.
   color-scheme: inherit;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
+  font-family: var(--font-sans);
   margin: 0;
 }
-/* You can add global styles to this file, and also import other style files */
 
 html,
 body {
   height: 100%;
 }
-body {
-  margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+// ---- Phase status ----
+// Every phase name maps to one status on every kind (kubeswift-io/design,
+// docs/status.md). Components keep their own chip shape and read the colours
+// through --phase-fg / --phase-bg, so the mapping lives only here.
+[data-phase] {
+  --phase-fg: var(--status-neutral);
+  --phase-bg: var(--status-neutral-bg);
+}
+[data-phase='Running'],
+[data-phase='Ready'],
+[data-phase='Completed'],
+[data-phase='Attached'],
+[data-phase='Active'] {
+  --phase-fg: var(--status-success);
+  --phase-bg: var(--status-success-bg);
+}
+[data-phase='Importing'],
+[data-phase='Validating'],
+[data-phase='Preparing'],
+[data-phase='Snapshotting'],
+[data-phase='Pulling'],
+[data-phase='StopAndCopy'],
+[data-phase='Resuming'],
+[data-phase='Materializing'],
+[data-phase='Exporting'],
+[data-phase='Warming'],
+[data-phase='Capturing'],
+[data-phase='Uploading'],
+[data-phase='Downloading'],
+[data-phase='Restoring'],
+[data-phase='Attaching'],
+[data-phase='Detaching'],
+[data-phase='Discovering'] {
+  --phase-fg: var(--status-info);
+  --phase-bg: var(--status-info-bg);
+}
+[data-phase='Pending'],
+[data-phase='Scheduling'],
+[data-phase='Degraded'] {
+  --phase-fg: var(--status-warning);
+  --phase-bg: var(--status-warning-bg);
+}
+[data-phase='Failed'],
+[data-phase='Error'] {
+  --phase-fg: var(--status-danger);
+  --phase-bg: var(--status-danger-bg);
 }

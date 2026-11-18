@@ -1,6 +1,6 @@
 <div class="backdrop" (click)="closed.emit()"></div>
 
-<div class="console" role="dialog" aria-label="Sandbox shell">
+<div class="console" data-theme="dark" role="dialog" aria-label="Sandbox shell">
   <header>
     <span class="title">Shell — {{ name() }}</span>
     <span class="status" [class]="status()">{{ status() }}</span>

@@ -31,13 +31,13 @@
       background: var(--mat-sys-error);
     }
     &.on .dot {
-      background: #1e8e3e;
+      background: var(--status-success);
     }
     // Amber, not green and not red: the fleet answered, but not all of it.
     // Distinct on purpose — a partial answer rendering as "live" is what made
     // an unreachable cluster look like an empty one.
     &.degraded .dot {
-      background: #f9ab00;
+      background: var(--status-warning);
     }
   }
   .count {
@@ -117,7 +117,7 @@
       background: var(--mat-sys-error);
       flex: none;
       &.ok {
-        background: #1e8e3e;
+        background: var(--status-success);
       }
     }
     .meta {
@@ -157,25 +157,8 @@
     border-radius: 12px;
     font-size: 12px;
     font-weight: 500;
-    background: var(--mat-sys-surface-container-high);
-    color: var(--mat-sys-on-surface-variant);
-
-    &[data-phase='Running'] {
-      background: #e6f4ea;
-      color: #1e8e3e;
-    }
-    &[data-phase='Failed'] {
-      background: #fce8e6;
-      color: #d93025;
-    }
-    &[data-phase='Pending'],
-    &[data-phase='Scheduling'] {
-      background: #fef7e0;
-      color: #b06000;
-    }
-    &[data-phase='Stopped'] {
-      background: var(--mat-sys-surface-container-highest);
-    }
+    background: var(--phase-bg, var(--status-neutral-bg));
+    color: var(--phase-fg, var(--status-neutral));
   }
 }
 

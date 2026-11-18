@@ -33,6 +33,23 @@ CORS allows the dev origin). Override at runtime with
 npm run build        # → dist/kubeswift-ui/browser (static assets)
 ```
 
+## Design
+
+Colours, fonts and the logo come from the KubeSwift design system,
+[kubeswift-io/design](https://github.com/kubeswift-io/design), vendored in
+[`src/design/`](src/design/). `src/styles.scss` maps Angular Material's
+`--mat-sys-*` variables onto those tokens, so Material components and the
+console's own styles follow the brand in light and dark.
+
+- Do not edit `src/design/`. Change tokens in the design repo, then run
+  `scripts/sync-design.sh /path/to/design` and commit.
+- Phase chips read their colour from the phase name: a `.phase` element with
+  `data-phase="Running"` (or any other phase) gets `--phase-fg` and
+  `--phase-bg`, set once in `styles.scss` from the design system's phase map.
+- Fonts and icons are self-hosted (`src/design/fonts`, `material-icons`), so
+  the console makes no requests outside its own origin and the gateway, and
+  builds without network access to Google Fonts.
+
 ## Container image
 
 A multi-stage [`Dockerfile`](Dockerfile) builds the app (`npm ci && ng build`)

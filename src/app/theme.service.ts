@@ -4,10 +4,10 @@ type Theme = 'light' | 'dark';
 const STORE = 'kubeswift.theme';
 
 /**
- * ThemeService toggles light/dark by flipping the document's `color-scheme`.
- * The whole UI — Angular Material and our own components — is built on the
- * Material 3 `--mat-sys-*` system tokens, which resolve light/dark from
- * `color-scheme`, so nothing else has to change. The choice persists in
+ * ThemeService toggles light/dark on the document root: `color-scheme` for
+ * Angular Material's own light-dark() values, and `data-theme` for the
+ * KubeSwift design tokens (src/design/tokens/tokens.css), which the
+ * `--mat-sys-*` overrides in styles.scss point at. The choice persists in
  * localStorage and defaults to the OS preference on first visit.
  */
 @Injectable({ providedIn: 'root' })
@@ -18,6 +18,7 @@ export class ThemeService {
     effect(() => {
       const t = this.theme();
       document.documentElement.style.colorScheme = t;
+      document.documentElement.dataset['theme'] = t;
       localStorage.setItem(STORE, t);
     });
   }
