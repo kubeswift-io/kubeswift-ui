@@ -29,7 +29,13 @@ export class ThemeService {
 }
 
 function load(): Theme {
-  const saved = localStorage.getItem(STORE);
+  let saved: string | null | undefined;
+  try {
+    saved = globalThis.localStorage?.getItem(STORE);
+  } catch {
+    // Storage blocked (privacy settings) or absent (Node 25+ without
+    // --localstorage-file): fall back to the OS preference.
+  }
   if (saved === 'light' || saved === 'dark') return saved;
   return globalThis.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
