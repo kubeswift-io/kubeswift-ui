@@ -2,7 +2,15 @@ import { Component, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormShell } from '../form-shell/form-shell';
 import { ResourceForm } from '../resource-form';
-import { keepIfListed, listNames, listNamesReport, pickerErrors } from '../wizard-util';
+import { SecretField } from '../secret-field/secret-field';
+import {
+  SecretList,
+  keepIfListed,
+  listNames,
+  listNamesReport,
+  listSecrets,
+  pickerErrors,
+} from '../wizard-util';
 
 type Obj = Record<string, unknown>;
 type Source = 'new' | 'pool';
@@ -16,7 +24,7 @@ type ScratchKind = '' | 'blank' | 'pvc';
  */
 @Component({
   selector: 'app-create-sandbox',
-  imports: [MatIconModule, FormShell],
+  imports: [MatIconModule, FormShell, SecretField],
   templateUrl: './create-sandbox.html',
   styleUrl: '../wizard.scss',
 })
@@ -33,6 +41,9 @@ export class CreateSandbox extends ResourceForm {
   readonly networkMode = signal('restricted');
   readonly rootfsMode = signal(''); // '' -> controller default (block)
   readonly command = signal('');
+  readonly imagePullSecret = signal('');
+  readonly verifyKey = signal('');
+  readonly secrets = signal<SecretList | null>(null);
   readonly poolRef = signal('');
   readonly gpuProfileRef = signal('');
   readonly modelRef = signal('');
@@ -51,14 +62,16 @@ export class CreateSandbox extends ResourceForm {
     await this.onNamespace(cluster, this.namespace());
   }
 
-  // Pools and GPU profiles are namespaced: a sandbox names them in its own
-  // namespace, so only that namespace's are offered.
+  // Pools, GPU profiles and Secrets are namespaced: a sandbox names them in its
+  // own namespace, so only that namespace's are offered.
   protected override async onNamespace(cluster: string, ns: string): Promise<void> {
-    const [pl, gpu] = await Promise.all([
+    const [pl, gpu, secrets] = await Promise.all([
       listNamesReport(this.gw, cluster, 'swiftsandboxpools', ns),
       listNamesReport(this.gw, cluster, 'swiftgpuprofiles', ns),
+      listSecrets(this.gw, cluster, ns),
     ]);
     if (this.isStale(cluster, ns)) return;
+    this.secrets.set(secrets);
     this.pools.set(pl.names);
     this.gpuProfiles.set(gpu.names);
     this.poolRef.set(keepIfListed(this.poolRef(), pl.names));
@@ -66,8 +79,9 @@ export class CreateSandbox extends ResourceForm {
     this.pickerError.set(pickerErrors({ 'sandbox pools': pl, 'GPU profiles': gpu }));
   }
 
-  // Choosing a pool prefills the image from the pool's spec so the checkout is
-  // rootfs-compatible; the field stays editable.
+  // Choosing a pool prefills the image and verify key from the pool's spec: a
+  // checkout whose image or verifyKeySecretRef differs from the pool's gets no
+  // warm slot and boots cold. The fields stay editable.
   async selectPool(name: string): Promise<void> {
     this.poolRef.set(name);
     if (!name) return;
@@ -78,8 +92,12 @@ export class CreateSandbox extends ResourceForm {
         namespace: this.namespace(),
         name,
       });
-      const o = JSON.parse(r.json) as { spec?: { image?: string } };
+      const o = JSON.parse(r.json) as {
+        spec?: { image?: string; imagePullSecret?: string; verifyKeySecretRef?: { name?: string } };
+      };
       if (o.spec?.image) this.image.set(o.spec.image);
+      this.imagePullSecret.set(o.spec?.imagePullSecret ?? '');
+      this.verifyKey.set(o.spec?.verifyKeySecretRef?.name ?? '');
     } catch {
       // leave image as-is; the user can type it.
     }
@@ -94,6 +112,8 @@ export class CreateSandbox extends ResourceForm {
     this.rootfsMode.set(String(spec['rootfsMode'] ?? ''));
     const cmd = spec['command'];
     this.command.set(Array.isArray(cmd) ? (cmd as string[]).join(' ') : '');
+    this.imagePullSecret.set(String(spec['imagePullSecret'] ?? ''));
+    this.verifyKey.set(String(((spec['verifyKeySecretRef'] ?? {}) as Obj)['name'] ?? ''));
     if (spec['poolRef']) {
       this.source.set('pool');
       this.poolRef.set(String((spec['poolRef'] as Obj)['name'] ?? ''));
@@ -130,6 +150,10 @@ export class CreateSandbox extends ResourceForm {
     const cmd = this.command().trim();
     if (cmd) spec['command'] = cmd.split(/\s+/);
     else delete spec['command'];
+    if (this.imagePullSecret().trim()) spec['imagePullSecret'] = this.imagePullSecret().trim();
+    else delete spec['imagePullSecret'];
+    if (this.verifyKey().trim()) spec['verifyKeySecretRef'] = { name: this.verifyKey().trim() };
+    else delete spec['verifyKeySecretRef'];
 
     if (this.source() === 'pool') {
       spec['poolRef'] = { name: this.poolRef() };

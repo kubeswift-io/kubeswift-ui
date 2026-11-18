@@ -23,7 +23,7 @@
       @if (isEdit()) {
         <input [value]="namespace()" disabled />
       } @else {
-        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
+        <select [value]="namespace()" (change)="selectNamespace($any($event.target).value)">
           @for (ns of namespaces(); track ns) {
             <option [value]="ns">{{ ns }}</option>
           }
@@ -84,6 +84,36 @@
         />
       </label>
     </div>
+    <label class="field">
+      <span>Digest (instead of a tag)</span>
+      <input
+        placeholder="sha256:…"
+        [value]="ociDigest()"
+        (input)="ociDigest.set($any($event.target).value)"
+      />
+    </label>
+    <p class="hint">A digest pins the exact artifact; a tag can be moved after you import it.</p>
+    <div class="row2">
+      <app-secret-field
+        label="Credentials Secret (optional)"
+        placeholder="(anonymous)"
+        [value]="ociCredentials()"
+        [secrets]="secrets()"
+        (valueChange)="ociCredentials.set($event)"
+      />
+      <app-secret-field
+        label="Verify key Secret (optional)"
+        placeholder="(no signature check)"
+        kind="any"
+        [value]="ociVerifyKey()"
+        [secrets]="secrets()"
+        (valueChange)="ociVerifyKey.set($event)"
+      />
+    </div>
+    <p class="hint">
+      The verify key Secret holds a cosign public key under <code>cosign.pub</code>; the import
+      fails unless the artifact's signature verifies.
+    </p>
     <label class="check">
       <input
         type="checkbox"
@@ -92,6 +122,9 @@
       />
       <span>Insecure registry (plaintext HTTP — test only)</span>
     </label>
+    @if (ociProblem()) {
+      <p class="hint warn">{{ ociProblem() }}</p>
+    }
   } @else {
     <div class="row2">
       <label class="field">

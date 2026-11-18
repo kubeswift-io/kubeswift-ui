@@ -23,7 +23,7 @@
       @if (isEdit()) {
         <input [value]="namespace()" disabled />
       } @else {
-        <select [value]="namespace()" (change)="namespace.set($any($event.target).value)">
+        <select [value]="namespace()" (change)="selectNamespace($any($event.target).value)">
           @for (ns of namespaces(); track ns) {
             <option [value]="ns">{{ ns }}</option>
           }
@@ -59,14 +59,13 @@
         (input)="profile.set($any($event.target).value)"
       />
     </label>
-    <label class="field">
-      <span>Pull secret (optional)</span>
-      <input
-        placeholder="regcreds"
-        [value]="pullSecret()"
-        (input)="pullSecret.set($any($event.target).value)"
-      />
-    </label>
+    <app-secret-field
+      label="Pull secret (optional)"
+      placeholder="(anonymous)"
+      [value]="pullSecret()"
+      [secrets]="secrets()"
+      (valueChange)="pullSecret.set($event)"
+    />
   </div>
 
   <label class="field">

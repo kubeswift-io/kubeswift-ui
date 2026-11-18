@@ -3,8 +3,10 @@ import {
   keepIfListed,
   listGuestNames,
   listNamesReport,
+  listSecrets,
   listSnapshotClasses,
   pickerErrors,
+  secretWarning,
 } from './wizard-util';
 
 /** gw builds a GatewayService stand-in with only the calls a test needs. */
@@ -36,7 +38,10 @@ describe('wizard-util pickers', () => {
       resources: {
         listResources: async (req: unknown) => {
           asked = req;
-          return { resources: [{ ref: { name: 'b' } }, { ref: { name: 'a' } }], error: { message: 'partial' } };
+          return {
+            resources: [{ ref: { name: 'b' } }, { ref: { name: 'a' } }],
+            error: { message: 'partial' },
+          };
         },
       },
     });
@@ -46,8 +51,13 @@ describe('wizard-util pickers', () => {
   });
 
   it('listNamesReport turns a thrown call into an error, not an empty success', async () => {
-    const g = gw({ resources: { listResources: async () => Promise.reject(new Error('permission denied')) } });
-    expect(await listNamesReport(g, 'c1', 'swiftimages')).toEqual({ names: [], error: 'permission denied' });
+    const g = gw({
+      resources: { listResources: async () => Promise.reject(new Error('permission denied')) },
+    });
+    expect(await listNamesReport(g, 'c1', 'swiftimages')).toEqual({
+      names: [],
+      error: 'permission denied',
+    });
   });
 
   it('listGuestNames asks GuestService for one cluster and namespace', async () => {
@@ -75,6 +85,60 @@ describe('wizard-util pickers', () => {
         }),
       },
     });
-    expect(await listSnapshotClasses(g, 'c1')).toEqual({ names: ['fast', 'slow'], defaults: ['fast'], error: '' });
+    expect(await listSnapshotClasses(g, 'c1')).toEqual({
+      names: ['fast', 'slow'],
+      defaults: ['fast'],
+      error: '',
+    });
+  });
+});
+
+describe('wizard-util Secret fields', () => {
+  const sec = (name: string, type: string) => ({ ref: { name }, columns: { type } });
+
+  it('listSecrets splits a namespace by registry type and lists only that namespace', async () => {
+    let asked: unknown;
+    const g = gw({
+      resources: {
+        listResources: async (req: unknown) => {
+          asked = req;
+          return {
+            resources: [
+              sec('zreg', 'kubernetes.io/dockerconfigjson'),
+              sec('cosign', 'Opaque'),
+              sec('areg', 'kubernetes.io/dockerconfigjson'),
+            ],
+          };
+        },
+      },
+    });
+    const l = await listSecrets(g, 'c1', 'team-a');
+    expect(asked).toEqual({ cluster: 'c1', kind: 'secrets', namespace: 'team-a' });
+    expect(l).toEqual({ registry: ['areg', 'zreg'], other: ['cosign'], error: '' });
+  });
+
+  it('listSecrets reports a failure instead of an empty list', async () => {
+    const g = gw({
+      resources: {
+        listResources: async () => {
+          throw new Error('forbidden');
+        },
+      },
+    });
+    expect((await listSecrets(g, 'c1', 'ns')).error).toBe('forbidden');
+    expect(await listSecrets(g, 'c1', '')).toEqual({ registry: [], other: [], error: '' });
+  });
+
+  it('secretWarning flags a missing or wrong-type Secret, never an unlistable one', () => {
+    const l = { registry: ['reg'], other: ['key'], error: '' };
+    expect(secretWarning('reg', l, 'registry')).toBe('');
+    expect(secretWarning('key', l, 'registry')).toContain(
+      'not of type kubernetes.io/dockerconfigjson',
+    );
+    expect(secretWarning('key', l, 'any')).toBe('');
+    expect(secretWarning('gone', l, 'any')).toContain('No Secret gone');
+    expect(secretWarning('', l, 'registry')).toBe('');
+    expect(secretWarning('gone', { ...l, error: 'forbidden' }, 'registry')).toBe('');
+    expect(secretWarning('gone', null, 'registry')).toBe('');
   });
 });
