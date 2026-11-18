@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import { GatewayService } from '../gateway.service';
+import { terminalTheme, TERMINAL_FONT } from '../terminal-theme';
 
 /**
  * SandboxLogs is a read-only xterm view of a SwiftSandbox's console. It opens a
@@ -47,10 +48,10 @@ export class SandboxLogs implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     const term = new Terminal({
       fontSize: 12,
-      fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
+      fontFamily: TERMINAL_FONT,
       convertEol: true,
       disableStdin: true,
-      theme: { background: '#1e1e1e' },
+      theme: terminalTheme(this.host().nativeElement),
     });
     const fit = new FitAddon();
     term.loadAddon(fit);

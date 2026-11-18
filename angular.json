@@ -35,6 +35,8 @@
             ],
             "styles": [
               "node_modules/@xterm/xterm/css/xterm.css",
+              "node_modules/material-icons/iconfont/filled.css",
+              "src/design/tokens/tokens.css",
               "src/styles.scss"
             ]
           },

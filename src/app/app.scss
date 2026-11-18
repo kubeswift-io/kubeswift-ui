@@ -14,12 +14,27 @@
   background: var(--mat-sys-surface-container);
   border-bottom: 1px solid var(--mat-sys-outline-variant);
 
-  .logo {
-    color: var(--mat-sys-primary);
-  }
   .brand {
-    font-weight: 600;
-    font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    border-radius: 6px;
+    .logo {
+      width: 26px;
+      height: 26px;
+      color: var(--brand-ink);
+    }
+  }
+  .wordmark {
+    font-size: 19px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--brand-ink);
+    .swift {
+      font-weight: 700;
+      color: var(--brand-swift);
+    }
   }
   .nav {
     display: flex;
@@ -97,14 +112,20 @@
   text-align: center;
 
   .logo {
-    color: var(--mat-sys-primary);
-    font-size: 56px;
-    width: 56px;
-    height: 56px;
+    color: var(--brand-ink);
+    width: 64px;
+    height: 64px;
   }
-  h1 {
-    margin: 4px 0 0;
-    font-weight: 600;
+  h1.wordmark {
+    margin: 12px 0 0;
+    font-size: 32px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--brand-ink);
+    .swift {
+      font-weight: 700;
+      color: var(--brand-swift);
+    }
   }
   p {
     margin: 0 0 16px;

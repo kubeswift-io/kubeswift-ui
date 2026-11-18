@@ -140,16 +140,8 @@
   border-radius: 12px;
   font-size: 13px;
   font-weight: 500;
-  background: var(--mat-sys-surface-container-high);
-  color: var(--mat-sys-on-surface);
-  &[data-phase='Ready'] {
-    background: color-mix(in srgb, #4caf50 22%, transparent);
-    color: #2e7d32;
-  }
-  &[data-phase='Failed'] {
-    background: color-mix(in srgb, #f44336 22%, transparent);
-    color: #c62828;
-  }
+  background: var(--phase-bg, var(--status-neutral-bg));
+  color: var(--phase-fg, var(--status-neutral));
 }
 
 .kv {

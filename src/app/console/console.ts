@@ -15,6 +15,7 @@ import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import type { ObjectRef } from '../gen/kubeswift/v1/common_pb';
 import { GatewayService } from '../gateway.service';
+import { terminalTheme, TERMINAL_FONT } from '../terminal-theme';
 
 /**
  * Console is the xterm.js serial terminal for one VM. It opens a raw WebSocket
@@ -44,9 +45,9 @@ export class Console implements AfterViewInit, OnDestroy {
     const term = new Terminal({
       cursorBlink: true,
       fontSize: 13,
-      fontFamily: 'ui-monospace, Menlo, Consolas, monospace',
+      fontFamily: TERMINAL_FONT,
       convertEol: true,
-      theme: { background: '#1e1e1e' },
+      theme: terminalTheme(this.host().nativeElement),
     });
     const fit = new FitAddon();
     term.loadAddon(fit);

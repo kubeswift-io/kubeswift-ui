@@ -27,7 +27,7 @@
       background: var(--mat-sys-error);
     }
     &.on .dot {
-      background: #1e8e3e;
+      background: var(--status-success);
     }
   }
   .count {
@@ -76,19 +76,8 @@
     border-radius: 12px;
     font-size: 12px;
     font-weight: 500;
-    background: var(--mat-sys-surface-container-high);
-    color: var(--mat-sys-on-surface-variant);
-
-    // terminal
-    &[data-phase='Completed'] { background: #e6f4ea; color: #1e8e3e; }
-    &[data-phase='Failed'] { background: #fce8e6; color: #d93025; }
-    &[data-phase='Cancelled'] { background: var(--mat-sys-surface-container-highest); }
-    // in-flight
-    &[data-phase='Validating'],
-    &[data-phase='Preparing'],
-    &[data-phase='StopAndCopy'],
-    &[data-phase='Resuming'],
-    &[data-phase='Pending'] { background: #e8f0fe; color: #1a73e8; }
+    background: var(--phase-bg, var(--status-neutral-bg));
+    color: var(--phase-fg, var(--status-neutral));
   }
 }
 

@@ -177,21 +177,8 @@
     border-radius: 12px;
     font-size: 12px;
     font-weight: 500;
-    background: var(--mat-sys-surface-container-high);
-    color: var(--mat-sys-on-surface-variant);
-    &[data-phase='Running'] {
-      background: #e6f4ea;
-      color: #1e8e3e;
-    }
-    &[data-phase='Failed'] {
-      background: #fce8e6;
-      color: #d93025;
-    }
-    &[data-phase='Pending'],
-    &[data-phase='Scheduling'] {
-      background: #fef7e0;
-      color: #b06000;
-    }
+    background: var(--phase-bg, var(--status-neutral-bg));
+    color: var(--phase-fg, var(--status-neutral));
   }
 
   .conds {
@@ -210,10 +197,10 @@
       vertical-align: top;
     }
     .st.t {
-      color: #1e8e3e;
+      color: var(--status-success);
     }
     .st.f {
-      color: #d93025;
+      color: var(--status-danger);
     }
     .msg td {
       color: var(--mat-sys-on-surface-variant);
@@ -281,7 +268,7 @@
     border-radius: 50%;
     background: var(--mat-sys-outline);
     &.ok {
-      background: #2e7d32;
+      background: var(--status-success);
     }
   }
 }

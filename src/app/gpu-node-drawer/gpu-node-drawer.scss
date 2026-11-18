@@ -99,8 +99,8 @@
   background: var(--mat-sys-surface-container-high);
   color: var(--mat-sys-on-surface-variant);
   &.ok {
-    background: var(--mat-sys-tertiary-container, #d7f5dd);
-    color: var(--mat-sys-on-tertiary-container, #0b3d1a);
+    background: var(--status-success-bg);
+    color: var(--status-success);
   }
 }
 

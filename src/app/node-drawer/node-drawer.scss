@@ -73,13 +73,13 @@
   border-radius: 50%;
   flex: none;
   &.green {
-    background: #1e8e3e;
+    background: var(--status-success);
   }
   &.amber {
-    background: #f9ab00;
+    background: var(--status-warning);
   }
   &.red {
-    background: #d93025;
+    background: var(--status-danger);
   }
 }
 
