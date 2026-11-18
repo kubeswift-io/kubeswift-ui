@@ -4,6 +4,12 @@ import { Component, computed, input } from '@angular/core';
  * Sparkline draws a compact inline-SVG line chart for one metric series, with
  * the latest value formatted by unit. No chart library — a scaled polyline over
  * a fixed viewBox, stretched by the container width.
+ *
+ * Each sparkline is one series named by its own label, so every line uses the
+ * same colour, the design system's accent (azure on light, teal on dark;
+ * 11.4:1 and 8.7:1 on the card). Status colours are reserved for state and are
+ * never used for a series. The colour is bound as a style so CSS variables
+ * resolve in every browser.
  */
 @Component({
   selector: 'app-sparkline',
@@ -18,7 +24,7 @@ import { Component, computed, input } from '@angular/core';
           <polyline
             [attr.points]="path()"
             fill="none"
-            [attr.stroke]="color()"
+            [style.stroke]="color()"
             stroke-width="1.5"
             vector-effect="non-scaling-stroke"
           />
@@ -28,7 +34,7 @@ import { Component, computed, input } from '@angular/core';
             y1="27"
             x2="100"
             y2="27"
-            stroke="var(--mat-sys-outline-variant)"
+            style="stroke: var(--mat-sys-outline-variant)"
             stroke-width="1"
             vector-effect="non-scaling-stroke"
           />
@@ -68,7 +74,7 @@ export class Sparkline {
   readonly label = input.required<string>();
   readonly values = input.required<number[]>();
   readonly unit = input<string>('');
-  readonly color = input<string>('#1a73e8');
+  readonly color = input<string>('var(--accent)');
 
   // polyline points scaled to the data range over a 100x28 viewBox (1px top/bottom pad).
   readonly path = computed(() => {
